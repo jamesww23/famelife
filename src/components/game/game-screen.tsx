@@ -6,6 +6,7 @@ import { EventCard } from "./event-card";
 import { EventOutcome } from "./event-outcome";
 import { BoostModal } from "./boost-modal";
 import { MilestonePopup } from "./milestone-popup";
+import { ExtendOffer } from "./extend-offer";
 
 export function GameScreen() {
   const { state, restartGame } = useGame();
@@ -21,6 +22,7 @@ export function GameScreen() {
       <div className="w-full max-w-lg flex-1 flex flex-col justify-center">
         {state.phase === "event" && state.currentEvent && <EventCard />}
         {state.phase === "outcome" && <EventOutcome />}
+        {state.phase === "extend_offer" && <ExtendOffer />}
       </div>
 
       {/* Quit button */}

@@ -75,7 +75,7 @@ function EffectPreview({ effects }: { effects: Record<string, number> }) {
       {items.map(([key, val]) => (
         <span
           key={key}
-          className={`text-xs font-bold ${val > 0 ? "text-emerald-500" : "text-red-400"}`}
+          className="text-xs font-bold text-gray-400"
         >
           {emojiMap[key] || ""} {val > 0 ? "+" : ""}{typeof val === "number" && Math.abs(val) >= 1000 ? `${(val / 1000).toFixed(0)}K` : val}
         </span>

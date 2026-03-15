@@ -27,6 +27,8 @@ type GameContextValue = {
   onDeclineBoost: () => void;
   proceedFromOutcome: () => void;
   proceedFromMilestone: () => void;
+  extendGame: () => void;
+  declineExtend: () => void;
   restartGame: () => void;
 };
 
@@ -40,6 +42,8 @@ type Action =
   | { type: "DECLINE_BOOST" }
   | { type: "PROCEED_OUTCOME" }
   | { type: "PROCEED_MILESTONE" }
+  | { type: "EXTEND_GAME" }
+  | { type: "DECLINE_EXTEND" }
   | { type: "RESTART" };
 
 function reducer(state: GameState, action: Action): GameState {
@@ -69,6 +73,19 @@ function reducer(state: GameState, action: Action): GameState {
     }
     case "PROCEED_MILESTONE": {
       return endTurn(state);
+    }
+    case "EXTEND_GAME": {
+      // Switch to full mode and continue playing
+      const extended = { ...state, mode: "full" as GameMode, phase: "event" as GamePhase };
+      return serveNextEvent(extended);
+    }
+    case "DECLINE_EXTEND": {
+      const years = Math.ceil(state.week / 4);
+      return {
+        ...state,
+        phase: "game_over" as GamePhase,
+        gameOverReason: `After ${years} years, you stepped away from the spotlight.`,
+      };
     }
     case "RESTART":
       return { ...INITIAL };
@@ -166,6 +183,14 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: "PROCEED_MILESTONE" });
   }, []);
 
+  const extendGame = useCallback(() => {
+    dispatch({ type: "EXTEND_GAME" });
+  }, []);
+
+  const declineExtend = useCallback(() => {
+    dispatch({ type: "DECLINE_EXTEND" });
+  }, []);
+
   const restartGame = useCallback(() => {
     localStorage.removeItem(STORAGE_KEY);
     dispatch({ type: "RESTART" });
@@ -181,6 +206,8 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         onDeclineBoost,
         proceedFromOutcome,
         proceedFromMilestone,
+        extendGame,
+        declineExtend,
         restartGame,
       }}
     >

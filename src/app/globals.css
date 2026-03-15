@@ -179,6 +179,42 @@
   animation: slideUp 0.5s ease-out 0.3s both;
 }
 
+/* Stat delta floating animations */
+@keyframes deltaFloatUp {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(-28px); opacity: 0; }
+}
+@keyframes deltaFloatDown {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(-28px); opacity: 0; }
+}
+@keyframes statFlash {
+  0% { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
+  30% { box-shadow: 0 0 12px rgba(224, 64, 251, 0.4); }
+  100% { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
+}
+
+.stat-delta {
+  position: absolute;
+  top: -4px;
+  right: 6px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.stat-delta-up {
+  color: #10b981;
+  animation: deltaFloatUp 1.2s ease-out forwards;
+}
+.stat-delta-down {
+  color: #ef4444;
+  animation: deltaFloatDown 1.2s ease-out forwards;
+}
+.stat-pill-flash {
+  animation: statFlash 0.6s ease-out;
+}
+
 /* Boost modal */
 .boost-overlay {
   background: rgba(0, 0, 0, 0.6);

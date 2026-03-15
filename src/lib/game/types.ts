@@ -160,6 +160,7 @@ export type GamePhase =
   | "outcome"
   | "boost_offer"
   | "milestone"
+  | "extend_offer"
   | "game_over";
 
 export interface GameState {

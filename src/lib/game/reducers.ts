@@ -1,4 +1,4 @@
-import { MAX_RECENT_EVENTS, ENERGY_RECOVERY, MENTAL_HEALTH_RECOVERY } from "./constants";
+import { MAX_RECENT_EVENTS, ENERGY_RECOVERY, MENTAL_HEALTH_RECOVERY, QUICK_GAME_TURNS } from "./constants";
 import { clamp } from "./random";
 import { getTierForFollowers, checkGameOver } from "./progression";
 import {
@@ -155,6 +155,21 @@ export function advanceWeek(state: GameState): GameState {
   stats.mentalHealth = clamp(stats.mentalHealth + MENTAL_HEALTH_RECOVERY, 0, 100);
 
   const newWeek = state.week + 1;
+
+  // At the end of quick mode, offer to extend instead of ending
+  if (state.mode === "quick" && newWeek > QUICK_GAME_TURNS) {
+    return {
+      ...state,
+      stats,
+      week: newWeek,
+      phase: "extend_offer",
+      currentEvent: null,
+      currentChoiceResult: null,
+      pendingBoost: null,
+      pendingMilestones: [],
+    };
+  }
+
   const gameOverReason = checkGameOver({ ...state, stats, week: newWeek });
 
   return {
