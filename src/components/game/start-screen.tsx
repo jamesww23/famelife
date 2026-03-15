@@ -6,23 +6,46 @@ import { archetypes } from "@/data/archetypes";
 import { traits } from "@/data/traits";
 import { ArchetypeId, TraitId } from "@/lib/game/types";
 
-type Step = "intro" | "name" | "avatar" | "trait" | "archetype" | "goal";
+type Step = "intro" | "gender" | "avatar" | "trait" | "archetype" | "goal";
+type Gender = "male" | "female" | "random";
 
-const AVATARS = [
-  "😎", "🤩", "😏", "🥰", "😤", "🤓",
-  "👩‍🎤", "👨‍🎤", "👩‍💻", "👨‍💻", "🧑‍🎨", "🧑‍🚀",
-  "👸", "🤴", "🧛", "🧜‍♀️", "🦸‍♂️", "🦹‍♀️",
-];
+const MALE_NAMES = ["Jake", "Marcus", "Tyler", "Ethan", "Kai", "Liam", "Noah", "Jayden", "Adrian", "Caleb", "Dex", "Remi", "Leo", "Zane", "Miles"];
+const FEMALE_NAMES = ["Mia", "Zara", "Luna", "Aria", "Chloe", "Jade", "Nia", "Ivy", "Kira", "Sasha", "Raven", "Skye", "Nova", "Blair", "Elle"];
 
-const STEPS: Step[] = ["intro", "name", "avatar", "trait", "archetype", "goal"];
+const MALE_AVATARS = ["😎", "🤩", "😏", "😤", "🤓", "👨‍🎤", "👨‍💻", "🤴", "🦸‍♂️", "🧑‍🚀", "🧑‍🎨", "🧛"];
+const FEMALE_AVATARS = ["🥰", "🤩", "😏", "😎", "🤓", "👩‍🎤", "👩‍💻", "👸", "🦹‍♀️", "🧜‍♀️", "🧑‍🎨", "🧑‍🚀"];
+const ALL_AVATARS = ["😎", "🤩", "😏", "🥰", "😤", "🤓", "👩‍🎤", "👨‍🎤", "👩‍💻", "👨‍💻", "🧑‍🎨", "🧑‍🚀", "👸", "🤴", "🧛", "🧜‍♀️", "🦸‍♂️", "🦹‍♀️"];
+
+function pickRandom<T>(arr: T[]): T {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+const STEPS: Step[] = ["intro", "gender", "avatar", "trait", "archetype", "goal"];
 
 export function StartScreen() {
   const { startGame } = useGame();
   const [step, setStep] = useState<Step>("intro");
+  const [gender, setGender] = useState<Gender | null>(null);
   const [name, setName] = useState("");
   const [avatar, setAvatar] = useState<string | null>(null);
   const [traitId, setTraitId] = useState<TraitId | null>(null);
   const [selectedArchetype, setSelectedArchetype] = useState<ArchetypeId | null>(null);
+
+  const handleGender = (g: Gender) => {
+    setGender(g);
+    if (g === "male") {
+      setName(pickRandom(MALE_NAMES));
+    } else if (g === "female") {
+      setName(pickRandom(FEMALE_NAMES));
+    } else {
+      // Surprise me — random from both
+      setName(pickRandom([...MALE_NAMES, ...FEMALE_NAMES]));
+    }
+    setAvatar(null); // reset avatar when gender changes
+    setStep("avatar");
+  };
+
+  const avatarList = gender === "male" ? MALE_AVATARS : gender === "female" ? FEMALE_AVATARS : ALL_AVATARS;
 
   const handleStart = () => {
     if (!selectedArchetype || !avatar || !traitId || !name.trim()) return;
@@ -91,7 +114,7 @@ export function StartScreen() {
               </div>
 
               <button
-                onClick={() => setStep("name")}
+                onClick={() => setStep("gender")}
                 className="w-full py-3.5 sm:py-4 rounded-2xl font-bold text-base sm:text-lg bg-white text-[#e040fb] hover:scale-[1.02] active:scale-[0.98] shadow-lg transition-all"
               >
                 Create Your Character
@@ -99,56 +122,55 @@ export function StartScreen() {
             </>
           )}
 
-          {/* Step 1: Name */}
-          {step === "name" && (
+          {/* Step 1: Gender */}
+          {step === "gender" && (
             <>
               <p className="text-center text-white font-semibold mb-4 text-sm uppercase tracking-wider">
-                What&apos;s Your Name?
+                Who Are You?
               </p>
-              <div className="game-card p-4 sm:p-6 mb-4">
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && name.trim()) setStep("avatar");
-                  }}
-                  placeholder="Enter your name..."
-                  maxLength={20}
-                  autoFocus
-                  className="w-full text-center text-xl sm:text-2xl font-bold text-gray-900 bg-transparent outline-none placeholder-gray-300 py-2"
-                />
-              </div>
-              <div className="flex gap-2">
+              <div className="space-y-2.5 sm:space-y-3 mb-5">
                 <button
-                  onClick={() => setStep("intro")}
-                  className="py-3.5 px-6 rounded-2xl font-bold text-sm text-white/70 hover:text-white transition-colors"
+                  onClick={() => handleGender("male")}
+                  className="game-card w-full p-4 sm:p-5 text-center transition-all active:scale-[0.98] border-3 border-transparent hover:border-[#e040fb]"
                 >
-                  Back
+                  <div className="text-4xl mb-1.5">👦</div>
+                  <div className="font-bold text-base text-gray-900">Male</div>
                 </button>
                 <button
-                  onClick={() => name.trim() && setStep("avatar")}
-                  disabled={!name.trim()}
-                  className={`flex-1 py-3.5 sm:py-4 rounded-2xl font-bold text-base sm:text-lg transition-all ${
-                    name.trim()
-                      ? "bg-white text-[#e040fb] hover:scale-[1.02] active:scale-[0.98] shadow-lg"
-                      : "bg-white/30 text-white/50 cursor-not-allowed"
-                  }`}
+                  onClick={() => handleGender("female")}
+                  className="game-card w-full p-4 sm:p-5 text-center transition-all active:scale-[0.98] border-3 border-transparent hover:border-[#e040fb]"
                 >
-                  Next
+                  <div className="text-4xl mb-1.5">👧</div>
+                  <div className="font-bold text-base text-gray-900">Female</div>
+                </button>
+                <button
+                  onClick={() => handleGender("random")}
+                  className="game-card w-full p-4 sm:p-5 text-center transition-all active:scale-[0.98] border-3 border-transparent hover:border-[#e040fb]"
+                >
+                  <div className="text-4xl mb-1.5">🎲</div>
+                  <div className="font-bold text-base text-gray-900">Surprise Me</div>
                 </button>
               </div>
+              <button
+                onClick={() => setStep("intro")}
+                className="w-full py-3 rounded-2xl font-bold text-sm text-white/70 hover:text-white transition-colors"
+              >
+                Back
+              </button>
             </>
           )}
 
           {/* Step 2: Avatar */}
           {step === "avatar" && (
             <>
-              <p className="text-center text-white font-semibold mb-4 text-sm uppercase tracking-wider">
+              <p className="text-center text-white font-semibold mb-1 text-sm uppercase tracking-wider">
                 Choose Your Look
               </p>
+              <p className="text-center text-white/60 text-sm mb-4">
+                Playing as <span className="font-bold text-white">{name}</span>
+              </p>
               <div className="grid grid-cols-6 gap-2 sm:gap-3 mb-5">
-                {AVATARS.map((a) => (
+                {avatarList.map((a) => (
                   <button
                     key={a}
                     onClick={() => setAvatar(a)}
@@ -164,7 +186,7 @@ export function StartScreen() {
               </div>
               <div className="flex gap-2">
                 <button
-                  onClick={() => setStep("name")}
+                  onClick={() => setStep("gender")}
                   className="py-3.5 px-6 rounded-2xl font-bold text-sm text-white/70 hover:text-white transition-colors"
                 >
                   Back
