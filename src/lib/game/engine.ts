@@ -14,27 +14,34 @@ import {
 } from "./reducers";
 import {
   ArchetypeId,
+  CharacterBuild,
   GameState,
   GameMode,
   EventChoice,
   RewardedBoost,
 } from "./types";
+import { traits } from "@/data/traits";
 
 // ---- Initial State ----
 
-export function createInitialState(archetypeId: ArchetypeId, mode: GameMode): GameState {
+export function createInitialState(archetypeId: ArchetypeId, mode: GameMode, character: CharacterBuild): GameState {
   const arch = archetypes.find((a) => a.id === archetypeId)!;
-  const stats = applyEffectsSimple({ ...DEFAULT_STATS }, arch.startingModifiers);
+  const trait = traits.find((t) => t.id === character.traitId);
+  let stats = applyEffectsSimple({ ...DEFAULT_STATS }, arch.startingModifiers);
+  if (trait) {
+    stats = applyEffectsSimple(stats, trait.modifiers);
+  }
 
   return {
     phase: "event",
     week: 1,
     mode,
     archetype: archetypeId,
+    character,
     stats,
     flags: [],
     careerTier: getTierForFollowers(stats.followers),
-    log: [{ week: 1, text: `Started career as ${arch.name}`, type: "system", emoji: "🎬" }],
+    log: [{ week: 1, text: `${character.name} started their career as ${arch.name}`, type: "system", emoji: "🎬" }],
     milestones: [],
     currentEvent: null,
     currentChoiceResult: null,

@@ -54,11 +54,16 @@ export function StatBar() {
         />
       </div>
 
-      {/* Top row: quarter + tier */}
+      {/* Top row: character + quarter + tier */}
       <div className="flex items-center justify-between mb-2 px-1">
-        <span className="text-white/80 text-xs font-semibold">
-          {formatQuarter(week)}
-        </span>
+        <div className="flex items-center gap-1.5">
+          <span className="text-sm">{state.character.avatar}</span>
+          <span className="text-white font-bold text-xs">{state.character.name}</span>
+          <span className="text-white/50 text-xs">·</span>
+          <span className="text-white/80 text-xs font-semibold">
+            {formatQuarter(week)}
+          </span>
+        </div>
         <span className="text-white text-xs font-bold">
           {getTierEmoji(careerTier)} {getTierName(careerTier)}
         </span>

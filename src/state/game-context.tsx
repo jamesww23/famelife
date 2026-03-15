@@ -4,6 +4,7 @@ import React, { createContext, useContext, useReducer, useCallback, useEffect, u
 import {
   GameState,
   ArchetypeId,
+  CharacterBuild,
   GameMode,
   EventChoice,
   GamePhase,
@@ -21,7 +22,7 @@ import { STORAGE_KEY } from "@/lib/game/constants";
 
 type GameContextValue = {
   state: GameState;
-  startGame: (archetype: ArchetypeId, mode: GameMode) => void;
+  startGame: (archetype: ArchetypeId, mode: GameMode, character: CharacterBuild) => void;
   chooseEventOption: (choice: EventChoice) => void;
   onAcceptBoost: () => void;
   onDeclineBoost: () => void;
@@ -36,7 +37,7 @@ const GameContext = createContext<GameContextValue | null>(null);
 
 type Action =
   | { type: "SET_STATE"; state: GameState }
-  | { type: "START_GAME"; archetype: ArchetypeId; mode: GameMode }
+  | { type: "START_GAME"; archetype: ArchetypeId; mode: GameMode; character: CharacterBuild }
   | { type: "CHOOSE_EVENT"; choice: EventChoice }
   | { type: "ACCEPT_BOOST" }
   | { type: "DECLINE_BOOST" }
@@ -51,7 +52,7 @@ function reducer(state: GameState, action: Action): GameState {
     case "SET_STATE":
       return action.state;
     case "START_GAME": {
-      const initial = createInitialState(action.archetype, action.mode);
+      const initial = createInitialState(action.archetype, action.mode, action.character);
       // Immediately serve the first event
       return serveNextEvent(initial);
     }
@@ -99,6 +100,7 @@ const INITIAL: GameState = {
   week: 0,
   mode: "full",
   archetype: "comedy",
+  character: { name: "", avatar: "😎", traitId: "street_smart" },
   stats: { followers: 0, fame: 0, reputation: 0, money: 0, energy: 0, mentalHealth: 0 },
   flags: [],
   careerTier: "new_creator",
@@ -151,9 +153,9 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     }
   }, [state]);
 
-  const startGame = useCallback((archetype: ArchetypeId, mode: GameMode) => {
+  const startGame = useCallback((archetype: ArchetypeId, mode: GameMode, character: CharacterBuild) => {
     localStorage.removeItem(STORAGE_KEY);
-    dispatch({ type: "START_GAME", archetype, mode });
+    dispatch({ type: "START_GAME", archetype, mode, character });
   }, []);
 
   const chooseEventOption = useCallback((choice: EventChoice) => {

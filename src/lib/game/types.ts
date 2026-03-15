@@ -17,6 +17,30 @@ export type StatKey = keyof Stats;
 
 export type StatEffects = Partial<Record<StatKey, number>>;
 
+// ---- Character Build ----
+
+export interface CharacterBuild {
+  name: string;
+  avatar: string;       // emoji avatar
+  traitId: TraitId;
+}
+
+export type TraitId =
+  | "rich_family"
+  | "street_smart"
+  | "natural_talent"
+  | "hard_worker"
+  | "thick_skin"
+  | "social_butterfly";
+
+export interface Trait {
+  id: TraitId;
+  name: string;
+  emoji: string;
+  description: string;
+  modifiers: StatEffects;
+}
+
 // ---- Archetypes ----
 
 export type ArchetypeId =
@@ -168,6 +192,7 @@ export interface GameState {
   week: number;
   mode: GameMode;
   archetype: ArchetypeId;
+  character: CharacterBuild;
   stats: Stats;
   flags: string[];
   careerTier: CareerTier;

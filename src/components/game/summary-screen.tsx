@@ -10,7 +10,7 @@ export function SummaryScreen() {
   const [shared, setShared] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const shareText = `${summary.fameRankEmoji} ${summary.fameRank} | Fame Score: ${summary.fameScore}/1000\n\n"${summary.headline}"\n\n👥 ${formatFollowers(summary.followers)} followers\n💰 ${formatMoney(summary.money)}\n🏆 Top ${100 - summary.percentile}% of players\n🔥 ${summary.viralMoments} viral moments\n😱 ${summary.scandals} scandals\n\nPlay Fame Life: `;
+  const shareText = `${state.character.avatar} ${state.character.name} — ${summary.fameRankEmoji} ${summary.fameRank} | Fame Score: ${summary.fameScore}/1000\n\n"${summary.headline}"\n\n👥 ${formatFollowers(summary.followers)} followers\n💰 ${formatMoney(summary.money)}\n🏆 Top ${100 - summary.percentile}% of players\n🔥 ${summary.viralMoments} viral moments\n😱 ${summary.scandals} scandals\n\nPlay Fame Life: `;
 
   const handleShare = async () => {
     if (navigator.share) {
@@ -46,8 +46,8 @@ export function SummaryScreen() {
       <div className="w-full max-w-lg animate-slide-up">
         {/* Header */}
         <div className="text-center mb-4 sm:mb-6">
-          <div className="text-4xl sm:text-5xl mb-2">{summary.fameRankEmoji}</div>
-          <h1 className="text-2xl sm:text-3xl font-black text-white mb-1">Game Over</h1>
+          <div className="text-4xl sm:text-5xl mb-2">{state.character.avatar}</div>
+          <h1 className="text-2xl sm:text-3xl font-black text-white mb-1">{state.character.name}&apos;s Story</h1>
           <p className="text-white/70 text-sm">{summary.endingReason}</p>
         </div>
 
