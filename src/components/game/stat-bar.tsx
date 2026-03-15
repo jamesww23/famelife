@@ -31,7 +31,7 @@ export function StatBar() {
       </div>
 
       {/* Stats grid */}
-      <div className="grid grid-cols-3 gap-1.5">
+      <div className="grid grid-cols-3 gap-1 sm:gap-1.5">
         <StatPill emoji={STAT_EMOJI.followers} value={formatFollowers(stats.followers)} />
         <StatPill emoji={STAT_EMOJI.money} value={formatMoney(stats.money)} />
         <StatPill emoji={STAT_EMOJI.fame} value={`${stats.fame}`} bar barValue={stats.fame} barColor="#a855f7" />

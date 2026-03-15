@@ -11,7 +11,7 @@ export function GameScreen() {
   const { state, restartGame } = useGame();
 
   return (
-    <div className="min-h-screen flex flex-col items-center p-4 pb-8">
+    <div className="min-h-screen min-h-[100dvh] flex flex-col items-center p-3 sm:p-4 pb-6 sm:pb-8">
       {/* Top stat bar */}
       <div className="w-full max-w-lg mb-4 animate-slide-down">
         <StatBar />
