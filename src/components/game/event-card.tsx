@@ -49,7 +49,6 @@ export function EventCard() {
             className="choice-btn"
           >
             <span>{choice.text}</span>
-            <EffectPreview effects={choice.effects} />
           </button>
         ))}
       </div>
@@ -57,29 +56,3 @@ export function EventCard() {
   );
 }
 
-function EffectPreview({ effects }: { effects: Record<string, number> }) {
-  const items = Object.entries(effects).filter(([, v]) => v !== 0);
-  if (items.length === 0) return null;
-
-  const emojiMap: Record<string, string> = {
-    followers: "👥",
-    fame: "⭐",
-    reputation: "🛡️",
-    money: "💰",
-    energy: "⚡",
-    mentalHealth: "🧠",
-  };
-
-  return (
-    <div className="flex items-center justify-center gap-2 mt-1.5 flex-wrap">
-      {items.map(([key, val]) => (
-        <span
-          key={key}
-          className="text-xs font-bold text-gray-400"
-        >
-          {emojiMap[key] || ""} {val > 0 ? "+" : ""}{typeof val === "number" && Math.abs(val) >= 1000 ? `${(val / 1000).toFixed(0)}K` : val}
-        </span>
-      ))}
-    </div>
-  );
-}
