@@ -71,12 +71,12 @@ export function StatBar() {
 
       {/* Stats grid */}
       <div className="grid grid-cols-3 gap-1 sm:gap-1.5">
-        <StatPill emoji={STAT_EMOJI.followers} value={formatFollowers(stats.followers)} delta={deltas.followers} deltaFormat="followers" />
-        <StatPill emoji={STAT_EMOJI.money} value={formatMoney(stats.money)} delta={deltas.money} deltaFormat="money" />
-        <StatPill emoji={STAT_EMOJI.fame} value={`${stats.fame}`} bar barValue={stats.fame} barColor="#a855f7" delta={deltas.fame} />
-        <StatPill emoji={STAT_EMOJI.reputation} value={`${stats.reputation}`} bar barValue={stats.reputation} barColor="#10b981" delta={deltas.reputation} />
-        <StatPill emoji={STAT_EMOJI.energy} value={`${stats.energy}`} bar barValue={stats.energy} barColor="#f59e0b" delta={deltas.energy} />
-        <StatPill emoji={STAT_EMOJI.mentalHealth} value={`${stats.mentalHealth}`} bar barValue={stats.mentalHealth} barColor="#3b82f6"
+        <StatPill label="Followers" emoji={STAT_EMOJI.followers} value={formatFollowers(stats.followers)} delta={deltas.followers} deltaFormat="followers" />
+        <StatPill label="Money" emoji={STAT_EMOJI.money} value={formatMoney(stats.money)} delta={deltas.money} deltaFormat="money" />
+        <StatPill label="Fame" emoji={STAT_EMOJI.fame} value={`${stats.fame}`} bar barValue={stats.fame} barColor="#a855f7" delta={deltas.fame} />
+        <StatPill label="Rep" emoji={STAT_EMOJI.reputation} value={`${stats.reputation}`} bar barValue={stats.reputation} barColor="#10b981" delta={deltas.reputation} />
+        <StatPill label="Energy" emoji={STAT_EMOJI.energy} value={`${stats.energy}`} bar barValue={stats.energy} barColor="#f59e0b" delta={deltas.energy} />
+        <StatPill label="Mental" emoji={STAT_EMOJI.mentalHealth} value={`${stats.mentalHealth}`} bar barValue={stats.mentalHealth} barColor="#3b82f6"
           danger={stats.mentalHealth < 25} delta={deltas.mentalHealth}
         />
       </div>
@@ -85,6 +85,7 @@ export function StatBar() {
 }
 
 function StatPill({
+  label,
   emoji,
   value,
   bar,
@@ -94,6 +95,7 @@ function StatPill({
   delta,
   deltaFormat,
 }: {
+  label: string;
   emoji: string;
   value: string;
   bar?: boolean;
@@ -124,8 +126,9 @@ function StatPill({
 
   return (
     <div className={`stat-pill flex-col items-start relative ${danger ? "animate-shake" : ""} ${hasChanged ? "stat-pill-flash" : ""}`}>
+      <div className="text-[9px] sm:text-[10px] font-semibold text-gray-400 uppercase tracking-wider leading-none mb-0.5">{label}</div>
       <div className="flex items-center gap-1 w-full">
-        <span>{emoji}</span>
+        <span className="text-xs">{emoji}</span>
         <span className={`text-xs font-bold ${danger ? "text-red-500" : "text-gray-800"}`}>{value}</span>
       </div>
       {bar && (
