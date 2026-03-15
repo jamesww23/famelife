@@ -29,13 +29,27 @@
 @layer base {
   * {
     border-color: var(--color-border);
+    box-sizing: border-box;
+  }
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    overflow-x: hidden;
   }
   body {
     background: linear-gradient(135deg, #667eea 0%, #e040fb 50%, #ff6b9d 100%);
     color: var(--color-foreground);
     min-height: 100vh;
+    min-height: 100dvh;
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    overflow-x: hidden;
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
   }
 }
 
@@ -165,8 +179,116 @@
   animation: slideUp 0.5s ease-out 0.3s both;
 }
 
+/* Stat delta floating animations */
+@keyframes deltaFloatUp {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(-28px); opacity: 0; }
+}
+@keyframes deltaFloatDown {
+  0% { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(-28px); opacity: 0; }
+}
+@keyframes statFlash {
+  0% { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
+  30% { box-shadow: 0 0 12px rgba(224, 64, 251, 0.4); }
+  100% { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); }
+}
+
+.stat-delta {
+  position: absolute;
+  top: -4px;
+  right: 6px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.stat-delta-up {
+  color: #10b981;
+  animation: deltaFloatUp 1.2s ease-out forwards;
+}
+.stat-delta-down {
+  color: #ef4444;
+  animation: deltaFloatDown 1.2s ease-out forwards;
+}
+.stat-pill-flash {
+  animation: statFlash 0.6s ease-out;
+}
+
 /* Boost modal */
 .boost-overlay {
   background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(4px);
+}
+
+/* ===== Mobile Responsive Styles ===== */
+
+/* Ensure buttons have minimum touch target (44px per Apple HIG / 48dp per Material) */
+.choice-btn {
+  min-height: 48px;
+}
+
+/* Small phones (iPhone SE, Galaxy S series small — 320-374px) */
+@media (max-width: 374px) {
+  .stat-pill {
+    padding: 3px 6px;
+    font-size: 0.65rem;
+    gap: 2px;
+  }
+  .game-card {
+    border-radius: 1rem;
+  }
+  .choice-btn {
+    padding: 12px 14px;
+    font-size: 0.875rem;
+    border-radius: 0.75rem;
+  }
+  .social-bubble {
+    padding: 8px 10px;
+    font-size: 0.8rem;
+  }
+}
+
+/* Standard phones (375-428px — iPhone 12/13/14/15, Pixel, Galaxy S) */
+@media (min-width: 375px) and (max-width: 428px) {
+  .stat-pill {
+    padding: 4px 8px;
+    font-size: 0.7rem;
+  }
+}
+
+/* Prevent content from being hidden behind on-screen keyboard */
+@supports (height: 100dvh) {
+  .min-h-screen {
+    min-height: 100dvh;
+  }
+}
+
+/* Landscape phone orientation */
+@media (max-height: 500px) and (orientation: landscape) {
+  .game-card {
+    border-radius: 0.75rem;
+  }
+  .choice-btn {
+    padding: 10px 16px;
+    min-height: 40px;
+  }
+  .stat-pill {
+    padding: 2px 6px;
+    font-size: 0.65rem;
+  }
+}
+
+/* Reduce motion for accessibility and battery */
+@media (prefers-reduced-motion: reduce) {
+  .animate-slide-up,
+  .animate-slide-down,
+  .animate-fade-in,
+  .animate-scale-in,
+  .animate-pop-in,
+  .animate-float-up,
+  .animate-shake,
+  .animate-pulse-glow {
+    animation: none !important;
+  }
 }

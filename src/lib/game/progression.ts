@@ -50,10 +50,10 @@ export function checkGameOver(state: GameState): string | null {
   if (state.stats.energy <= 0 && state.stats.mentalHealth < 20)
     return "Complete exhaustion. You had to quit the internet.";
   if (state.week >= getMaxTurns(state)) {
+    // If in quick mode at turn 12, don't end — the extend offer will handle it
+    if (state.mode === "quick") return null;
     const years = Math.ceil(state.week / 4);
-    return state.mode === "quick"
-      ? `After ${years} years, you stepped away from the spotlight.`
-      : `After ${years} years, you retired from content creation.`;
+    return `After ${years} years, you retired from content creation.`;
   }
   return null;
 }

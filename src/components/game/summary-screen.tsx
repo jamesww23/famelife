@@ -8,25 +8,25 @@ export function SummaryScreen() {
   const summary = generateSummary(state);
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-screen min-h-[100dvh] flex items-center justify-center p-3 sm:p-4">
       <div className="w-full max-w-lg animate-slide-up">
         {/* Header */}
-        <div className="text-center mb-6">
-          <div className="text-5xl mb-2">{summary.archetypeEmoji}</div>
-          <h1 className="text-3xl font-black text-white mb-1">Game Over</h1>
+        <div className="text-center mb-4 sm:mb-6">
+          <div className="text-4xl sm:text-5xl mb-2">{summary.archetypeEmoji}</div>
+          <h1 className="text-2xl sm:text-3xl font-black text-white mb-1">Game Over</h1>
           <p className="text-white/70 text-sm">{summary.endingReason}</p>
         </div>
 
         {/* Headline card */}
-        <div className="game-card p-6 mb-4">
-          <p className="text-lg font-black text-gray-900 leading-snug text-center">
+        <div className="game-card p-4 sm:p-6 mb-3 sm:mb-4">
+          <p className="text-base sm:text-lg font-black text-gray-900 leading-snug text-center">
             &ldquo;{summary.headline}&rdquo;
           </p>
         </div>
 
         {/* Stats grid */}
-        <div className="game-card p-5 mb-4">
-          <div className="grid grid-cols-2 gap-3">
+        <div className="game-card p-4 sm:p-5 mb-3 sm:mb-4">
+          <div className="grid grid-cols-2 gap-2 sm:gap-3">
             <StatRow emoji="👥" label="Followers" value={formatFollowers(summary.followers)} />
             <StatRow emoji="👑" label="Final Tier" value={summary.fameTier} />
             <StatRow emoji="💰" label="Money" value={formatMoney(summary.money)} />
@@ -42,7 +42,7 @@ export function SummaryScreen() {
 
         {/* Milestones */}
         {summary.milestones.length > 0 && (
-          <div className="game-card p-5 mb-4">
+          <div className="game-card p-4 sm:p-5 mb-3 sm:mb-4">
             <h3 className="font-bold text-gray-900 text-sm mb-2">Milestones Unlocked</h3>
             <div className="flex flex-wrap gap-2">
               {summary.milestones.map((id) => (
@@ -67,7 +67,7 @@ export function SummaryScreen() {
                 navigator.clipboard.writeText(summary.headline).catch(() => {});
               }
             }}
-            className="w-full py-3.5 bg-white text-[#e040fb] rounded-2xl font-bold text-base hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg"
+            className="w-full py-3.5 bg-white text-[#e040fb] rounded-2xl font-bold text-base active:scale-[0.98] transition-all shadow-lg"
           >
             Share Your Story
           </button>

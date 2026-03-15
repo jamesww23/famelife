@@ -15,10 +15,10 @@ export function MilestonePopup() {
     <div className="fixed inset-0 flex items-center justify-center z-50 p-4 animate-fade-in"
       style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(4px)" }}
     >
-      <div className="game-card p-8 w-full max-w-sm text-center animate-pop-in">
-        <div className="text-6xl mb-3">{milestone.emoji}</div>
-        <h3 className="text-2xl font-black text-gray-900 mb-1">{milestone.title}</h3>
-        <p className="text-gray-500 text-sm mb-6">{milestone.description}</p>
+      <div className="game-card p-6 sm:p-8 w-full max-w-[calc(100%-2rem)] sm:max-w-sm text-center animate-pop-in">
+        <div className="text-5xl sm:text-6xl mb-3">{milestone.emoji}</div>
+        <h3 className="text-xl sm:text-2xl font-black text-gray-900 mb-1">{milestone.title}</h3>
+        <p className="text-gray-500 text-sm mb-5 sm:mb-6">{milestone.description}</p>
 
         {/* Confetti dots */}
         <div className="relative h-0">

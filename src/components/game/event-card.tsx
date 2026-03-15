@@ -14,26 +14,26 @@ export function EventCard() {
   return (
     <div className="animate-scale-in" key={event.id + state.week}>
       {/* Event card */}
-      <div className="game-card p-6 mb-4">
+      <div className="game-card p-4 sm:p-6 mb-3 sm:mb-4">
         {/* Category badge */}
-        <div className="flex items-center gap-2 mb-3">
+        <div className="flex items-center gap-2 mb-2 sm:mb-3">
           <span
-            className="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full text-white"
+            className="text-[10px] sm:text-xs font-bold uppercase tracking-wider px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-white"
             style={{ backgroundColor: color }}
           >
             {event.type}
           </span>
           {event.chainId && (
-            <span className="text-xs font-bold text-purple-500 uppercase tracking-wider">
+            <span className="text-[10px] sm:text-xs font-bold text-purple-500 uppercase tracking-wider">
               Storyline
             </span>
           )}
         </div>
 
         {/* Emoji + Title */}
-        <div className="flex items-center gap-2 mb-2">
-          {event.emoji && <span className="text-3xl">{event.emoji}</span>}
-          <h2 className="text-xl font-black text-gray-900">{event.title}</h2>
+        <div className="flex items-start gap-2 mb-2">
+          {event.emoji && <span className="text-2xl sm:text-3xl shrink-0">{event.emoji}</span>}
+          <h2 className="text-lg sm:text-xl font-black text-gray-900 leading-tight">{event.title}</h2>
         </div>
 
         {/* Description */}
@@ -41,7 +41,7 @@ export function EventCard() {
       </div>
 
       {/* Choice buttons */}
-      <div className="space-y-2.5">
+      <div className="space-y-2 sm:space-y-2.5">
         {event.choices.map((choice, i) => (
           <button
             key={choice.id}
@@ -75,7 +75,7 @@ function EffectPreview({ effects }: { effects: Record<string, number> }) {
       {items.map(([key, val]) => (
         <span
           key={key}
-          className={`text-xs font-bold ${val > 0 ? "text-emerald-500" : "text-red-400"}`}
+          className="text-xs font-bold text-gray-400"
         >
           {emojiMap[key] || ""} {val > 0 ? "+" : ""}{typeof val === "number" && Math.abs(val) >= 1000 ? `${(val / 1000).toFixed(0)}K` : val}
         </span>

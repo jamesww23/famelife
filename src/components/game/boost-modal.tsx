@@ -23,7 +23,7 @@ export function BoostModal() {
 
   return (
     <div className="boost-overlay fixed inset-0 flex items-center justify-center z-50 p-4 animate-fade-in">
-      <div className="game-card p-6 w-full max-w-sm animate-scale-in">
+      <div className="game-card p-5 sm:p-6 w-full max-w-[calc(100%-2rem)] sm:max-w-sm animate-scale-in">
         {loading ? (
           <div className="text-center py-8">
             <div className="text-4xl mb-3 animate-pulse">{boost.emoji}</div>
@@ -43,8 +43,8 @@ export function BoostModal() {
         ) : (
           <>
             <div className="text-center mb-4">
-              <div className="text-5xl mb-2">{boost.emoji}</div>
-              <h3 className="text-xl font-black text-gray-900">{boost.name}</h3>
+              <div className="text-4xl sm:text-5xl mb-2">{boost.emoji}</div>
+              <h3 className="text-lg sm:text-xl font-black text-gray-900">{boost.name}</h3>
               <p className="text-gray-500 text-sm mt-1">{boost.description}</p>
             </div>
 

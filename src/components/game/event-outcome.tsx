@@ -14,7 +14,7 @@ export function EventOutcome() {
 
   return (
     <div className="animate-scale-in" key={`outcome-${event.id}-${state.week}`}>
-      <div className="game-card p-6 mb-4">
+      <div className="game-card p-4 sm:p-6 mb-3 sm:mb-4">
         {/* Result text */}
         <p className="text-gray-700 text-sm leading-relaxed mb-4">
           {choice.followUpText || `You chose: "${choice.text}"`}
@@ -48,7 +48,7 @@ export function EventOutcome() {
 
       <button
         onClick={proceedFromOutcome}
-        className="w-full py-4 bg-white rounded-2xl font-bold text-[#e040fb] text-lg shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all"
+        className="w-full py-3.5 sm:py-4 bg-white rounded-2xl font-bold text-[#e040fb] text-base sm:text-lg shadow-lg active:scale-[0.98] transition-all"
       >
         Continue
       </button>
