@@ -1,80 +1,69 @@
-import { DEFAULT_STATS } from "./constants";
+import { DEFAULT_STATS, BOOST_CHANCE } from "./constants";
 import { getTierForFollowers } from "./progression";
 import { archetypes } from "@/data/archetypes";
 import { allEvents } from "@/data/events";
-import { allActions } from "@/data/actions";
-import { rewardedAds } from "@/data/rewarded-ads";
+import { rewardedBoosts } from "@/data/rewarded-boosts";
 import { milestones } from "@/data/milestones";
 import { selectEvent } from "./event-selector";
 import {
-  applyAction,
-  setCurrentEvent,
+  applyEffectsSimple,
   applyEventChoice,
-  applyRewardedAd,
+  applyBoost,
   advanceWeek,
   addMilestone,
-  applyEffects,
 } from "./reducers";
-import { isTierAtLeast } from "./progression";
 import {
   ArchetypeId,
   GameState,
-  GameAction,
+  GameMode,
   EventChoice,
-  RewardedAd,
+  RewardedBoost,
 } from "./types";
 
 // ---- Initial State ----
 
-export function createInitialState(archetypeId: ArchetypeId): GameState {
+export function createInitialState(archetypeId: ArchetypeId, mode: GameMode): GameState {
   const arch = archetypes.find((a) => a.id === archetypeId)!;
-  const stats = applyEffects({ ...DEFAULT_STATS }, arch.startingModifiers);
+  const stats = applyEffectsSimple({ ...DEFAULT_STATS }, arch.startingModifiers);
 
   return {
-    phase: "choose_action",
+    phase: "event",
     week: 1,
+    mode,
     archetype: archetypeId,
     stats,
     flags: [],
     careerTier: getTierForFollowers(stats.followers),
-    log: [{ week: 1, text: `🎬 Started career as ${arch.name}`, type: "system" }],
+    log: [{ week: 1, text: `Started career as ${arch.name}`, type: "system", emoji: "🎬" }],
     milestones: [],
     currentEvent: null,
     currentChoiceResult: null,
-    pendingAd: null,
+    pendingBoost: null,
     pendingMilestones: [],
-    lastActionId: null,
     recentEventIds: [],
+    activeChains: {},
     brandDeals: 0,
     scandals: 0,
     celebrityEvents: 0,
     relationships: 0,
+    viralMoments: 0,
+    comebacks: 0,
     gameOverReason: null,
   };
 }
 
-// ---- Available Actions ----
+// ---- Serve next event (Reigns-style: events come to you) ----
 
-export function getAvailableActions(state: GameState): GameAction[] {
-  return allActions.filter((a) => {
-    if (a.minTier && !isTierAtLeast(state.careerTier, a.minTier)) return false;
-    if (a.energyCost > state.stats.energy) return false;
-    return true;
-  });
+export function serveNextEvent(state: GameState): GameState {
+  const event = selectEvent(allEvents, state);
+  return {
+    ...state,
+    phase: "event",
+    currentEvent: event,
+  };
 }
 
-// ---- Turn Steps ----
-
-export function performAction(state: GameState, action: GameAction): GameState {
-  // 1. Apply action
-  let next = applyAction(state, action);
-
-  // 2. Select and present event
-  const event = selectEvent(allEvents, next, action.eventBias);
-  next = setCurrentEvent(next, event);
-
-  return next;
-}
+// ---- Resolve player choice ----
 
 export function resolveEventChoice(state: GameState, choice: EventChoice): GameState {
   if (!state.currentEvent) return state;
@@ -83,28 +72,37 @@ export function resolveEventChoice(state: GameState, choice: EventChoice): GameS
   // Check milestones
   next = checkMilestones(next);
 
-  // Check for rewarded ad opportunity
-  const ad = findEligibleAd(next);
-  if (ad) {
-    next = { ...next, pendingAd: ad };
+  // Check for boost opportunity
+  const boost = findEligibleBoost(next);
+  if (boost) {
+    next = { ...next, pendingBoost: boost };
   }
 
   return next;
 }
 
-export function acceptRewardedAd(state: GameState): GameState {
-  if (!state.pendingAd) return state;
-  let next = applyRewardedAd(state, state.pendingAd);
+// ---- Boost handling ----
+
+export function acceptBoost(state: GameState): GameState {
+  if (!state.pendingBoost) return state;
+  let next = applyBoost(state, state.pendingBoost);
   next = checkMilestones(next);
   return next;
 }
 
-export function declineRewardedAd(state: GameState): GameState {
-  return { ...state, pendingAd: null };
+export function declineBoost(state: GameState): GameState {
+  return { ...state, pendingBoost: null };
 }
 
+// ---- End turn ----
+
 export function endTurn(state: GameState): GameState {
-  return advanceWeek(state);
+  const next = advanceWeek(state);
+  // If not game over, serve the next event automatically
+  if (next.phase === "event") {
+    return serveNextEvent(next);
+  }
+  return next;
 }
 
 // ---- Helpers ----
@@ -113,23 +111,23 @@ function checkMilestones(state: GameState): GameState {
   let next = state;
   for (const m of milestones) {
     if (!next.milestones.includes(m.id) && m.check(next)) {
-      next = addMilestone(next, m.id, m.title);
+      next = addMilestone(next, m.id, m.title, m.emoji);
     }
   }
   return next;
 }
 
-function findEligibleAd(state: GameState): RewardedAd | null {
+function findEligibleBoost(state: GameState): RewardedBoost | null {
   const lastEvent = state.currentChoiceResult?.event;
   if (!lastEvent) return null;
 
-  // Only show ads ~40% of the time
-  if (Math.random() > 0.4) return null;
+  // Only show boosts some of the time
+  if (Math.random() > BOOST_CHANCE) return null;
 
-  const candidates = rewardedAds.filter((ad) => {
-    switch (ad.triggerCondition) {
+  const candidates = rewardedBoosts.filter((boost) => {
+    switch (boost.triggerCondition) {
       case "post_content":
-        return lastEvent.type === "viral" || state.lastActionId?.includes("post") || state.lastActionId?.includes("livestream");
+        return lastEvent.type === "viral";
       case "post_scandal":
         return lastEvent.type === "drama" || lastEvent.type === "failure";
       case "celebrity_threshold":

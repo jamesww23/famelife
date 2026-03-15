@@ -1,69 +1,106 @@
 "use client";
 
+import { useState } from "react";
 import { useGame } from "@/state/game-context";
 import { archetypes } from "@/data/archetypes";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ArchetypeId } from "@/lib/game/types";
-import { useState } from "react";
+import { ArchetypeId, GameMode } from "@/lib/game/types";
 
 export function StartScreen() {
   const { startGame } = useGame();
-  const [selected, setSelected] = useState<ArchetypeId | null>(null);
+  const [selectedArchetype, setSelectedArchetype] = useState<ArchetypeId | null>(null);
+  const [step, setStep] = useState<"archetype" | "mode">("archetype");
+
+  const handleStart = (mode: GameMode) => {
+    if (!selectedArchetype) return;
+    startGame(selectedArchetype, mode);
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-violet-950 via-indigo-950 to-slate-950 p-6">
-      <div className="max-w-3xl w-full space-y-8">
-        <div className="text-center space-y-3">
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-violet-400 via-pink-400 to-orange-400 bg-clip-text text-transparent">
-            Influencer Life
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="w-full max-w-lg">
+        {/* Logo */}
+        <div className="text-center mb-8 animate-slide-down">
+          <h1 className="text-5xl font-black text-white mb-2 drop-shadow-lg">
+            FAME LIFE
           </h1>
-          <p className="text-lg text-slate-400">
-            Rise from nobody to global celebrity. Every choice shapes your story.
+          <p className="text-white/80 text-lg font-medium">
+            From nobody to icon. Every tap shapes your story.
           </p>
         </div>
 
-        <div className="space-y-3">
-          <h2 className="text-center text-sm font-medium text-slate-500 uppercase tracking-wider">
-            Choose Your Archetype
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {archetypes.map((arch) => (
-              <Card
-                key={arch.id}
-                className={`cursor-pointer transition-all hover:scale-[1.02] ${
-                  selected === arch.id
-                    ? "ring-2 ring-violet-500 bg-violet-950/50"
-                    : "bg-slate-900/50 hover:bg-slate-900/80"
-                }`}
-                onClick={() => setSelected(arch.id)}
-              >
-                <CardContent className="p-4 space-y-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">{arch.emoji}</span>
-                    <span className="font-semibold text-white text-sm">
-                      {arch.name}
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-400 leading-relaxed">
-                    {arch.description}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
+        {step === "archetype" ? (
+          <div className="animate-slide-up">
+            <p className="text-center text-white font-semibold mb-4 text-sm uppercase tracking-wider">
+              Choose Your Path
+            </p>
+            <div className="grid grid-cols-2 gap-3 mb-6">
+              {archetypes.map((arch) => (
+                <button
+                  key={arch.id}
+                  onClick={() => setSelectedArchetype(arch.id)}
+                  className={`game-card p-4 text-left transition-all ${
+                    selectedArchetype === arch.id
+                      ? "border-3 border-[#e040fb] scale-[1.02] shadow-[0_0_0_3px_#e040fb]"
+                      : "border-3 border-transparent hover:scale-[1.01]"
+                  }`}
+                >
+                  <div className="text-3xl mb-2">{arch.emoji}</div>
+                  <div className="font-bold text-sm text-gray-900">{arch.name}</div>
+                  <div className="text-xs text-gray-500 mt-1 leading-snug">{arch.description}</div>
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => selectedArchetype && setStep("mode")}
+              disabled={!selectedArchetype}
+              className={`w-full py-4 rounded-2xl font-bold text-lg transition-all ${
+                selectedArchetype
+                  ? "bg-white text-[#e040fb] hover:scale-[1.02] active:scale-[0.98] shadow-lg"
+                  : "bg-white/30 text-white/50 cursor-not-allowed"
+              }`}
+            >
+              Next
+            </button>
           </div>
-        </div>
-
-        <div className="text-center">
-          <Button
-            size="lg"
-            disabled={!selected}
-            onClick={() => selected && startGame(selected)}
-            className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white px-10 py-6 text-lg font-semibold"
-          >
-            Start Your Journey
-          </Button>
-        </div>
+        ) : (
+          <div className="animate-scale-in">
+            <p className="text-center text-white font-semibold mb-4 text-sm uppercase tracking-wider">
+              Choose Game Length
+            </p>
+            <div className="space-y-3 mb-6">
+              <button
+                onClick={() => handleStart("quick")}
+                className="game-card w-full p-5 text-left hover:scale-[1.01] active:scale-[0.99] transition-all"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-3xl">⚡</span>
+                  <div>
+                    <div className="font-bold text-gray-900">Quick Fame</div>
+                    <div className="text-sm text-gray-500">3 years / ~5 min. Fast rise, fast fall.</div>
+                  </div>
+                </div>
+              </button>
+              <button
+                onClick={() => handleStart("full")}
+                className="game-card w-full p-5 text-left hover:scale-[1.01] active:scale-[0.99] transition-all"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-3xl">👑</span>
+                  <div>
+                    <div className="font-bold text-gray-900">Full Career</div>
+                    <div className="text-sm text-gray-500">10 years / ~15 min. The whole story.</div>
+                  </div>
+                </div>
+              </button>
+            </div>
+            <button
+              onClick={() => setStep("archetype")}
+              className="w-full py-3 text-white/70 font-medium hover:text-white transition-colors"
+            >
+              Back
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

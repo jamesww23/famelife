@@ -19,13 +19,4 @@ export const allEvents: GameEvent[] = [
   ...recoveryEvents,
 ];
 
-export {
-  viralEvents,
-  dramaEvents,
-  brandEvents,
-  celebrityEvents,
-  platformEvents,
-  lifestyleEvents,
-  failureEvents,
-  recoveryEvents,
-};
+export { viralEvents, dramaEvents, brandEvents, celebrityEvents, platformEvents, lifestyleEvents, failureEvents, recoveryEvents };

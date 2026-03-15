@@ -1,4 +1,4 @@
-import { CAREER_TIERS, TIER_ORDER } from "./constants";
+import { CAREER_TIERS, TIER_ORDER, QUICK_GAME_TURNS, FULL_GAME_TURNS } from "./constants";
 import { CareerTier, GameState } from "./types";
 
 export function getTierForFollowers(followers: number): CareerTier {
@@ -13,6 +13,10 @@ export function getTierName(tier: CareerTier): string {
   return CAREER_TIERS.find((t) => t.id === tier)?.name ?? "Unknown";
 }
 
+export function getTierEmoji(tier: CareerTier): string {
+  return CAREER_TIERS.find((t) => t.id === tier)?.emoji ?? "📱";
+}
+
 export function getTierIndex(tier: CareerTier): number {
   return TIER_ORDER.indexOf(tier);
 }
@@ -25,12 +29,32 @@ export function isTierAtMost(current: CareerTier, max: CareerTier): boolean {
   return getTierIndex(current) <= getTierIndex(max);
 }
 
+export function getMaxTurns(state: GameState): number {
+  return state.mode === "quick" ? QUICK_GAME_TURNS : FULL_GAME_TURNS;
+}
+
+/** Convert a 1-based turn number to "Q1 Year 1" format. */
+export function formatQuarter(turn: number): string {
+  const year = Math.ceil(turn / 4);
+  const quarter = ((turn - 1) % 4) + 1;
+  return `Q${quarter} Year ${year}`;
+}
+
 export function checkGameOver(state: GameState): string | null {
-  if (state.stats.mentalHealth <= 0) return "Mental health collapse. You burned out completely.";
-  if (state.stats.reputation <= 0 && state.stats.fame > 30) return "Permanently cancelled. Your reputation hit zero.";
-  if (state.stats.money < -5000) return "Bankruptcy. You couldn't pay your debts.";
-  if (state.stats.energy <= 0 && state.stats.mentalHealth < 20) return "Complete exhaustion. You had to leave the internet.";
-  if (state.week > 260) return "Retirement. After 5 years, you stepped away from the spotlight.";
+  if (state.stats.mentalHealth <= 0)
+    return "You burned out completely. Mental health hit zero.";
+  if (state.stats.reputation <= 0 && state.stats.fame > 30)
+    return "Permanently cancelled. Your reputation never recovered.";
+  if (state.stats.money < -30000)
+    return "Bankruptcy. The debts caught up with you.";
+  if (state.stats.energy <= 0 && state.stats.mentalHealth < 20)
+    return "Complete exhaustion. You had to quit the internet.";
+  if (state.week >= getMaxTurns(state)) {
+    const years = Math.ceil(state.week / 4);
+    return state.mode === "quick"
+      ? `After ${years} years, you stepped away from the spotlight.`
+      : `After ${years} years, you retired from content creation.`;
+  }
   return null;
 }
 

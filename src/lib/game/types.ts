@@ -1,5 +1,5 @@
 // ============================================================
-// Influencer Life Simulator – Core Type Definitions
+// Influencer Life Simulator – Core Type Definitions (v2 – Reigns-style)
 // ============================================================
 
 // ---- Stats ----
@@ -49,25 +49,15 @@ export type CareerTier =
 export interface CareerTierDef {
   id: CareerTier;
   name: string;
+  emoji: string;
   minFollowers: number;
 }
 
-// ---- Actions ----
+// ---- Game Mode ----
 
-export type ActionCategory = "content" | "career" | "social" | "recovery";
+export type GameMode = "quick" | "full";
 
-export interface GameAction {
-  id: string;
-  category: ActionCategory;
-  name: string;
-  description: string;
-  effects: StatEffects;
-  energyCost: number;
-  minTier?: CareerTier;
-  eventBias?: Partial<Record<EventCategory, number>>;
-}
-
-// ---- Events ----
+// ---- Events (Reigns-style) ----
 
 export type EventCategory =
   | "viral"
@@ -81,11 +71,19 @@ export type EventCategory =
 
 export interface EventChoice {
   id: string;
-  text: string;
+  text: string;         // short label for button
   effects: StatEffects;
   setFlags?: string[];
   removeFlags?: string[];
-  followUpText?: string;
+  followUpText?: string; // narrative result
+  triggerChain?: string; // chain ID to continue after this choice
+  socialReaction?: SocialReaction; // fake social media reaction
+}
+
+export interface SocialReaction {
+  type: "comment" | "headline" | "tweet";
+  text: string;
+  author?: string;
 }
 
 export interface GameEvent {
@@ -93,6 +91,7 @@ export interface GameEvent {
   type: EventCategory;
   title: string;
   text: string;
+  emoji?: string;     // displayed on card
   weight: number;
   minTier?: CareerTier;
   maxTier?: CareerTier;
@@ -100,13 +99,28 @@ export interface GameEvent {
   excludedFlags?: string[];
   statConditions?: Partial<Record<StatKey, { min?: number; max?: number }>>;
   choices: EventChoice[];
+  // Chain support
+  chainId?: string;   // belongs to this story chain
+  chainStep?: number; // position in chain (0-indexed)
+  isSwipeable?: boolean; // true = binary swipe (left=choice[0], right=choice[1])
 }
 
-// ---- Rewarded Ads ----
+// ---- Story Chains ----
 
-export interface RewardedAd {
+export interface StoryChain {
   id: string;
   name: string;
+  events: string[]; // ordered event IDs
+}
+
+// ---- Rewarded Ads / Boosts ----
+
+export type BoostMethod = "ad" | "share";
+
+export interface RewardedBoost {
+  id: string;
+  name: string;
+  emoji: string;
   description: string;
   effects: StatEffects;
   triggerCondition: "post_content" | "post_scandal" | "celebrity_threshold" | "brand_deal" | "low_energy" | "any";
@@ -117,8 +131,16 @@ export interface RewardedAd {
 export interface Milestone {
   id: string;
   title: string;
+  emoji: string;
   description: string;
   check: (state: GameState) => boolean;
+}
+
+// ---- Stat Change Animation ----
+
+export interface StatDelta {
+  stat: StatKey;
+  delta: number;
 }
 
 // ---- Run Log ----
@@ -126,39 +148,50 @@ export interface Milestone {
 export interface LogEntry {
   week: number;
   text: string;
-  type: "action" | "event" | "milestone" | "ad" | "system";
+  type: "event" | "milestone" | "boost" | "system" | "social";
+  emoji?: string;
 }
 
 // ---- Game State ----
 
 export type GamePhase =
   | "start"
-  | "choose_action"
   | "event"
-  | "event_outcome"
-  | "rewarded_ad"
+  | "outcome"
+  | "boost_offer"
   | "milestone"
   | "game_over";
 
 export interface GameState {
   phase: GamePhase;
   week: number;
+  mode: GameMode;
   archetype: ArchetypeId;
   stats: Stats;
   flags: string[];
   careerTier: CareerTier;
   log: LogEntry[];
   milestones: string[];
+  // Current turn
   currentEvent: GameEvent | null;
-  currentChoiceResult: { choice: EventChoice; event: GameEvent } | null;
-  pendingAd: RewardedAd | null;
+  currentChoiceResult: {
+    choice: EventChoice;
+    event: GameEvent;
+    deltas: StatDelta[];
+  } | null;
+  pendingBoost: RewardedBoost | null;
   pendingMilestones: string[];
-  lastActionId: string | null;
+  // History
   recentEventIds: string[];
+  activeChains: Record<string, number>; // chainId -> current step
+  // Counters
   brandDeals: number;
   scandals: number;
   celebrityEvents: number;
   relationships: number;
+  viralMoments: number;
+  comebacks: number;
+  // End
   gameOverReason: string | null;
 }
 
@@ -167,7 +200,9 @@ export interface GameState {
 export interface GameSummary {
   archetype: ArchetypeId;
   archetypeName: string;
-  weeksPlayed: number;
+  archetypeEmoji: string;
+  quartersPlayed: number;
+  yearsPlayed: number;
   followers: number;
   fameTier: string;
   money: number;
@@ -175,6 +210,9 @@ export interface GameSummary {
   scandals: number;
   celebrityEvents: number;
   relationships: number;
+  viralMoments: number;
+  comebacks: number;
   endingReason: string;
   milestones: string[];
+  headline: string; // shareable one-liner
 }

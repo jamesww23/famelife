@@ -1,66 +1,82 @@
 "use client";
 
 import { useGame } from "@/state/game-context";
-import { STAT_LABELS, STAT_ICONS } from "@/lib/game/constants";
-import { formatFollowers, formatMoney, getTierName } from "@/lib/game/progression";
-import { Badge } from "@/components/ui/badge";
-import { StatKey } from "@/lib/game/types";
-
-function StatProgress({ value, color }: { value: number; color: string }) {
-  return (
-    <div className="relative h-2 w-full overflow-hidden rounded-full bg-muted">
-      <div
-        className={`h-full rounded-full transition-all duration-300 ${color}`}
-        style={{ width: `${Math.max(0, Math.min(100, value))}%` }}
-      />
-    </div>
-  );
-}
+import { STAT_EMOJI } from "@/lib/game/constants";
+import { formatFollowers, formatMoney, getTierName, getTierEmoji, getMaxTurns, formatQuarter } from "@/lib/game/progression";
 
 export function StatBar() {
   const { state } = useGame();
   const { stats, week, careerTier } = state;
-
-  const boundedStats: { key: StatKey; color: string }[] = [
-    { key: "fame", color: "bg-yellow-500" },
-    { key: "reputation", color: "bg-blue-500" },
-    { key: "energy", color: "bg-green-500" },
-    { key: "mentalHealth", color: "bg-purple-500" },
-  ];
+  const maxTurns = getMaxTurns(state);
+  const progress = Math.min((week / maxTurns) * 100, 100);
 
   return (
-    <div className="bg-card border-b px-4 py-3">
-      <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-3">
-          <Badge variant="outline" className="text-sm font-semibold">
-            Week {week}
-          </Badge>
-          <Badge className="bg-gradient-to-r from-violet-600 to-indigo-600 text-white">
-            {getTierName(careerTier)}
-          </Badge>
-        </div>
-        <div className="flex items-center gap-4 text-sm">
-          <span className="font-medium">
-            {STAT_ICONS.followers} {formatFollowers(stats.followers)}
-          </span>
-          <span className="font-medium">
-            {STAT_ICONS.money} {formatMoney(stats.money)}
-          </span>
-        </div>
+    <div className="w-full">
+      {/* Quarter progress bar */}
+      <div className="h-1 bg-white/20 rounded-full mb-2 overflow-hidden">
+        <div
+          className="h-full bg-white/60 rounded-full transition-all duration-500"
+          style={{ width: `${progress}%` }}
+        />
       </div>
-      <div className="grid grid-cols-4 gap-3">
-        {boundedStats.map(({ key, color }) => (
-          <div key={key} className="space-y-1">
-            <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span>
-                {STAT_ICONS[key]} {STAT_LABELS[key]}
-              </span>
-              <span className="font-medium text-foreground">{stats[key]}</span>
-            </div>
-            <StatProgress value={stats[key]} color={color} />
-          </div>
-        ))}
+
+      {/* Top row: quarter + tier */}
+      <div className="flex items-center justify-between mb-2 px-1">
+        <span className="text-white/80 text-xs font-semibold">
+          {formatQuarter(week)}
+        </span>
+        <span className="text-white text-xs font-bold">
+          {getTierEmoji(careerTier)} {getTierName(careerTier)}
+        </span>
       </div>
+
+      {/* Stats grid */}
+      <div className="grid grid-cols-3 gap-1.5">
+        <StatPill emoji={STAT_EMOJI.followers} value={formatFollowers(stats.followers)} />
+        <StatPill emoji={STAT_EMOJI.money} value={formatMoney(stats.money)} />
+        <StatPill emoji={STAT_EMOJI.fame} value={`${stats.fame}`} bar barValue={stats.fame} barColor="#a855f7" />
+        <StatPill emoji={STAT_EMOJI.reputation} value={`${stats.reputation}`} bar barValue={stats.reputation} barColor="#10b981" />
+        <StatPill emoji={STAT_EMOJI.energy} value={`${stats.energy}`} bar barValue={stats.energy} barColor="#f59e0b" />
+        <StatPill emoji={STAT_EMOJI.mentalHealth} value={`${stats.mentalHealth}`} bar barValue={stats.mentalHealth} barColor="#3b82f6"
+          danger={stats.mentalHealth < 25}
+        />
+      </div>
+    </div>
+  );
+}
+
+function StatPill({
+  emoji,
+  value,
+  bar,
+  barValue,
+  barColor,
+  danger,
+}: {
+  emoji: string;
+  value: string;
+  bar?: boolean;
+  barValue?: number;
+  barColor?: string;
+  danger?: boolean;
+}) {
+  return (
+    <div className={`stat-pill flex-col items-start ${danger ? "animate-shake" : ""}`}>
+      <div className="flex items-center gap-1 w-full">
+        <span>{emoji}</span>
+        <span className={`text-xs font-bold ${danger ? "text-red-500" : "text-gray-800"}`}>{value}</span>
+      </div>
+      {bar && (
+        <div className="stat-bar w-full mt-1">
+          <div
+            className="stat-bar-fill"
+            style={{
+              width: `${Math.max(barValue ?? 0, 0)}%`,
+              backgroundColor: danger ? "#ef4444" : barColor,
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }

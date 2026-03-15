@@ -4,17 +4,16 @@ import React, { createContext, useContext, useReducer, useCallback, useEffect, u
 import {
   GameState,
   ArchetypeId,
-  GameAction,
+  GameMode,
   EventChoice,
   GamePhase,
 } from "@/lib/game/types";
 import {
   createInitialState,
-  getAvailableActions,
-  performAction,
+  serveNextEvent,
   resolveEventChoice,
-  acceptRewardedAd,
-  declineRewardedAd,
+  acceptBoost,
+  declineBoost,
   endTurn,
 } from "@/lib/game/engine";
 import { generateSummary } from "@/lib/game/summary";
@@ -22,12 +21,10 @@ import { STORAGE_KEY } from "@/lib/game/constants";
 
 type GameContextValue = {
   state: GameState;
-  availableActions: GameAction[];
-  startGame: (archetype: ArchetypeId) => void;
-  chooseAction: (action: GameAction) => void;
+  startGame: (archetype: ArchetypeId, mode: GameMode) => void;
   chooseEventOption: (choice: EventChoice) => void;
-  onAcceptAd: () => void;
-  onDeclineAd: () => void;
+  onAcceptBoost: () => void;
+  onDeclineBoost: () => void;
   proceedFromOutcome: () => void;
   proceedFromMilestone: () => void;
   restartGame: () => void;
@@ -37,11 +34,10 @@ const GameContext = createContext<GameContextValue | null>(null);
 
 type Action =
   | { type: "SET_STATE"; state: GameState }
-  | { type: "START_GAME"; archetype: ArchetypeId }
-  | { type: "CHOOSE_ACTION"; action: GameAction }
+  | { type: "START_GAME"; archetype: ArchetypeId; mode: GameMode }
   | { type: "CHOOSE_EVENT"; choice: EventChoice }
-  | { type: "ACCEPT_AD" }
-  | { type: "DECLINE_AD" }
+  | { type: "ACCEPT_BOOST" }
+  | { type: "DECLINE_BOOST" }
   | { type: "PROCEED_OUTCOME" }
   | { type: "PROCEED_MILESTONE" }
   | { type: "RESTART" };
@@ -50,20 +46,21 @@ function reducer(state: GameState, action: Action): GameState {
   switch (action.type) {
     case "SET_STATE":
       return action.state;
-    case "START_GAME":
-      return createInitialState(action.archetype);
-    case "CHOOSE_ACTION":
-      return performAction(state, action.action);
+    case "START_GAME": {
+      const initial = createInitialState(action.archetype, action.mode);
+      // Immediately serve the first event
+      return serveNextEvent(initial);
+    }
     case "CHOOSE_EVENT":
       return resolveEventChoice(state, action.choice);
-    case "ACCEPT_AD":
-      return acceptRewardedAd(state);
-    case "DECLINE_AD":
-      return declineRewardedAd(state);
+    case "ACCEPT_BOOST":
+      return acceptBoost(state);
+    case "DECLINE_BOOST":
+      return declineBoost(state);
     case "PROCEED_OUTCOME": {
-      // After seeing outcome, check if we need to show ad or milestones, or end turn
-      if (state.pendingAd) {
-        return { ...state, phase: "rewarded_ad" as GamePhase };
+      // After seeing outcome, check boost -> milestone -> next turn
+      if (state.pendingBoost) {
+        return { ...state, phase: "boost_offer" as GamePhase };
       }
       if (state.pendingMilestones.length > 0) {
         return { ...state, phase: "milestone" as GamePhase };
@@ -74,7 +71,7 @@ function reducer(state: GameState, action: Action): GameState {
       return endTurn(state);
     }
     case "RESTART":
-      return { ...createInitialState("comedy"), phase: "start" as GamePhase };
+      return { ...INITIAL };
     default:
       return state;
   }
@@ -83,6 +80,7 @@ function reducer(state: GameState, action: Action): GameState {
 const INITIAL: GameState = {
   phase: "start",
   week: 0,
+  mode: "quick",
   archetype: "comedy",
   stats: { followers: 0, fame: 0, reputation: 0, money: 0, energy: 0, mentalHealth: 0 },
   flags: [],
@@ -91,14 +89,16 @@ const INITIAL: GameState = {
   milestones: [],
   currentEvent: null,
   currentChoiceResult: null,
-  pendingAd: null,
+  pendingBoost: null,
   pendingMilestones: [],
-  lastActionId: null,
   recentEventIds: [],
+  activeChains: {},
   brandDeals: 0,
   scandals: 0,
   celebrityEvents: 0,
   relationships: 0,
+  viralMoments: 0,
+  comebacks: 0,
   gameOverReason: null,
 };
 
@@ -134,30 +134,25 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     }
   }, [state]);
 
-  const availableActions = state.phase === "choose_action" ? getAvailableActions(state) : [];
-
-  const startGame = useCallback((archetype: ArchetypeId) => {
-    dispatch({ type: "START_GAME", archetype });
-  }, []);
-
-  const chooseAction = useCallback((action: GameAction) => {
-    dispatch({ type: "CHOOSE_ACTION", action });
+  const startGame = useCallback((archetype: ArchetypeId, mode: GameMode) => {
+    localStorage.removeItem(STORAGE_KEY);
+    dispatch({ type: "START_GAME", archetype, mode });
   }, []);
 
   const chooseEventOption = useCallback((choice: EventChoice) => {
     dispatch({ type: "CHOOSE_EVENT", choice });
   }, []);
 
-  const onAcceptAd = useCallback(() => {
-    dispatch({ type: "ACCEPT_AD" });
-    // After ad, check milestones then end turn
+  const onAcceptBoost = useCallback(() => {
+    dispatch({ type: "ACCEPT_BOOST" });
+    // After boost, proceed to milestone or end turn
     setTimeout(() => {
       dispatch({ type: "PROCEED_OUTCOME" });
     }, 0);
   }, []);
 
-  const onDeclineAd = useCallback(() => {
-    dispatch({ type: "DECLINE_AD" });
+  const onDeclineBoost = useCallback(() => {
+    dispatch({ type: "DECLINE_BOOST" });
     setTimeout(() => {
       dispatch({ type: "PROCEED_OUTCOME" });
     }, 0);
@@ -180,12 +175,10 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     <GameContext.Provider
       value={{
         state,
-        availableActions,
         startGame,
-        chooseAction,
         chooseEventOption,
-        onAcceptAd,
-        onDeclineAd,
+        onAcceptBoost,
+        onDeclineBoost,
         proceedFromOutcome,
         proceedFromMilestone,
         restartGame,

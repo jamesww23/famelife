@@ -1,84 +1,96 @@
 "use client";
 
 import { useGame, generateSummary } from "@/state/game-context";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { archetypes } from "@/data/archetypes";
 import { formatFollowers, formatMoney } from "@/lib/game/progression";
 
 export function SummaryScreen() {
   const { state, restartGame } = useGame();
   const summary = generateSummary(state);
-  const arch = archetypes.find((a) => a.id === summary.archetype);
-
-  const stats = [
-    { label: "Weeks Played", value: summary.weeksPlayed },
-    { label: "Final Followers", value: formatFollowers(summary.followers) },
-    { label: "Career Tier", value: summary.fameTier },
-    { label: "Money", value: formatMoney(summary.money) },
-    { label: "Brand Deals", value: summary.brandDeals },
-    { label: "Scandals", value: summary.scandals },
-    { label: "Celebrity Events", value: summary.celebrityEvents },
-    { label: "Relationships", value: summary.relationships },
-  ];
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-indigo-950 to-violet-950 p-6">
-      <Card className="max-w-md w-full bg-card/90 backdrop-blur">
-        <CardHeader className="text-center pb-3">
-          <div className="text-4xl mb-2">{arch?.emoji || "🎬"}</div>
-          <CardTitle className="text-2xl">Career Over</CardTitle>
-          <p className="text-sm text-muted-foreground">{summary.endingReason}</p>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="text-center">
-            <Badge className="bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-sm px-3 py-1">
-              {summary.archetypeName}
-            </Badge>
-          </div>
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="w-full max-w-lg animate-slide-up">
+        {/* Header */}
+        <div className="text-center mb-6">
+          <div className="text-5xl mb-2">{summary.archetypeEmoji}</div>
+          <h1 className="text-3xl font-black text-white mb-1">Game Over</h1>
+          <p className="text-white/70 text-sm">{summary.endingReason}</p>
+        </div>
 
-          <Separator />
+        {/* Headline card */}
+        <div className="game-card p-6 mb-4">
+          <p className="text-lg font-black text-gray-900 leading-snug text-center">
+            &ldquo;{summary.headline}&rdquo;
+          </p>
+        </div>
 
+        {/* Stats grid */}
+        <div className="game-card p-5 mb-4">
           <div className="grid grid-cols-2 gap-3">
-            {stats.map(({ label, value }) => (
-              <div key={label} className="text-center p-2 rounded-lg bg-muted/30">
-                <div className="text-lg font-bold">{value}</div>
-                <div className="text-xs text-muted-foreground">{label}</div>
-              </div>
-            ))}
+            <StatRow emoji="👥" label="Followers" value={formatFollowers(summary.followers)} />
+            <StatRow emoji="👑" label="Final Tier" value={summary.fameTier} />
+            <StatRow emoji="💰" label="Money" value={formatMoney(summary.money)} />
+            <StatRow emoji="📅" label="Years" value={`${summary.yearsPlayed}`} />
+            <StatRow emoji="🤝" label="Brand Deals" value={`${summary.brandDeals}`} />
+            <StatRow emoji="😱" label="Scandals" value={`${summary.scandals}`} />
+            <StatRow emoji="🌟" label="Celeb Moments" value={`${summary.celebrityEvents}`} />
+            <StatRow emoji="❤️" label="Relationships" value={`${summary.relationships}`} />
+            <StatRow emoji="🔥" label="Viral Moments" value={`${summary.viralMoments}`} />
+            <StatRow emoji="💪" label="Comebacks" value={`${summary.comebacks}`} />
           </div>
+        </div>
 
-          {summary.milestones.length > 0 && (
-            <>
-              <Separator />
-              <div className="space-y-2">
-                <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider text-center">
-                  Milestones Achieved
-                </h3>
-                <div className="flex flex-wrap gap-1.5 justify-center">
-                  {summary.milestones.map((id) => (
-                    <Badge key={id} variant="secondary" className="text-xs">
-                      {id.replace(/_/g, " ")}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            </>
-          )}
+        {/* Milestones */}
+        {summary.milestones.length > 0 && (
+          <div className="game-card p-5 mb-4">
+            <h3 className="font-bold text-gray-900 text-sm mb-2">Milestones Unlocked</h3>
+            <div className="flex flex-wrap gap-2">
+              {summary.milestones.map((id) => (
+                <span key={id} className="text-xs bg-purple-50 text-purple-600 font-bold px-2.5 py-1 rounded-full">
+                  {id.replace(/_/g, " ")}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
 
-          <Separator />
-
-          <Button
-            className="w-full bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white"
-            size="lg"
+        {/* Actions */}
+        <div className="space-y-2.5">
+          <button
+            onClick={() => {
+              if (navigator.share) {
+                navigator.share({
+                  title: "Fame Life",
+                  text: summary.headline,
+                }).catch(() => {});
+              } else {
+                navigator.clipboard.writeText(summary.headline).catch(() => {});
+              }
+            }}
+            className="w-full py-3.5 bg-white text-[#e040fb] rounded-2xl font-bold text-base hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg"
+          >
+            Share Your Story
+          </button>
+          <button
             onClick={restartGame}
+            className="w-full py-3.5 bg-white/20 text-white rounded-2xl font-bold text-base hover:bg-white/30 active:scale-[0.98] transition-all"
           >
             Play Again
-          </Button>
-        </CardContent>
-      </Card>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StatRow({ emoji, label, value }: { emoji: string; label: string; value: string }) {
+  return (
+    <div className="flex items-center gap-2">
+      <span className="text-lg">{emoji}</span>
+      <div>
+        <div className="text-xs text-gray-400 font-medium">{label}</div>
+        <div className="text-sm font-bold text-gray-900">{value}</div>
+      </div>
     </div>
   );
 }
