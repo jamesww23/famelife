@@ -314,11 +314,11 @@ export function StartScreen() {
                 <div className="border-t border-gray-100 pt-4">
                   <p className="text-xs font-bold text-[#e040fb] uppercase tracking-wider mb-3">Your Mission</p>
                   <div className="space-y-2 text-left">
-                    <GoalRow emoji="🌍" text="Reach Global Icon status (5M+ followers)" />
-                    <GoalRow emoji="💰" text="Build your fortune — don&apos;t go bankrupt" />
-                    <GoalRow emoji="🧠" text="Protect your mental health at all costs" />
-                    <GoalRow emoji="⭐" text="Maximize your Fame Score (out of 1,000)" />
-                    <GoalRow emoji="🏆" text="Survive all 10 years without burning out" />
+                    <GoalRow emoji="📱" text="Start as a nobody" />
+                    <GoalRow emoji="🔥" text="Go viral" />
+                    <GoalRow emoji="👑" text="Build your creator empire" />
+                    <GoalRow emoji="💰" text="Make millions" />
+                    <GoalRow emoji="🌍" text="Become a social media legend" />
                   </div>
                 </div>
               </div>
