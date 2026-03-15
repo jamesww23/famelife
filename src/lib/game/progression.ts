@@ -1,4 +1,4 @@
-import { CAREER_TIERS, TIER_ORDER, QUICK_GAME_TURNS, FULL_GAME_TURNS } from "./constants";
+import { CAREER_TIERS, TIER_ORDER, FULL_GAME_TURNS } from "./constants";
 import { CareerTier, GameState } from "./types";
 
 export function getTierForFollowers(followers: number): CareerTier {
@@ -29,8 +29,8 @@ export function isTierAtMost(current: CareerTier, max: CareerTier): boolean {
   return getTierIndex(current) <= getTierIndex(max);
 }
 
-export function getMaxTurns(state: GameState): number {
-  return state.mode === "quick" ? QUICK_GAME_TURNS : FULL_GAME_TURNS;
+export function getMaxTurns(_state: GameState): number {
+  return FULL_GAME_TURNS;
 }
 
 /** Convert a 1-based turn number to "Q1 Year 1" format. */
@@ -50,8 +50,6 @@ export function checkGameOver(state: GameState): string | null {
   if (state.stats.energy <= 0 && state.stats.mentalHealth < 20)
     return "Complete exhaustion. You had to quit the internet.";
   if (state.week >= getMaxTurns(state)) {
-    // If in quick mode at turn 12, don't end — the extend offer will handle it
-    if (state.mode === "quick") return null;
     const years = Math.ceil(state.week / 4);
     return `After ${years} years, you retired from content creation.`;
   }

@@ -216,4 +216,9 @@ export interface GameSummary {
   endingReason: string;
   milestones: string[];
   headline: string; // shareable one-liner
+  // Rankings & scoring
+  fameScore: number;        // 0-1000 composite score
+  fameRank: string;         // title based on score
+  fameRankEmoji: string;
+  percentile: number;       // estimated percentile (0-100)
 }

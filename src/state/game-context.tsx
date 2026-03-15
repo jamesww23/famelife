@@ -97,7 +97,7 @@ function reducer(state: GameState, action: Action): GameState {
 const INITIAL: GameState = {
   phase: "start",
   week: 0,
-  mode: "quick",
+  mode: "full",
   archetype: "comedy",
   stats: { followers: 0, fame: 0, reputation: 0, money: 0, energy: 0, mentalHealth: 0 },
   flags: [],

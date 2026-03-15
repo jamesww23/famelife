@@ -11,8 +11,7 @@ export function StartScreen() {
 
   const handleStart = () => {
     if (!selectedArchetype) return;
-    // Always start as "quick" — player gets offered to extend at year 3
-    startGame(selectedArchetype, "quick");
+    startGame(selectedArchetype, "full");
   };
 
   return (
