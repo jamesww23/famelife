@@ -67,8 +67,6 @@ function getFameRank(score: number): { rank: string; emoji: string } {
 
 /** Estimate percentile based on score using a simulated distribution curve. */
 function estimatePercentile(score: number): number {
-  // Simulate a bell-curve distribution where most players land 200-500
-  // This uses a rough sigmoid mapping
   if (score >= 900) return 99;
   if (score >= 800) return 96;
   if (score >= 700) return 90;
@@ -81,6 +79,145 @@ function estimatePercentile(score: number): number {
   return 3;
 }
 
+/** Determine an earned title based on run characteristics. */
+function getEarnedTitle(state: GameState): { title: string; emoji: string } {
+  const { followers, fame, reputation, money } = state.stats;
+  const flags = state.flags;
+
+  // Internet Legend: top-tier everything
+  if (followers >= 5_000_000 && fame >= 80 && money >= 200_000 && reputation >= 60) {
+    return { title: "Internet Legend", emoji: "👑" };
+  }
+
+  // Creator Empire Boss: owns studio or huge money + followers
+  if (flags.includes("ownsStudio") || (money >= 500_000 && followers >= 1_000_000)) {
+    return { title: "Creator Empire Boss", emoji: "🏰" };
+  }
+
+  // Social Media Mogul: massive followers and money
+  if (followers >= 3_000_000 && money >= 100_000) {
+    return { title: "Social Media Mogul", emoji: "💰" };
+  }
+
+  // Chaos Celebrity: high fame + high scandals
+  if (fame >= 60 && state.scandals >= 4) {
+    return { title: "Chaos Celebrity", emoji: "🌪️" };
+  }
+
+  // Cancelled Star: ended by cancellation
+  if (state.gameOverReason?.includes("cancelled")) {
+    return { title: "Cancelled Star", emoji: "❌" };
+  }
+
+  // Viral Menace: lots of viral moments + controversy
+  if (state.viralMoments >= 5 && state.scandals >= 2) {
+    return { title: "Viral Menace", emoji: "😈" };
+  }
+
+  // Brand-Safe Icon: high reputation, lots of brand deals, no controversy
+  if (reputation >= 75 && state.brandDeals >= 4 && state.scandals <= 1) {
+    return { title: "Brand-Safe Icon", emoji: "✨" };
+  }
+
+  // Comeback Monarch: multiple comebacks
+  if (state.comebacks >= 3) {
+    return { title: "Comeback Monarch", emoji: "🦅" };
+  }
+
+  // Burnout Story
+  if (state.gameOverReason?.includes("burned out") || state.gameOverReason?.includes("exhaustion")) {
+    return { title: "Burned Bright", emoji: "🕯️" };
+  }
+
+  // Bankrupt dreamer
+  if (state.gameOverReason?.includes("Bankruptcy")) {
+    return { title: "Bankrupt Dreamer", emoji: "💸" };
+  }
+
+  // Drama Magnet: lots of scandals but survived
+  if (state.scandals >= 3 && !state.gameOverReason?.includes("cancelled")) {
+    return { title: "Teflon Creator", emoji: "🛡️" };
+  }
+
+  // Beloved Creator: high reputation, high followers
+  if (reputation >= 70 && followers >= 500_000) {
+    return { title: "Beloved Creator", emoji: "💖" };
+  }
+
+  // Celebrity Crossover
+  if (state.celebrityEvents >= 4) {
+    return { title: "Hollywood Crossover", emoji: "🎬" };
+  }
+
+  // Viral Star
+  if (state.viralMoments >= 5) {
+    return { title: "Viral Machine", emoji: "⚡" };
+  }
+
+  // Career Creator: survived full career
+  if (state.week >= 36) {
+    return { title: "Career Creator", emoji: "💪" };
+  }
+
+  if (fame >= 50) return { title: "Rising Celebrity", emoji: "⭐" };
+  if (followers >= 50_000) return { title: "Growing Creator", emoji: "📈" };
+  return { title: "Aspiring Creator", emoji: "🌱" };
+}
+
+/** Generate a one-line BitLife-style story recap. */
+function generateStoryRecap(state: GameState): string {
+  const name = state.character.name;
+  const years = Math.ceil(state.week / 4);
+  const arch = archetypes.find(a => a.id === state.archetype);
+  const archName = arch?.name?.toLowerCase() ?? "creator";
+
+  const highlights: string[] = [];
+
+  if (state.stats.followers >= 1_000_000) {
+    highlights.push("hit a million followers");
+  } else if (state.stats.followers >= 100_000) {
+    highlights.push("built a loyal following");
+  }
+
+  if (state.scandals >= 3) {
+    highlights.push("weathered multiple scandals");
+  } else if (state.scandals >= 1) {
+    highlights.push("survived a scandal");
+  }
+
+  if (state.flags.includes("ownsStudio")) {
+    highlights.push("built a media empire");
+  } else if (state.stats.money >= 100_000) {
+    highlights.push("made serious money");
+  }
+
+  if (state.comebacks >= 2) {
+    highlights.push("kept coming back");
+  }
+
+  if (state.flags.includes("publicRelationship")) {
+    highlights.push("found love in the spotlight");
+  }
+
+  if (state.flags.includes("startedFeud")) {
+    highlights.push("made enemies along the way");
+  }
+
+  const verb = state.gameOverReason?.includes("retired") ? "retired" :
+    state.gameOverReason?.includes("cancelled") ? "got cancelled" :
+    state.gameOverReason?.includes("burned out") ? "burned out" :
+    state.gameOverReason?.includes("Bankruptcy") ? "went bankrupt" :
+    state.gameOverReason?.includes("exhaustion") ? "collapsed from exhaustion" :
+    "stepped away";
+
+  if (highlights.length === 0) {
+    return `${name} spent ${years} years as a ${archName} and ${verb}.`;
+  }
+
+  const story = highlights.slice(0, 3).join(", ");
+  return `${name} ${story}, then ${verb} after ${years} years.`;
+}
+
 /** Generate a shareable headline based on the run. */
 function generateHeadline(state: GameState): string {
   const arch = archetypes.find((a) => a.id === state.archetype);
@@ -91,7 +228,6 @@ function generateHeadline(state: GameState): string {
 
   const parts: string[] = [];
 
-  // Opening
   if (followers >= 5_000_000) {
     parts.push(`Started with 500 followers, became a Global Icon`);
   } else if (followers >= 1_000_000) {
@@ -102,33 +238,32 @@ function generateHeadline(state: GameState): string {
     parts.push(`Tried to make it as a ${archName}`);
   }
 
-  // Drama
   if (state.scandals >= 3) {
     parts.push(`survived ${state.scandals} scandals`);
   } else if (state.scandals === 1) {
     parts.push(`survived a scandal`);
   }
 
-  // Relationships
   if (state.relationships >= 2) {
     parts.push(`had ${state.relationships} public relationships`);
   } else if (state.relationships === 1) {
     parts.push(`found love`);
   }
 
-  // Money
   if (state.stats.money >= 100_000) {
     parts.push(`banked $${Math.floor(state.stats.money / 1000)}K`);
   } else if (state.stats.money < 0) {
     parts.push(`went broke`);
   }
 
-  // Viral
   if (state.viralMoments >= 3) {
     parts.push(`went viral ${state.viralMoments} times`);
   }
 
-  // Ending flavor
+  if (state.flags.includes("ownsStudio")) {
+    parts.push(`built a creator empire`);
+  }
+
   if (state.gameOverReason?.includes("cancelled")) {
     parts.push(`and got cancelled`);
   } else if (state.gameOverReason?.includes("burned out")) {
@@ -143,7 +278,6 @@ function generateHeadline(state: GameState): string {
     parts.push(`over ${years} ${years === 1 ? "year" : "years"}`);
   }
 
-  // Join with commas and periods
   const headline = parts[0] + (parts.length > 1 ? ", " + parts.slice(1).join(", ") : "") + ".";
   return headline;
 }
@@ -154,6 +288,8 @@ export function generateSummary(state: GameState): GameSummary {
   const fameScore = calculateFameScore(state);
   const { rank, emoji } = getFameRank(fameScore);
   const percentile = estimatePercentile(fameScore);
+  const earned = getEarnedTitle(state);
+  const storyRecap = generateStoryRecap(state);
 
   return {
     archetype: state.archetype,
@@ -177,5 +313,8 @@ export function generateSummary(state: GameState): GameSummary {
     fameRank: rank,
     fameRankEmoji: emoji,
     percentile,
+    earnedTitle: earned.title,
+    earnedTitleEmoji: earned.emoji,
+    storyRecap,
   };
 }

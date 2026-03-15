@@ -15,7 +15,7 @@ export const archetypes: Archetype[] = [
     emoji: "💄",
     description: "Tutorials, reviews, and brand deals. Lucrative but competitive.",
     startingModifiers: { money: 300, reputation: 10, fame: 2 },
-    eventWeightModifiers: { brand: 1.5, lifestyle: 1.2, drama: 0.9 },
+    eventWeightModifiers: { brand: 1.5, lifestyle: 1.2, drama: 0.9, empire: 1.3 },
   },
   {
     id: "lifestyle",
@@ -23,7 +23,7 @@ export const archetypes: Archetype[] = [
     emoji: "🌴",
     description: "Your life is the content. Everything is aesthetic, until it gets real.",
     startingModifiers: { followers: 150, mentalHealth: -5, fame: 5 },
-    eventWeightModifiers: { lifestyle: 1.5, celebrity: 1.2, recovery: 1.1 },
+    eventWeightModifiers: { lifestyle: 1.5, celebrity: 1.2, recovery: 1.1, empire: 1.2 },
   },
   {
     id: "drama",

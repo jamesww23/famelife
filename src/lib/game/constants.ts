@@ -1,4 +1,4 @@
-import { CareerTier, CareerTierDef, Stats } from "./types";
+import { CareerTier, CareerTierDef, CareerPhase, Stats } from "./types";
 
 export const CAREER_TIERS: CareerTierDef[] = [
   { id: "new_creator", name: "New Creator", emoji: "📱", minFollowers: 0 },
@@ -46,7 +46,7 @@ export const STAT_EMOJI: Record<keyof Stats, string> = {
 };
 
 export const MAX_RECENT_EVENTS = 12;
-export const STORAGE_KEY = "influencer-life-save-v3";
+export const STORAGE_KEY = "influencer-life-save-v4";
 
 // Game length in quarters (each turn = 1 quarter = 3 months)
 export const QUICK_GAME_TURNS = 12;  // 3 years
@@ -60,6 +60,25 @@ export const ENERGY_RECOVERY = 18;
 export const MENTAL_HEALTH_RECOVERY = 8;
 
 // Event category colors for UI
+// Career phase order (for comparison)
+export const PHASE_ORDER: CareerPhase[] = [
+  "early_creator",
+  "emerging",
+  "breakout",
+  "famous",
+  "celebrity",
+  "empire",
+];
+
+export const PHASE_LABELS: Record<CareerPhase, string> = {
+  early_creator: "Early Creator",
+  emerging: "Emerging",
+  breakout: "Breakout",
+  famous: "Famous",
+  celebrity: "Celebrity",
+  empire: "Empire",
+};
+
 export const EVENT_COLORS: Record<string, string> = {
   viral: "#10b981",    // emerald
   drama: "#ef4444",    // red
@@ -69,6 +88,7 @@ export const EVENT_COLORS: Record<string, string> = {
   lifestyle: "#ec4899", // pink
   failure: "#6b7280",   // gray
   recovery: "#14b8a6",  // teal
+  empire: "#d97706",    // gold
 };
 
 export const EVENT_EMOJI: Record<string, string> = {
@@ -80,4 +100,5 @@ export const EVENT_EMOJI: Record<string, string> = {
   lifestyle: "🏖️",
   failure: "💔",
   recovery: "💪",
+  empire: "🏰",
 };

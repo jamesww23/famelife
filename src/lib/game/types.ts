@@ -60,6 +60,16 @@ export interface Archetype {
   eventWeightModifiers: Partial<Record<EventCategory, number>>;
 }
 
+// ---- Career Phases (derived from stats + flags) ----
+
+export type CareerPhase =
+  | "early_creator"
+  | "emerging"
+  | "breakout"
+  | "famous"
+  | "celebrity"
+  | "empire";
+
 // ---- Career Tiers ----
 
 export type CareerTier =
@@ -91,7 +101,8 @@ export type EventCategory =
   | "platform"
   | "lifestyle"
   | "failure"
-  | "recovery";
+  | "recovery"
+  | "empire";
 
 export interface EventChoice {
   id: string;
@@ -123,6 +134,9 @@ export interface GameEvent {
   excludedFlags?: string[];
   statConditions?: Partial<Record<StatKey, { min?: number; max?: number }>>;
   choices: EventChoice[];
+  // Phase support
+  minPhase?: CareerPhase;
+  maxPhase?: CareerPhase;
   // Chain support
   chainId?: string;   // belongs to this story chain
   chainStep?: number; // position in chain (0-indexed)
@@ -246,4 +260,8 @@ export interface GameSummary {
   fameRank: string;         // title based on score
   fameRankEmoji: string;
   percentile: number;       // estimated percentile (0-100)
+  // Enhanced summary
+  earnedTitle: string;      // run-specific title (e.g. "Chaos Celebrity")
+  earnedTitleEmoji: string;
+  storyRecap: string;       // one-line BitLife-style recap
 }

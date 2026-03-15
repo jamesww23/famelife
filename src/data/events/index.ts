@@ -7,6 +7,7 @@ import { platformEvents } from "./platform";
 import { lifestyleEvents } from "./lifestyle";
 import { failureEvents } from "./failure";
 import { recoveryEvents } from "./recovery";
+import { empireEvents } from "./empire";
 
 export const allEvents: GameEvent[] = [
   ...viralEvents,
@@ -17,6 +18,7 @@ export const allEvents: GameEvent[] = [
   ...lifestyleEvents,
   ...failureEvents,
   ...recoveryEvents,
+  ...empireEvents,
 ];
 
-export { viralEvents, dramaEvents, brandEvents, celebrityEvents, platformEvents, lifestyleEvents, failureEvents, recoveryEvents };
+export { viralEvents, dramaEvents, brandEvents, celebrityEvents, platformEvents, lifestyleEvents, failureEvents, recoveryEvents, empireEvents };

@@ -191,4 +191,81 @@ export const lifestyleEvents: GameEvent[] = [
       },
     ],
   },
+
+  // === RELATIONSHIP / MANAGER EVENTS ===
+  {
+    id: "manager_opportunity",
+    type: "lifestyle",
+    title: "Manager Opportunity",
+    emoji: "🤝",
+    text: "A slick talent manager slides into your DMs. 'I can 10x your career. Let me handle the business side.'",
+    weight: 7,
+    minPhase: "emerging",
+    excludedFlags: ["hasManager"],
+    choices: [
+      {
+        id: "sign_with_manager",
+        text: "Sign the contract",
+        effects: { money: -3000, energy: 15, fame: 8 },
+        setFlags: ["hasManager"],
+        followUpText: "You have a manager now. Emails get answered. Deals start flowing. This changes everything.",
+        socialReaction: { type: "comment", text: "they got management?? okay they're serious about this", author: "@industry_watcher" },
+      },
+      {
+        id: "stay_independent_mgr",
+        text: "Stay independent",
+        effects: { reputation: 5, energy: -5 },
+        followUpText: "You keep full control. It's harder, but nobody takes a cut of your hustle.",
+      },
+    ],
+  },
+  {
+    id: "manager_betrayal",
+    type: "lifestyle",
+    title: "Manager Betrayal",
+    emoji: "🔪",
+    text: "You finally checked the books. Your manager has been skimming 40% instead of the agreed 15%. For months.",
+    weight: 6,
+    requiredFlags: ["hasManager"],
+    choices: [
+      {
+        id: "fire_publicly",
+        text: "Fire them on camera",
+        effects: { reputation: 10, fame: 8, money: -5000 },
+        removeFlags: ["hasManager"],
+        socialReaction: { type: "headline", text: "INFLUENCER FIRES MANAGER LIVE ON STREAM — 'YOU ROBBED ME'" },
+      },
+      {
+        id: "renegotiate_quietly",
+        text: "Handle it behind closed doors",
+        effects: { money: -2000, mentalHealth: -10 },
+        followUpText: "You renegotiate the terms. They stay, but the trust is gone. You sleep with one eye open.",
+      },
+    ],
+  },
+  {
+    id: "new_romance",
+    type: "lifestyle",
+    title: "New Romance",
+    emoji: "💕",
+    text: "You met someone amazing. They're funny, supportive, and they don't care about your follower count.",
+    weight: 7,
+    minPhase: "emerging",
+    excludedFlags: ["publicRelationship"],
+    choices: [
+      {
+        id: "go_public_romance",
+        text: "Post the couple pic",
+        effects: { fame: 12, followers: 10000, mentalHealth: 10 },
+        setFlags: ["publicRelationship"],
+        socialReaction: { type: "tweet", text: "THEY'RE SO CUTE TOGETHER OMG 😭❤️ new fav couple", author: "@shippers_unite" },
+      },
+      {
+        id: "keep_romance_private",
+        text: "Keep it just for us",
+        effects: { mentalHealth: 15, energy: 10 },
+        followUpText: "Some things are better without a comment section. This is one of them.",
+      },
+    ],
+  },
 ];

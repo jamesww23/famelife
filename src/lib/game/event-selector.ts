@@ -1,6 +1,6 @@
 import { archetypes } from "@/data/archetypes";
 import { GameEvent, GameState, EventCategory } from "./types";
-import { isTierAtLeast, isTierAtMost } from "./progression";
+import { isTierAtLeast, isTierAtMost, getPhaseForState, isPhaseAtLeast, isPhaseAtMost } from "./progression";
 import { weightedRandom } from "./random";
 
 interface ScoredEvent {
@@ -13,6 +13,11 @@ function isEligible(event: GameEvent, state: GameState): boolean {
   // Career tier gate
   if (event.minTier && !isTierAtLeast(state.careerTier, event.minTier)) return false;
   if (event.maxTier && !isTierAtMost(state.careerTier, event.maxTier)) return false;
+
+  // Career phase gate
+  const phase = getPhaseForState(state);
+  if (event.minPhase && !isPhaseAtLeast(phase, event.minPhase)) return false;
+  if (event.maxPhase && !isPhaseAtMost(phase, event.maxPhase)) return false;
 
   // Flag requirements
   if (event.requiredFlags?.some((f) => !state.flags.includes(f))) return false;
@@ -39,6 +44,7 @@ function isEligible(event: GameEvent, state: GameState): boolean {
 /** Score an event given the state and archetype. */
 function scoreEvent(event: GameEvent, state: GameState): number {
   let weight = event.weight;
+  const phase = getPhaseForState(state);
 
   // Archetype modifier
   const arch = archetypes.find((a) => a.id === state.archetype);
@@ -56,8 +62,84 @@ function scoreEvent(event: GameEvent, state: GameState): number {
     weight *= 2.5;
   }
 
-  // Drama boost when things are going too well (creates drama)
-  if (state.stats.fame > 60 && state.stats.reputation > 60) {
+  // ---- Phase-based weighting ----
+
+  // Empire events get huge boost when in empire phase
+  if (phase === "empire" && event.type === "empire") {
+    weight *= 2.0;
+  }
+  // Celebrity events boost in celebrity/empire phases
+  if ((phase === "celebrity" || phase === "empire") && event.type === "celebrity") {
+    weight *= 1.5;
+  }
+  // Brand events boost in breakout/famous phases (prime sponsorship era)
+  if ((phase === "breakout" || phase === "famous") && event.type === "brand") {
+    weight *= 1.3;
+  }
+  // Early-phase viral boost (getting discovered)
+  if ((phase === "early_creator" || phase === "emerging") && event.type === "viral") {
+    weight *= 1.4;
+  }
+
+  // ---- Flag-based dynamic weighting ----
+
+  // Feud consequences: more drama/failure events when feuding
+  if (state.flags.includes("startedFeud")) {
+    if (event.type === "drama") weight *= 1.6;
+    if (event.type === "failure") weight *= 1.3;
+  }
+
+  // Public relationship: more lifestyle events, paparazzi risk
+  if (state.flags.includes("publicRelationship")) {
+    if (event.type === "lifestyle") weight *= 1.4;
+    if (event.type === "celebrity") weight *= 1.2;
+  }
+
+  // Controversial: more drama and failure
+  if (state.flags.includes("controversial")) {
+    if (event.type === "drama") weight *= 1.5;
+    if (event.type === "brand") weight *= 0.7; // brands avoid controversy
+  }
+
+  // Brand safe: more brand opportunities
+  if (state.flags.includes("brandSafe")) {
+    if (event.type === "brand") weight *= 1.5;
+  }
+
+  // Burnout risk: more failure/recovery events
+  if (state.flags.includes("burnoutRisk")) {
+    if (event.type === "failure") weight *= 1.5;
+    if (event.type === "recovery") weight *= 1.8;
+    if (event.type === "viral") weight *= 0.6; // hard to go viral when burning out
+  }
+
+  // Has manager: more celebrity and brand opportunities
+  if (state.flags.includes("hasManager")) {
+    if (event.type === "celebrity") weight *= 1.4;
+    if (event.type === "brand") weight *= 1.3;
+    if (event.type === "empire") weight *= 1.3;
+  }
+
+  // Scandal magnet: attracts drama
+  if (state.flags.includes("scandalMagnet")) {
+    if (event.type === "drama") weight *= 1.7;
+  }
+
+  // Industry respected: more celebrity and empire events
+  if (state.flags.includes("industryRespected")) {
+    if (event.type === "celebrity") weight *= 1.3;
+    if (event.type === "empire") weight *= 1.4;
+  }
+
+  // Owns studio: empire events heavily boosted
+  if (state.flags.includes("ownsStudio")) {
+    if (event.type === "empire") weight *= 1.8;
+  }
+
+  // ---- Dynamic state-based boosts ----
+
+  // Overexposure: drama/failure boost when fame AND followers very high
+  if (state.stats.fame > 70 && state.stats.followers > 500_000) {
     if (event.type === "drama" || event.type === "failure") {
       weight *= 1.5;
     }
@@ -85,6 +167,14 @@ function scoreEvent(event: GameEvent, state: GameState): number {
   const eventTypeCount = recentTypes.filter(t => t === event.type).length;
   if (eventTypeCount >= 2) {
     weight *= 0.3;
+  }
+
+  // ---- Chaos injection: small chance of wild card events ----
+  // 8% chance to boost a random drama/failure/celebrity event
+  if (Math.random() < 0.08) {
+    if (event.type === "drama" || event.type === "celebrity" || event.type === "failure") {
+      weight *= 2.5;
+    }
   }
 
   return Math.max(weight, 0.01);

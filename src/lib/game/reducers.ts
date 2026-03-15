@@ -73,6 +73,7 @@ export function applyEventChoice(
   if (event.type === "celebrity") celebrityEvents++;
   if (event.type === "viral") viralMoments++;
   if (event.type === "recovery") comebacks++;
+  if (event.type === "empire") brandDeals++; // empire events count as brand milestones too
   if (event.id.includes("relationship") || choice.setFlags?.includes("publicRelationship")) {
     relationships++;
   }
@@ -148,19 +149,44 @@ export function applyBoost(state: GameState, boost: RewardedBoost): GameState {
   };
 }
 
-/** Advance to the next week. */
+/** Advance to the next week. Applies per-turn pressure mechanics. */
 export function advanceWeek(state: GameState): GameState {
   const stats = { ...state.stats };
+  let flags = [...state.flags];
+
+  // ---- Per-turn recovery ----
   stats.energy = clamp(stats.energy + ENERGY_RECOVERY, 0, 100);
   stats.mentalHealth = clamp(stats.mentalHealth + MENTAL_HEALTH_RECOVERY, 0, 100);
 
-  const newWeek = state.week + 1;
+  // ---- Overexposure pressure: high fame drains mental health ----
+  if (stats.fame > 75 && state.stats.followers > 500_000) {
+    stats.mentalHealth = clamp(stats.mentalHealth - 3, 0, 100);
+  }
 
-  const gameOverReason = checkGameOver({ ...state, stats, week: newWeek });
+  // ---- Auto-flag: burnoutRisk when mental health or energy chronically low ----
+  if (stats.mentalHealth < 25 || stats.energy < 20) {
+    if (!flags.includes("burnoutRisk")) flags.push("burnoutRisk");
+  } else if (stats.mentalHealth > 60 && stats.energy > 50) {
+    flags = flags.filter(f => f !== "burnoutRisk");
+  }
+
+  // ---- Auto-flag: controversial when scandals pile up ----
+  if (state.scandals >= 3 && !flags.includes("controversial")) {
+    flags.push("controversial");
+  }
+
+  // ---- Auto-flag: scandalMagnet at 5+ scandals ----
+  if (state.scandals >= 5 && !flags.includes("scandalMagnet")) {
+    flags.push("scandalMagnet");
+  }
+
+  const newWeek = state.week + 1;
+  const gameOverReason = checkGameOver({ ...state, stats, flags, week: newWeek });
 
   return {
     ...state,
     stats,
+    flags,
     week: newWeek,
     phase: gameOverReason ? "game_over" : "event",
     gameOverReason,

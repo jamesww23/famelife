@@ -205,4 +205,78 @@ export const celebrityEvents: GameEvent[] = [
       },
     ],
   },
+
+  // === CROSSOVER EVENTS ===
+  {
+    id: "movie_role_offer",
+    type: "celebrity",
+    title: "Movie Role Offer",
+    emoji: "🎬",
+    text: "A Hollywood director wants you for a supporting role in a major film. Actual acting. Actual movie theaters.",
+    weight: 5,
+    minPhase: "celebrity",
+    choices: [
+      {
+        id: "take_the_role",
+        text: "Take the role",
+        effects: { fame: 25, money: 20000, energy: -25, reputation: 10 },
+        setFlags: ["industryRespected"],
+        followUpText: "Three months of 5AM call times later, you see yourself on the big screen. Surreal.",
+        socialReaction: { type: "headline", text: "INTERNET STAR MAKES HOLLYWOOD DEBUT — CRITICS IMPRESSED" },
+      },
+      {
+        id: "decline_movie",
+        text: "Decline, stay in your lane",
+        effects: { reputation: 5, mentalHealth: 10 },
+        followUpText: "You pass on Hollywood. Your fans respect it. The director moves on.",
+      },
+    ],
+  },
+  {
+    id: "music_feature",
+    type: "celebrity",
+    title: "Music Feature",
+    emoji: "🎶",
+    text: "A chart-topping artist wants you on a track. Not as a joke — they actually think you've got something.",
+    weight: 6,
+    minPhase: "famous",
+    choices: [
+      {
+        id: "do_the_feature",
+        text: "Hit the studio",
+        effects: { fame: 18, followers: 30000, money: 10000, energy: -15 },
+        socialReaction: { type: "tweet", text: "THE COLLAB WE DIDN'T KNOW WE NEEDED. this actually slaps??", author: "@musichottest" },
+      },
+      {
+        id: "pass_on_music",
+        text: "Music isn't my thing",
+        effects: { energy: 5, reputation: 5 },
+        followUpText: "You know your strengths. Not everyone needs to drop a single.",
+      },
+    ],
+  },
+  {
+    id: "fashion_line_collab",
+    type: "celebrity",
+    title: "Fashion Line Collab",
+    emoji: "👗",
+    text: "A major fashion brand wants to co-create a capsule collection with your name on it. Your own clothing line.",
+    weight: 6,
+    minPhase: "breakout",
+    choices: [
+      {
+        id: "go_all_in_fashion",
+        text: "Go all in on the line",
+        effects: { money: 15000, fame: 12, reputation: 8, followers: 10000, energy: -10 },
+        socialReaction: { type: "headline", text: "INFLUENCER x [BRAND] COLLECTION SELLS OUT IN 12 MINUTES" },
+      },
+      {
+        id: "limited_edition_fashion",
+        text: "Limited edition only",
+        effects: { money: 5000, fame: 5, reputation: 10 },
+        followUpText: "Exclusive and tasteful. The fashion crowd approves of your restraint.",
+        socialReaction: { type: "comment", text: "the limited drop was so smart, keeps the demand high", author: "@fashioninsider" },
+      },
+    ],
+  },
 ];

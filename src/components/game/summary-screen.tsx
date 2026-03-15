@@ -10,7 +10,7 @@ export function SummaryScreen() {
   const [shared, setShared] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const shareText = `${state.character.avatar} ${state.character.name} — ${summary.fameRankEmoji} ${summary.fameRank} | Fame Score: ${summary.fameScore}/1000\n\n"${summary.headline}"\n\n👥 ${formatFollowers(summary.followers)} followers\n💰 ${formatMoney(summary.money)}\n🏆 Top ${100 - summary.percentile}% of players\n🔥 ${summary.viralMoments} viral moments\n😱 ${summary.scandals} scandals\n\nPlay Fame Life: `;
+  const shareText = `${state.character.avatar} ${state.character.name} — ${summary.earnedTitleEmoji} ${summary.earnedTitle}\n${summary.fameRankEmoji} ${summary.fameRank} | Fame Score: ${summary.fameScore}/1000\n\n"${summary.headline}"\n\n${summary.storyRecap}\n\n👥 ${formatFollowers(summary.followers)} followers\n💰 ${formatMoney(summary.money)}\n🏆 Top ${100 - summary.percentile}% of players\n🔥 ${summary.viralMoments} viral moments\n😱 ${summary.scandals} scandals\n\nPlay Fame Life: `;
 
   const handleShare = async () => {
     if (navigator.share) {
@@ -51,6 +51,14 @@ export function SummaryScreen() {
           <p className="text-white/70 text-sm">{summary.endingReason}</p>
         </div>
 
+        {/* Earned Title */}
+        <div className="game-card p-3 sm:p-4 mb-3 sm:mb-4 text-center">
+          <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">You Earned</div>
+          <div className="text-xl sm:text-2xl font-black text-gray-900">
+            {summary.earnedTitleEmoji} {summary.earnedTitle}
+          </div>
+        </div>
+
         {/* Fame Rank Card */}
         <div className="game-card p-4 sm:p-6 mb-3 sm:mb-4">
           <div className="text-center mb-3">
@@ -82,8 +90,9 @@ export function SummaryScreen() {
           </div>
         </div>
 
-        {/* Headline card */}
+        {/* Story recap */}
         <div className="game-card p-4 sm:p-5 mb-3 sm:mb-4">
+          <p className="text-sm text-gray-500 italic text-center mb-2">{summary.storyRecap}</p>
           <p className="text-base sm:text-lg font-black text-gray-900 leading-snug text-center">
             &ldquo;{summary.headline}&rdquo;
           </p>
