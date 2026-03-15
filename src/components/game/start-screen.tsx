@@ -86,38 +86,40 @@ export function StartScreen() {
 
         <div className="animate-slide-up" key={step}>
 
-          {/* Intro — Story + Tutorial */}
+          {/* Intro — Story + Mission */}
           {step === "intro" && (
             <>
               <div className="game-card p-5 sm:p-7 mb-4">
                 <div className="text-center mb-4">
                   <div className="text-4xl mb-2">📱</div>
                   <p className="text-gray-900 font-bold text-base sm:text-lg leading-snug">
-                    You just posted your first video. It got 12 views — 8 were from your mom.
+                    You just posted your first video.<br />
+                    12 views. 8 from your mom.
                   </p>
-                  <p className="text-gray-500 text-sm mt-2 leading-relaxed">
-                    But you have a dream: go from nobody to global icon in 10 years.
-                    Every quarter, life throws something at you — drama, brand deals, viral moments, scandals.
-                    Your choices shape everything.
+                  <p className="text-gray-500 text-sm mt-2">
+                    But something inside you says this is just the beginning.
                   </p>
                 </div>
 
-                <div className="border-t border-gray-100 pt-4 mt-4">
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 text-center">How It Works</p>
-                  <div className="space-y-3">
-                    <TutorialRow emoji="🎯" title="Make Choices" text="Each turn, you face an event with 2 options. Pick wisely — every choice has consequences." />
-                    <TutorialRow emoji="📊" title="Watch Your Stats" text="Track 6 stats: Followers, Money, Fame, Reputation, Energy, and Mental Health." />
-                    <TutorialRow emoji="💀" title="Don&apos;t Hit Zero" text="If your mental health, energy, or reputation bottoms out — game over." />
-                    <TutorialRow emoji="👑" title="Chase Glory" text="Unlock milestones, go viral, land brand deals, and aim for the highest Fame Score." />
+                <div className="border-t border-gray-100 pt-4 mt-2">
+                  <div className="space-y-2.5 text-left">
+                    <StoryStep emoji="🔥" text="Go viral. Get noticed." />
+                    <StoryStep emoji="💰" text="Land brand deals. Stack millions." />
+                    <StoryStep emoji="👑" text="Build an empire. Become a legend." />
+                    <StoryStep emoji="💀" text="But one wrong move and it all falls apart." />
                   </div>
                 </div>
+
+                <p className="text-center text-gray-400 text-xs mt-4">
+                  10 years. 40 choices. Your story.
+                </p>
               </div>
 
               <button
                 onClick={() => setStep("gender")}
                 className="w-full py-3.5 sm:py-4 rounded-2xl font-bold text-base sm:text-lg bg-white text-[#e040fb] hover:scale-[1.02] active:scale-[0.98] shadow-lg transition-all"
               >
-                Create Your Character
+                Start Your Fame Story
               </button>
             </>
           )}
@@ -298,7 +300,7 @@ export function StartScreen() {
             </>
           )}
 
-          {/* Step 5: Goal Briefing */}
+          {/* Step 5: Ready */}
           {step === "goal" && (
             <>
               <div className="game-card p-5 sm:p-7 mb-4 text-center">
@@ -312,14 +314,11 @@ export function StartScreen() {
                 </p>
 
                 <div className="border-t border-gray-100 pt-4">
-                  <p className="text-xs font-bold text-[#e040fb] uppercase tracking-wider mb-3">Your Mission</p>
-                  <div className="space-y-2 text-left">
-                    <GoalRow emoji="📱" text="Start as a nobody" />
-                    <GoalRow emoji="🔥" text="Go viral" />
-                    <GoalRow emoji="👑" text="Build your creator empire" />
-                    <GoalRow emoji="💰" text="Make millions" />
-                    <GoalRow emoji="🌍" text="Become a social media legend" />
-                  </div>
+                  <p className="text-sm text-gray-500 leading-relaxed">
+                    The algorithm doesn&apos;t care who you are yet.
+                    <br />
+                    <span className="font-bold text-gray-900">Time to change that.</span>
+                  </p>
                 </div>
               </div>
 
@@ -345,23 +344,12 @@ export function StartScreen() {
   );
 }
 
-function TutorialRow({ emoji, title, text }: { emoji: string; title: string; text: string }) {
+function StoryStep({ emoji, text }: { emoji: string; text: string }) {
   return (
-    <div className="flex items-start gap-3">
-      <span className="text-xl shrink-0">{emoji}</span>
-      <div>
-        <div className="font-bold text-sm text-gray-900">{title}</div>
-        <div className="text-xs text-gray-500 leading-snug">{text}</div>
-      </div>
-    </div>
-  );
-}
-
-function GoalRow({ emoji, text }: { emoji: string; text: string }) {
-  return (
-    <div className="flex items-center gap-2.5 py-1">
+    <div className="flex items-center gap-2.5 py-0.5">
       <span className="text-lg shrink-0">{emoji}</span>
       <span className="text-sm font-semibold text-gray-700">{text}</span>
     </div>
   );
 }
+
