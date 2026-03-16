@@ -17,7 +17,7 @@ export const brandEvents: GameEvent[] = [
       {
         id: "accept_deal",
         text: "Take the bag 💰",
-        effects: { money: 4500, fame: 5, reputation: 8, followers: 3000 },
+        effects: { money: 3000, fame: 5, reputation: 8, followers: 2000 },
         setFlags: ["brandSafe"],
         triggerChain: "brand_empire",
         followUpText: "First check hits different. You post the ad and it actually does well.",
@@ -26,7 +26,7 @@ export const brandEvents: GameEvent[] = [
       {
         id: "negotiate_more",
         text: "Ask for double the rate",
-        effects: { money: 9000, fame: 5, reputation: -5 },
+        effects: { money: 6000, fame: 5, reputation: -5 },
         setFlags: ["brandSafe"],
         triggerChain: "brand_empire",
         followUpText: "They actually said yes. Know your worth.",
@@ -48,14 +48,14 @@ export const brandEvents: GameEvent[] = [
       {
         id: "sign_exclusive",
         text: "Sign the exclusive deal",
-        effects: { money: 45000, fame: 20, reputation: 12, followers: 15000 },
+        effects: { money: 25000, fame: 15, reputation: 10, followers: 8000 },
         triggerChain: "brand_empire",
         socialReaction: { type: "headline", text: "RISING CREATOR LANDS MAJOR BRAND DEAL" },
       },
       {
         id: "stay_independent",
         text: "Keep your options open",
-        effects: { money: 9000, reputation: 12 },
+        effects: { money: 5000, reputation: 10 },
         followUpText: "Freedom has its price, but also its perks.",
       },
     ],
@@ -75,7 +75,7 @@ export const brandEvents: GameEvent[] = [
       {
         id: "launch_brand",
         text: "Let's build an empire",
-        effects: { money: -15000, fame: 30, reputation: 20, followers: 30000 },
+        effects: { money: -15000, fame: 22, reputation: 15, followers: 18000 },
         followUpText: "The launch sells out in 3 minutes. You just became a mogul.",
         socialReaction: { type: "tweet", text: "SOLD OUT IN 3 MINUTES. they really built something real.", author: "@businessinsider" },
       },
@@ -101,7 +101,7 @@ export const brandEvents: GameEvent[] = [
       {
         id: "take_crypto_bag",
         text: "50K is 50K...",
-        effects: { money: 30000, reputation: -38, followers: -9000 },
+        effects: { money: 20000, reputation: -38, followers: -12000 },
         setFlags: ["scandalProne"],
         socialReaction: { type: "tweet", text: "another influencer shilling a rugpull. shocker.", author: "@cryptoskeptic" },
       },
@@ -149,7 +149,7 @@ export const brandEvents: GameEvent[] = [
       {
         id: "go_on_trip",
         text: "Pack your bags!",
-        effects: { followers: 18000, fame: 12, money: 6000, energy: 20, mentalHealth: 20 },
+        effects: { followers: 10000, fame: 8, money: 4000, energy: 15, mentalHealth: 12 },
         socialReaction: { type: "comment", text: "living my dream life fr fr 😭", author: "@jealousfan" },
       },
       {
@@ -172,7 +172,7 @@ export const brandEvents: GameEvent[] = [
       {
         id: "hype_it_up",
         text: "Go live for the launch",
-        effects: { money: 15000, followers: 9000, fame: 8, energy: -20 },
+        effects: { money: 10000, followers: 5000, fame: 6, energy: -20 },
         socialReaction: { type: "tweet", text: "just copped the hoodie LET'S GO 🔥", author: "@dayone_supporter" },
       },
       {
@@ -194,13 +194,13 @@ export const brandEvents: GameEvent[] = [
       {
         id: "pitch_bigger",
         text: "Pitch an even bigger brand",
-        effects: { fame: 8, money: 9000, energy: -20, reputation: 8 },
+        effects: { fame: 6, money: 6000, energy: -20, reputation: 8 },
         followUpText: "The bigger brand says yes. Levels.",
       },
       {
         id: "publicly_shade",
         text: "Subtweet about cheap creators",
-        effects: { fame: 10, reputation: -12, followers: 6000 },
+        effects: { fame: 8, reputation: -12, followers: 3000 },
         socialReaction: { type: "tweet", text: "the shade is ASTRONOMICAL 🌒", author: "@teaspill" },
       },
     ],

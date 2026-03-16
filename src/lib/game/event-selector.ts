@@ -82,98 +82,106 @@ function scoreEvent(event: GameEvent, state: GameState): number {
   }
 
   // ---- Flag-based dynamic weighting ----
+  // Track per-type multipliers separately to cap stacking
+  let dramaMultiplier = 1.0;
+  let failureMultiplier = 1.0;
 
   // Feud consequences: more drama/failure events when feuding
   if (state.flags.includes("startedFeud")) {
-    if (event.type === "drama") weight *= 1.6;
-    if (event.type === "failure") weight *= 1.3;
+    if (event.type === "drama") dramaMultiplier += 0.5;
+    if (event.type === "failure") failureMultiplier += 0.25;
   }
 
   // Public relationship: more lifestyle events, paparazzi risk
   if (state.flags.includes("publicRelationship")) {
-    if (event.type === "lifestyle") weight *= 1.4;
-    if (event.type === "celebrity") weight *= 1.2;
+    if (event.type === "lifestyle") weight *= 1.3;
+    if (event.type === "celebrity") weight *= 1.15;
   }
 
   // Controversial: more drama and failure
   if (state.flags.includes("controversial")) {
-    if (event.type === "drama") weight *= 1.5;
-    if (event.type === "brand") weight *= 0.7; // brands avoid controversy
+    if (event.type === "drama") dramaMultiplier += 0.4;
+    if (event.type === "failure") failureMultiplier += 0.3;
+    if (event.type === "brand") weight *= 0.6; // brands avoid controversy
   }
 
   // Brand safe: more brand opportunities
   if (state.flags.includes("brandSafe")) {
-    if (event.type === "brand") weight *= 1.5;
+    if (event.type === "brand") weight *= 1.4;
   }
 
   // Burnout risk: more failure/recovery events
   if (state.flags.includes("burnoutRisk")) {
-    if (event.type === "failure") weight *= 1.5;
-    if (event.type === "recovery") weight *= 1.8;
-    if (event.type === "viral") weight *= 0.6; // hard to go viral when burning out
+    if (event.type === "failure") failureMultiplier += 0.4;
+    if (event.type === "recovery") weight *= 1.6;
+    if (event.type === "viral") weight *= 0.5; // hard to go viral when burning out
   }
 
   // Has manager: more celebrity and brand opportunities
   if (state.flags.includes("hasManager")) {
-    if (event.type === "celebrity") weight *= 1.4;
-    if (event.type === "brand") weight *= 1.3;
+    if (event.type === "celebrity") weight *= 1.3;
+    if (event.type === "brand") weight *= 1.2;
     if (event.type === "empire") weight *= 1.3;
   }
 
-  // Scandal magnet: attracts drama
+  // Scandal magnet: attracts drama (additive, not multiplicative)
   if (state.flags.includes("scandalMagnet")) {
-    if (event.type === "drama") weight *= 1.7;
+    if (event.type === "drama") dramaMultiplier += 0.5;
   }
 
   // Industry respected: more celebrity and empire events
   if (state.flags.includes("industryRespected")) {
-    if (event.type === "celebrity") weight *= 1.3;
-    if (event.type === "empire") weight *= 1.4;
+    if (event.type === "celebrity") weight *= 1.25;
+    if (event.type === "empire") weight *= 1.3;
   }
 
   // Owns studio: empire events heavily boosted
   if (state.flags.includes("ownsStudio")) {
-    if (event.type === "empire") weight *= 1.8;
+    if (event.type === "empire") weight *= 1.6;
   }
+
+  // Apply capped drama/failure multipliers (max 2.5x to prevent snowball)
+  if (event.type === "drama") weight *= Math.min(dramaMultiplier, 2.5);
+  if (event.type === "failure") weight *= Math.min(failureMultiplier, 2.0);
 
   // ---- Dynamic state-based boosts ----
 
   // Overexposure: drama/failure boost when fame AND followers very high
   if (state.stats.fame > 70 && state.stats.followers > 500_000) {
     if (event.type === "drama" || event.type === "failure") {
-      weight *= 1.5;
+      weight *= 1.3;
     }
   }
 
   // Recovery boost when struggling
   if (state.stats.mentalHealth < 30 || state.stats.reputation < 30) {
     if (event.type === "recovery") {
-      weight *= 2.0;
+      weight *= 1.8;
     }
   }
 
   // Viral boost for low-follower players (keep early game exciting)
   if (state.stats.followers < 10000 && event.type === "viral") {
-    weight *= 1.4;
+    weight *= 1.3;
   }
 
   // Celebrity boost for high-fame players
   if (state.stats.fame > 50 && event.type === "celebrity") {
-    weight *= 1.3;
+    weight *= 1.2;
   }
 
   // Prevent too many of the same category in a row
   const recentTypes = state.log.slice(-3).map(l => l.type as string);
   const eventTypeCount = recentTypes.filter(t => t === event.type).length;
   if (eventTypeCount >= 2) {
-    weight *= 0.3;
+    weight *= 0.25;
   }
 
   // ---- Chaos injection: small chance of wild card events ----
-  // 8% chance to boost a random drama/failure/celebrity event
-  if (Math.random() < 0.08) {
+  // 6% chance to boost a random drama/failure/celebrity event
+  if (Math.random() < 0.06) {
     if (event.type === "drama" || event.type === "celebrity" || event.type === "failure") {
-      weight *= 2.5;
+      weight *= 2.0;
     }
   }
 

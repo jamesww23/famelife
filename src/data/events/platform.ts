@@ -19,7 +19,7 @@ export const platformEvents: GameEvent[] = [
       {
         id: "complain_publicly",
         text: "Rant about it publicly",
-        effects: { followers: 12000, fame: 8, reputation: -8, energy: -10 },
+        effects: { followers: 6000, fame: 5, reputation: -8, energy: -10 },
         socialReaction: { type: "tweet", text: "every creator rn: 'WHY DID MY VIEWS DROP' 😂", author: "@algorithm_watch" },
       },
     ],
@@ -35,7 +35,7 @@ export const platformEvents: GameEvent[] = [
       {
         id: "early_adopter",
         text: "Be an early adopter",
-        effects: { followers: 24000, fame: 13, energy: -20 },
+        effects: { followers: 12000, fame: 10, energy: -20 },
         followUpText: "You're one of the first big accounts. The OG advantage is real.",
         socialReaction: { type: "comment", text: "they're already huge on here lol first mover wins", author: "@newplatformfan" },
       },
@@ -104,7 +104,7 @@ export const platformEvents: GameEvent[] = [
       {
         id: "touch_grass",
         text: "Go outside for once",
-        effects: { energy: 40, mentalHealth: 30 },
+        effects: { energy: 30, mentalHealth: 20 },
         followUpText: "You see the sun. You forgot what that looked like.",
       },
       {
@@ -150,7 +150,7 @@ export const platformEvents: GameEvent[] = [
       {
         id: "rant_about_pay",
         text: "Post about how insulting this is",
-        effects: { followers: 15000, fame: 8, reputation: 8 },
+        effects: { followers: 8000, fame: 5, reputation: 8 },
         socialReaction: { type: "tweet", text: "2M views = $47 this is actually criminal 😭", author: "@creatoreconomy" },
       },
       {

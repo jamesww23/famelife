@@ -13,13 +13,13 @@ export const recoveryEvents: GameEvent[] = [
       {
         id: "lean_into_comeback",
         text: "This is my comeback era",
-        effects: { followers: 24000, fame: 15, mentalHealth: 20, reputation: 12 },
+        effects: { followers: 12000, fame: 10, mentalHealth: 15, reputation: 10 },
         socialReaction: { type: "tweet", text: "THE COMEBACK. WE WAITED AND IT WAS WORTH IT.", author: "@dayone_fan" },
       },
       {
         id: "stay_low_key",
         text: "Just happy to be back",
-        effects: { followers: 12000, fame: 8, mentalHealth: 30, reputation: 20 },
+        effects: { followers: 6000, fame: 5, mentalHealth: 20, reputation: 15 },
         socialReaction: { type: "comment", text: "no pressure, just glad you're okay ❤️", author: "@gentlefan" },
       },
     ],
@@ -36,13 +36,13 @@ export const recoveryEvents: GameEvent[] = [
       {
         id: "emotional_thank_you",
         text: "Post a tearful thank you",
-        effects: { followers: 15000, fame: 8, mentalHealth: 40, reputation: 20 },
+        effects: { followers: 8000, fame: 6, mentalHealth: 25, reputation: 15 },
         socialReaction: { type: "comment", text: "WE'RE NOT CRYING YOU'RE CRYING 😭❤️", author: "@fanclub_official" },
       },
       {
         id: "channel_energy",
         text: "Use the energy to create",
-        effects: { followers: 18000, fame: 12, mentalHealth: 20, energy: 20 },
+        effects: { followers: 10000, fame: 8, mentalHealth: 15, energy: 15 },
         followUpText: "You turn the love into your best content yet.",
       },
     ],
@@ -59,7 +59,7 @@ export const recoveryEvents: GameEvent[] = [
       {
         id: "accept_mentorship",
         text: "Accept the mentorship",
-        effects: { fame: 12, reputation: 20, mentalHealth: 30, energy: 20 },
+        effects: { fame: 8, reputation: 15, mentalHealth: 20, energy: 15 },
         setFlags: ["industryRespected"],
         followUpText: "They teach you things no course ever could. Game-changer.",
       },
@@ -82,13 +82,13 @@ export const recoveryEvents: GameEvent[] = [
       {
         id: "go_all_out_charity",
         text: "Go all out, 24 hours",
-        effects: { followers: 30000, fame: 20, reputation: 38, energy: -40, mentalHealth: 20, money: -3000 },
+        effects: { followers: 18000, fame: 15, reputation: 30, energy: -40, mentalHealth: 12, money: -3000 },
         socialReaction: { type: "headline", text: "INFLUENCER RAISES $500K FOR CHARITY IN MARATHON STREAM" },
       },
       {
         id: "modest_charity",
         text: "Keep it chill, 4 hours",
-        effects: { followers: 9000, fame: 8, reputation: 25, energy: -10, mentalHealth: 16 },
+        effects: { followers: 5000, fame: 5, reputation: 18, energy: -10, mentalHealth: 10 },
         setFlags: ["industryRespected"],
       },
     ],
@@ -104,14 +104,14 @@ export const recoveryEvents: GameEvent[] = [
       {
         id: "follow_inspiration",
         text: "Film it right now at 3AM",
-        effects: { followers: 21000, fame: 12, energy: -20, mentalHealth: 16, reputation: 12 },
+        effects: { followers: 12000, fame: 8, energy: -20, mentalHealth: 10, reputation: 10 },
         followUpText: "The raw 3AM energy made it magic. Your best work in months.",
         socialReaction: { type: "tweet", text: "this has SOUL. you can feel the passion. this is why we follow.", author: "@content_critic" },
       },
       {
         id: "sleep_on_it",
         text: "Write it down, film tomorrow",
-        effects: { followers: 12000, fame: 8, energy: 10, mentalHealth: 10 },
+        effects: { followers: 6000, fame: 5, energy: 10, mentalHealth: 8 },
         followUpText: "More polished, less raw. Still good. But was it the same?",
       },
     ],
@@ -127,13 +127,13 @@ export const recoveryEvents: GameEvent[] = [
       {
         id: "share_the_message",
         text: "Share it (with permission)",
-        effects: { followers: 15000, reputation: 20, mentalHealth: 40 },
+        effects: { followers: 8000, reputation: 15, mentalHealth: 25 },
         socialReaction: { type: "comment", text: "this is why creators matter. this right here.", author: "@emotional_wreck" },
       },
       {
         id: "keep_it_private",
         text: "Keep it close to your heart",
-        effects: { mentalHealth: 50, reputation: 8 },
+        effects: { mentalHealth: 30, reputation: 8 },
         followUpText: "Some things are more valuable than content. This is one of them.",
       },
     ],
@@ -150,13 +150,13 @@ export const recoveryEvents: GameEvent[] = [
       {
         id: "commit_to_rebrand",
         text: "This is the new me",
-        effects: { followers: 24000, fame: 15, reputation: 12, mentalHealth: 20 },
+        effects: { followers: 12000, fame: 10, reputation: 10, mentalHealth: 12 },
         socialReaction: { type: "tweet", text: "the glow-up in content quality is INSANE. reinvention done right.", author: "@trendwatch" },
       },
       {
         id: "blend_old_new",
         text: "Mix old and new styles",
-        effects: { followers: 15000, fame: 10, reputation: 20 },
+        effects: { followers: 8000, fame: 7, reputation: 15 },
         followUpText: "Best of both worlds. Your OG fans and new ones coexist.",
       },
     ],
@@ -173,7 +173,7 @@ export const recoveryEvents: GameEvent[] = [
       {
         id: "return_refreshed",
         text: "Come back with fresh eyes",
-        effects: { energy: 60, mentalHealth: 50, followers: -6000, reputation: 12 },
+        effects: { energy: 40, mentalHealth: 30, followers: -8000, reputation: 10 },
         removeFlags: ["burnoutRisk"],
         followUpText: "You forgot what trees look like. Now you're back and sharper than ever.",
         socialReaction: { type: "comment", text: "they look so healthy and happy wtf 🥹", author: "@wellness_stan" },
@@ -181,7 +181,7 @@ export const recoveryEvents: GameEvent[] = [
       {
         id: "document_journey",
         text: "Vlog the whole detox",
-        effects: { energy: 30, mentalHealth: 20, followers: 15000, fame: 8 },
+        effects: { energy: 20, mentalHealth: 12, followers: 8000, fame: 5 },
         followUpText: "Slightly defeats the purpose but... great content.",
       },
     ],

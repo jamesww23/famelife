@@ -17,7 +17,7 @@ export const celebrityEvents: GameEvent[] = [
       {
         id: "flirt_back",
         text: "Slide right back 😏",
-        effects: { fame: 12, mentalHealth: 10, followers: 9000 },
+        effects: { fame: 8, mentalHealth: 8, followers: 5000 },
         setFlags: ["celebrityNoticed"],
         triggerChain: "celeb_romance",
         followUpText: "You've been texting all night. This is happening.",
@@ -25,7 +25,7 @@ export const celebrityEvents: GameEvent[] = [
       {
         id: "keep_professional",
         text: "Thanks! Collab sometime?",
-        effects: { fame: 8, reputation: 8, followers: 6000 },
+        effects: { fame: 5, reputation: 8, followers: 3000 },
         setFlags: ["celebrityNoticed"],
         followUpText: "Professional. Boring. But safe.",
       },
@@ -47,7 +47,7 @@ export const celebrityEvents: GameEvent[] = [
       {
         id: "go_on_date",
         text: "Obviously yes",
-        effects: { fame: 20, mentalHealth: 20, energy: -10, followers: 15000 },
+        effects: { fame: 15, mentalHealth: 12, energy: -10, followers: 8000 },
         setFlags: ["publicRelationship"],
         triggerChain: "celeb_romance",
         socialReaction: { type: "tweet", text: "SOMEONE SPOTTED THEM AT DINNER TOGETHER OMG???", author: "@paparazzi_alert" },
@@ -74,13 +74,13 @@ export const celebrityEvents: GameEvent[] = [
       {
         id: "nail_the_interview",
         text: "Prep hard, nail it",
-        effects: { followers: 60000, fame: 38, reputation: 20, energy: -30 },
+        effects: { followers: 30000, fame: 25, reputation: 15, energy: -30 },
         socialReaction: { type: "headline", text: "BREAKOUT PODCAST APPEARANCE GOES VIRAL" },
       },
       {
         id: "wing_it",
         text: "Wing it, be authentic",
-        effects: { followers: 30000, fame: 25, reputation: 8, energy: -10 },
+        effects: { followers: 15000, fame: 18, reputation: 8, energy: -10 },
         socialReaction: { type: "comment", text: "the vibe was immaculate honestly", author: "@podcastclips" },
       },
     ],
@@ -97,13 +97,13 @@ export const celebrityEvents: GameEvent[] = [
       {
         id: "clap_back_celeb",
         text: "Ratio them on Twitter",
-        effects: { followers: 24000, fame: 20, reputation: -8, energy: -10 },
+        effects: { followers: 12000, fame: 14, reputation: -10, energy: -10 },
         socialReaction: { type: "tweet", text: "THE RATIO 💀 they really said 'talentless' and got BODIED", author: "@ratioking" },
       },
       {
         id: "prove_with_content",
         text: "Let your content speak",
-        effects: { followers: 12000, fame: 8, reputation: 20 },
+        effects: { followers: 6000, fame: 5, reputation: 15 },
         setFlags: ["industryRespected"],
       },
     ],
@@ -120,13 +120,13 @@ export const celebrityEvents: GameEvent[] = [
       {
         id: "wild_outfit",
         text: "Something absolutely unhinged",
-        effects: { followers: 36000, fame: 25, reputation: -8, money: -15000 },
+        effects: { followers: 20000, fame: 18, reputation: -10, money: -15000 },
         socialReaction: { type: "headline", text: "INFLUENCER'S RED CARPET LOOK BREAKS THE INTERNET" },
       },
       {
         id: "classic_elegant",
         text: "Classic and elegant",
-        effects: { followers: 15000, fame: 15, reputation: 20, money: -6000 },
+        effects: { followers: 8000, fame: 10, reputation: 15, money: -6000 },
         socialReaction: { type: "comment", text: "giving timeless. giving class.", author: "@fashioncritic" },
       },
     ],
@@ -194,7 +194,7 @@ export const celebrityEvents: GameEvent[] = [
       {
         id: "own_the_fall",
         text: "Post it yourself first",
-        effects: { followers: 18000, fame: 12, reputation: 12 },
+        effects: { followers: 10000, fame: 8, reputation: 10 },
         socialReaction: { type: "tweet", text: "owning the fall before anyone could meme it is PEAK self-awareness", author: "@wholesome_takes" },
       },
       {
@@ -219,7 +219,7 @@ export const celebrityEvents: GameEvent[] = [
       {
         id: "take_the_role",
         text: "Take the role",
-        effects: { fame: 25, money: 20000, energy: -25, reputation: 10 },
+        effects: { fame: 20, money: 15000, energy: -25, reputation: 10 },
         setFlags: ["industryRespected"],
         followUpText: "Three months of 5AM call times later, you see yourself on the big screen. Surreal.",
         socialReaction: { type: "headline", text: "INTERNET STAR MAKES HOLLYWOOD DEBUT — CRITICS IMPRESSED" },
@@ -244,7 +244,7 @@ export const celebrityEvents: GameEvent[] = [
       {
         id: "do_the_feature",
         text: "Hit the studio",
-        effects: { fame: 18, followers: 30000, money: 10000, energy: -15 },
+        effects: { fame: 14, followers: 18000, money: 8000, energy: -15 },
         socialReaction: { type: "tweet", text: "THE COLLAB WE DIDN'T KNOW WE NEEDED. this actually slaps??", author: "@musichottest" },
       },
       {
@@ -267,7 +267,7 @@ export const celebrityEvents: GameEvent[] = [
       {
         id: "go_all_in_fashion",
         text: "Go all in on the line",
-        effects: { money: 15000, fame: 12, reputation: 8, followers: 10000, energy: -10 },
+        effects: { money: 10000, fame: 8, reputation: 8, followers: 6000, energy: -10 },
         socialReaction: { type: "headline", text: "INFLUENCER x [BRAND] COLLECTION SELLS OUT IN 12 MINUTES" },
       },
       {

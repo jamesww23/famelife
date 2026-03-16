@@ -46,18 +46,18 @@ export const STAT_EMOJI: Record<keyof Stats, string> = {
 };
 
 export const MAX_RECENT_EVENTS = 12;
-export const STORAGE_KEY = "influencer-life-save-v4";
+export const STORAGE_KEY = "influencer-life-save-v5";
 
 // Game length in quarters (each turn = 1 quarter = 3 months)
 export const QUICK_GAME_TURNS = 12;  // 3 years
 export const FULL_GAME_TURNS = 40;   // 10 years
 
-// Boost chance per turn
-export const BOOST_CHANCE = 0.35;
+// Boost chance per turn (was 0.35 — reduced to prevent free stat inflation every 3 turns)
+export const BOOST_CHANCE = 0.22;
 
-// Recovery per quarter (higher since each turn = 3 months)
-export const ENERGY_RECOVERY = 18;
-export const MENTAL_HEALTH_RECOVERY = 8;
+// Recovery per quarter (tuned down so burnout/fatigue arcs have real teeth)
+export const ENERGY_RECOVERY = 14;
+export const MENTAL_HEALTH_RECOVERY = 5;
 
 // Event category colors for UI
 // Career phase order (for comparison)

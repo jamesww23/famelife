@@ -16,13 +16,13 @@ export const lifestyleEvents: GameEvent[] = [
       {
         id: "go_public",
         text: "Make it Instagram official",
-        effects: { followers: 60000, fame: 38, mentalHealth: -10, reputation: 8 },
+        effects: { followers: 30000, fame: 25, mentalHealth: -12, reputation: 8 },
         socialReaction: { type: "headline", text: "IT'S OFFICIAL: INTERNET STAR AND A-LISTER ARE DATING" },
       },
       {
         id: "break_it_off",
         text: "This is too much, end it",
-        effects: { followers: 15000, fame: 20, mentalHealth: -30, reputation: 13 },
+        effects: { followers: 8000, fame: 12, mentalHealth: -30, reputation: 10 },
         removeFlags: ["publicRelationship"],
         socialReaction: { type: "tweet", text: "they chose peace over clout. actually heartbreaking.", author: "@relationshiptakes" },
       },
@@ -49,7 +49,7 @@ export const lifestyleEvents: GameEvent[] = [
       {
         id: "take_real_break",
         text: "Take a full week off",
-        effects: { followers: -9000, energy: 50, mentalHealth: 40 },
+        effects: { followers: -9000, energy: 35, mentalHealth: 25 },
         removeFlags: ["burnoutRisk"],
         socialReaction: { type: "comment", text: "take all the time you need, we'll be here ❤️", author: "@supportivefan" },
       },
@@ -67,7 +67,7 @@ export const lifestyleEvents: GameEvent[] = [
       {
         id: "flex_apartment",
         text: "Give the full apartment tour",
-        effects: { followers: 18000, fame: 13, money: -9000, reputation: -8 },
+        effects: { followers: 10000, fame: 10, money: -9000, reputation: -8 },
         socialReaction: { type: "comment", text: "must be nice... *cries in studio apartment*", author: "@relatable_fan" },
       },
       {
@@ -90,7 +90,7 @@ export const lifestyleEvents: GameEvent[] = [
       {
         id: "commit_to_therapy",
         text: "Take it seriously",
-        effects: { mentalHealth: 40, energy: 20, money: -1500 },
+        effects: { mentalHealth: 25, energy: 15, money: -1500 },
         removeFlags: ["burnoutRisk"],
         followUpText: "It's not a quick fix but you feel lighter already.",
       },
@@ -114,7 +114,7 @@ export const lifestyleEvents: GameEvent[] = [
       {
         id: "stay_for_everyone",
         text: "Meet every single person",
-        effects: { followers: 15000, reputation: 25, energy: -40, mentalHealth: 20 },
+        effects: { followers: 8000, reputation: 20, energy: -40, mentalHealth: 12 },
         socialReaction: { type: "tweet", text: "they stayed 4 EXTRA HOURS to meet everyone. that's a real one.", author: "@attendee_fan" },
       },
       {
@@ -158,7 +158,7 @@ export const lifestyleEvents: GameEvent[] = [
       {
         id: "move_in",
         text: "Move in, let's go!",
-        effects: { followers: 24000, fame: 13, mentalHealth: -16, energy: -20 },
+        effects: { followers: 12000, fame: 10, mentalHealth: -18, energy: -20 },
         socialReaction: { type: "tweet", text: "THEY JOINED THE HOUSE OMG the content is about to be insane", author: "@housefandom" },
       },
       {
@@ -180,7 +180,7 @@ export const lifestyleEvents: GameEvent[] = [
       {
         id: "respond_with_humor",
         text: "Make a video clapping back",
-        effects: { followers: 12000, fame: 8, mentalHealth: -10 },
+        effects: { followers: 6000, fame: 5, mentalHealth: -12 },
         socialReaction: { type: "comment", text: "the way they turned hate into content 😂 UNBOTHERED", author: "@supportive_army" },
       },
       {
@@ -256,7 +256,7 @@ export const lifestyleEvents: GameEvent[] = [
       {
         id: "go_public_romance",
         text: "Post the couple pic",
-        effects: { fame: 12, followers: 10000, mentalHealth: 10 },
+        effects: { fame: 8, followers: 5000, mentalHealth: 8 },
         setFlags: ["publicRelationship"],
         socialReaction: { type: "tweet", text: "THEY'RE SO CUTE TOGETHER OMG 😭❤️ new fav couple", author: "@shippers_unite" },
       },

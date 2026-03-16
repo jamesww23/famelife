@@ -8,7 +8,7 @@ export const dramaEvents: GameEvent[] = [
     title: "You've Been Called Out",
     emoji: "😤",
     text: "Another creator just dropped a 20-minute video calling you fake. It's trending #1.",
-    weight: 12,
+    weight: 9,
     minTier: "micro_influencer",
     excludedFlags: ["startedFeud"],
     chainId: "rival_feud",
@@ -17,7 +17,7 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "clap_back",
         text: "Fire back with receipts",
-        effects: { followers: 15000, fame: 15, reputation: -13, energy: -20 },
+        effects: { followers: 8000, fame: 12, reputation: -15, energy: -20 },
         setFlags: ["startedFeud"],
         triggerChain: "rival_feud",
         socialReaction: { type: "tweet", text: "OH THEY DID NOT JUST POST THAT 💀🍿", author: "@dramaalert" },
@@ -25,7 +25,7 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "take_high_road",
         text: "Post a calm response",
-        effects: { followers: 6000, fame: 8, reputation: 20 },
+        effects: { followers: 3000, fame: 5, reputation: 15 },
         socialReaction: { type: "comment", text: "maturity is so rare on this app", author: "@wholesomefan" },
       },
     ],
@@ -44,7 +44,7 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "leak_their_dms",
         text: "Leak THEIR DMs back",
-        effects: { followers: 24000, fame: 20, reputation: -30, mentalHealth: -20 },
+        effects: { followers: 12000, fame: 15, reputation: -30, mentalHealth: -25 },
         triggerChain: "rival_feud",
         setFlags: ["scandalProne"],
         socialReaction: { type: "headline", text: "INFLUENCER FEUD GOES NUCLEAR — BOTH SIDES LEAKING EVERYTHING" },
@@ -52,7 +52,7 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "address_honestly",
         text: "Go live and address it",
-        effects: { followers: 9000, fame: 10, reputation: 13, energy: -20, mentalHealth: -10 },
+        effects: { followers: 5000, fame: 7, reputation: 10, energy: -20, mentalHealth: -15 },
         triggerChain: "rival_feud",
       },
     ],
@@ -71,14 +71,14 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "public_makeup",
         text: "Collab video together",
-        effects: { followers: 45000, fame: 25, reputation: 25, money: 6000 },
+        effects: { followers: 25000, fame: 18, reputation: 20, money: 4000 },
         removeFlags: ["startedFeud"],
         socialReaction: { type: "tweet", text: "THE COLLAB WE NEVER EXPECTED. i'm literally crying rn", author: "@fanpage_central" },
       },
       {
         id: "scorched_earth",
         text: "Destroy them one final time",
-        effects: { followers: 30000, fame: 30, reputation: -38, mentalHealth: -20 },
+        effects: { followers: 15000, fame: 22, reputation: -40, mentalHealth: -25 },
         removeFlags: ["startedFeud"],
         setFlags: ["scandalProne"],
         socialReaction: { type: "headline", text: "INFLUENCER ENDS RIVAL'S CAREER IN SAVAGE FINAL VIDEO" },
@@ -145,7 +145,7 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "own_it",
         text: "Post a no-filter photo",
-        effects: { followers: 15000, fame: 8, reputation: 25 },
+        effects: { followers: 8000, fame: 6, reputation: 20 },
         socialReaction: { type: "comment", text: "THIS is what we need more of 👏", author: "@realbeauty" },
       },
       {
@@ -167,7 +167,7 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "public_response",
         text: "Expose them right back",
-        effects: { followers: 18000, fame: 13, reputation: -13, mentalHealth: -16 },
+        effects: { followers: 10000, fame: 10, reputation: -15, mentalHealth: -18 },
         socialReaction: { type: "headline", text: "INFLUENCER BEST FRIENDS DESTROY EACH OTHER ON SOCIAL MEDIA" },
       },
       {
@@ -188,7 +188,7 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "laugh_it_off",
         text: "Make it a bit, own it",
-        effects: { followers: 12000, fame: 13, reputation: -13, money: -3000 },
+        effects: { followers: 6000, fame: 10, reputation: -15, money: -3000 },
         socialReaction: { type: "tweet", text: "NOT THEM ROASTING THEIR OWN SPONSOR LIVE 😭😭😭", author: "@livestreamfails" },
       },
       {
@@ -210,13 +210,13 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "prove_its_fake",
         text: "Get experts to debunk it",
-        effects: { followers: 9000, fame: 13, reputation: 20, money: -6000, energy: -30 },
+        effects: { followers: 5000, fame: 10, reputation: 15, money: -6000, energy: -30 },
         socialReaction: { type: "headline", text: "INFLUENCER FIGHTS BACK AGAINST AI DEEPFAKE" },
       },
       {
         id: "emotional_video",
         text: "Post a tearful response",
-        effects: { followers: 15000, fame: 8, reputation: 13, mentalHealth: -20 },
+        effects: { followers: 8000, fame: 6, reputation: 10, mentalHealth: -25 },
         socialReaction: { type: "comment", text: "this is so scary... nobody deserves this", author: "@empatheticviewer" },
       },
     ],
@@ -234,7 +234,7 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "go_all_in",
         text: "24-hour stream to win it",
-        effects: { followers: 24000, fame: 15, energy: -50, mentalHealth: -10 },
+        effects: { followers: 12000, fame: 10, energy: -50, mentalHealth: -15 },
         socialReaction: { type: "tweet", text: "they're actually doing a 24 HOUR STREAM for this 😂 respect", author: "@streamhighlights" },
       },
       {
@@ -258,7 +258,7 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "fuel_the_fire",
         text: "Fan cam + 'my army is unmatched'",
-        effects: { fame: 15, reputation: -15, followers: 15000 },
+        effects: { fame: 10, reputation: -18, followers: 8000 },
         setFlags: ["scandalMagnet"],
         socialReaction: { type: "headline", text: "INFLUENCER FAN WARS SPIRAL OUT OF CONTROL" },
       },
@@ -308,7 +308,7 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "fire_back_diss",
         text: "Drop your own diss track",
-        effects: { fame: 18, reputation: -10, followers: 20000, energy: -15 },
+        effects: { fame: 12, reputation: -12, followers: 10000, energy: -15 },
         socialReaction: { type: "tweet", text: "THE RESPONSE TRACK IS ACTUALLY FIRE?? this beef produced bangers", author: "@musicdrama" },
       },
       {
@@ -331,7 +331,7 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "spill_the_tea",
         text: "Spill everything on live",
-        effects: { fame: 20, reputation: -15, followers: 25000 },
+        effects: { fame: 15, reputation: -18, followers: 12000 },
         removeFlags: ["publicRelationship"],
         setFlags: ["controversial"],
         socialReaction: { type: "headline", text: "INFLUENCER EXPOSES EX IN EXPLOSIVE TELL-ALL LIVESTREAM" },

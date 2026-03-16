@@ -6,7 +6,7 @@ export const rewardedBoosts: RewardedBoost[] = [
     name: "Algorithm Boost",
     emoji: "🚀",
     description: "Push your content to the For You page!",
-    effects: { followers: 15000, fame: 12 },
+    effects: { followers: 8000, fame: 8 },
     triggerCondition: "post_content",
   },
   {
@@ -14,7 +14,7 @@ export const rewardedBoosts: RewardedBoost[] = [
     name: "PR Crisis Team",
     emoji: "🛡️",
     description: "Hire a crisis team to save your reputation.",
-    effects: { reputation: 35, fame: 8 },
+    effects: { reputation: 20, fame: 5 },
     triggerCondition: "post_scandal",
   },
   {
@@ -22,7 +22,7 @@ export const rewardedBoosts: RewardedBoost[] = [
     name: "Talent Manager",
     emoji: "🌟",
     description: "Unlock exclusive celebrity opportunities.",
-    effects: { fame: 25, money: 6000, reputation: 12 },
+    effects: { fame: 15, money: 4000, reputation: 8 },
     triggerCondition: "celebrity_threshold",
   },
   {
@@ -30,7 +30,7 @@ export const rewardedBoosts: RewardedBoost[] = [
     name: "Double Deal",
     emoji: "💎",
     description: "Double the payout from your latest brand deal!",
-    effects: { money: 9000, reputation: 8 },
+    effects: { money: 6000, reputation: 5 },
     triggerCondition: "brand_deal",
   },
   {
@@ -38,7 +38,7 @@ export const rewardedBoosts: RewardedBoost[] = [
     name: "Energy Boost",
     emoji: "⚡",
     description: "Recharge with a sponsored wellness retreat.",
-    effects: { energy: 50, mentalHealth: 20 },
+    effects: { energy: 35, mentalHealth: 15 },
     triggerCondition: "low_energy",
   },
 ];

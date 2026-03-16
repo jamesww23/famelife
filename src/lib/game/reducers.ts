@@ -160,7 +160,11 @@ export function advanceWeek(state: GameState): GameState {
 
   // ---- Overexposure pressure: high fame drains mental health ----
   if (stats.fame > 75 && state.stats.followers > 500_000) {
-    stats.mentalHealth = clamp(stats.mentalHealth - 3, 0, 100);
+    stats.mentalHealth = clamp(stats.mentalHealth - 5, 0, 100);
+  }
+  // Moderate fame pressure (creates mid-game tension)
+  else if (stats.fame > 55 && state.stats.followers > 200_000) {
+    stats.mentalHealth = clamp(stats.mentalHealth - 2, 0, 100);
   }
 
   // ---- Auto-flag: burnoutRisk when mental health or energy chronically low ----

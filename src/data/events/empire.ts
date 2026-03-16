@@ -7,13 +7,13 @@ export const empireEvents: GameEvent[] = [
     title: "Production Studio Launch",
     emoji: "🎬",
     text: "You've outgrown your home setup. A real estate agent just showed you a 10,000 sq ft warehouse that could become the ultimate content studio — soundstages, editing bays, the works.",
-    weight: 7,
-    minPhase: "celebrity",
+    weight: 8,
+    minPhase: "famous",
     choices: [
       {
         id: "invest_big_studio",
         text: "Go all in — build the dream studio",
-        effects: { money: -45000, fame: 20, followers: 50000, energy: -15 },
+        effects: { money: -45000, fame: 18, followers: 30000, energy: -15 },
         setFlags: ["ownsStudio"],
         followUpText:
           "Construction starts next week. You just signed a 5-year lease and hired a full build-out crew. This is either your empire's HQ or the most expensive mistake of your life.",
@@ -26,7 +26,7 @@ export const empireEvents: GameEvent[] = [
       {
         id: "start_small_studio",
         text: "Start with a modest rental space",
-        effects: { money: -12000, fame: 8, followers: 15000, energy: -5 },
+        effects: { money: -12000, fame: 6, followers: 8000, energy: -5 },
         followUpText:
           "A clean 2,000 sq ft space with good lighting and decent acoustics. Not flashy, but it gets the job done without draining your accounts.",
         socialReaction: {
@@ -43,13 +43,13 @@ export const empireEvents: GameEvent[] = [
     title: "Creator House",
     emoji: "🏠",
     text: "The creator house trend isn't dead — it's evolved. You've got the clout and the cash to either build your own or join an established one with some of the biggest names in the game.",
-    weight: 6,
+    weight: 7,
     minPhase: "famous",
     choices: [
       {
         id: "build_own_house",
         text: "Build your own creator house",
-        effects: { money: -35000, fame: 22, followers: 40000, reputation: 10, energy: -20 },
+        effects: { money: -35000, fame: 18, followers: 25000, reputation: 10, energy: -20 },
         setFlags: ["ownsStudio"],
         followUpText:
           "You bought a mansion, hired a house manager, and moved in five up-and-coming creators. Welcome to the content factory. Every room is a set.",
@@ -62,7 +62,7 @@ export const empireEvents: GameEvent[] = [
       {
         id: "join_existing_house",
         text: "Join an established creator house",
-        effects: { money: -8000, fame: 10, followers: 60000, reputation: 5, energy: -10 },
+        effects: { money: -8000, fame: 8, followers: 35000, reputation: 5, energy: -10 },
         followUpText:
           "You moved into the house and immediately got pulled into three collabs. The algorithm loves this kind of crossover content.",
         socialReaction: {
@@ -85,7 +85,7 @@ export const empireEvents: GameEvent[] = [
       {
         id: "premium_brand",
         text: "Launch a premium brand — limited drops only",
-        effects: { money: -20000, fame: 12, reputation: 15, followers: 20000 },
+        effects: { money: -20000, fame: 10, reputation: 12, followers: 12000 },
         followUpText:
           "The first drop sold out in 90 seconds. Resellers are already flipping your hoodies for 3x retail. The brand feels real — not just merch with your face on it.",
         socialReaction: {
@@ -120,7 +120,7 @@ export const empireEvents: GameEvent[] = [
       {
         id: "go_all_out_giveaway",
         text: "Go nuclear — $500K giveaway",
-        effects: { money: -50000, followers: 100000, fame: 25, energy: -20, reputation: 5 },
+        effects: { money: -50000, followers: 60000, fame: 20, energy: -20, reputation: 5 },
         followUpText:
           "The video hit 80 million views. You gave away 10 cars, paid off someone's student loans, and the internet lost its mind. Your subscriber count is climbing faster than ever.",
         socialReaction: {
@@ -132,7 +132,7 @@ export const empireEvents: GameEvent[] = [
       {
         id: "modest_giveaway",
         text: "Keep it reasonable — $50K giveaway",
-        effects: { money: -12000, followers: 25000, fame: 10, energy: -8 },
+        effects: { money: -12000, followers: 15000, fame: 8, energy: -8 },
         followUpText:
           "A solid giveaway that made some people's day without bankrupting you. The comments are positive and the engagement spike is real, even if it's not headline material.",
         socialReaction: {
@@ -149,7 +149,7 @@ export const empireEvents: GameEvent[] = [
     title: "Foundation Launch",
     emoji: "🌍",
     text: "You've got the platform and the resources. Your accountant says a charitable foundation could do real good — and also help with taxes. The question is how genuine you want to make it.",
-    weight: 6,
+    weight: 7,
     minPhase: "celebrity",
     choices: [
       {
@@ -221,14 +221,14 @@ export const empireEvents: GameEvent[] = [
     title: "Global Campaign",
     emoji: "🌐",
     text: "Your studio is up and running. Your team wants to go global — localized content for international markets, translated channels, the whole operation. This is how empires scale.",
-    weight: 5,
+    weight: 7,
     minPhase: "empire",
     requiredFlags: ["ownsStudio"],
     choices: [
       {
         id: "go_international",
         text: "Launch internationally — translate everything",
-        effects: { money: -40000, followers: 80000, fame: 22, energy: -25, reputation: 10 },
+        effects: { money: -40000, followers: 50000, fame: 18, energy: -25, reputation: 10 },
         followUpText:
           "You hired translation teams for six languages, launched regional channels, and started collaborating with international creators. Your content is being watched on every continent. The logistics are insane but the growth is unprecedented.",
         socialReaction: {
@@ -240,7 +240,7 @@ export const empireEvents: GameEvent[] = [
       {
         id: "domestic_focus",
         text: "Stay focused on the domestic market",
-        effects: { money: -10000, followers: 25000, fame: 10, energy: -10 },
+        effects: { money: -10000, followers: 15000, fame: 8, energy: -10 },
         followUpText:
           "You doubled down on what works — deeper content, better engagement, stronger community. Not as flashy as going global, but the foundation is rock solid.",
         socialReaction: {
@@ -257,13 +257,13 @@ export const empireEvents: GameEvent[] = [
     title: "Reality Show Offer",
     emoji: "📺",
     text: "A major network just offered you your own reality series. Cameras follow you 24/7, your life becomes content. The money is huge but your reputation is on the line.",
-    weight: 7,
+    weight: 8,
     minPhase: "famous",
     choices: [
       {
         id: "take_reality_show",
         text: "Sign the deal — let the cameras roll",
-        effects: { money: 35000, fame: 25, reputation: -12, energy: -25, followers: 45000, mentalHealth: -10 },
+        effects: { money: 25000, fame: 20, reputation: -15, energy: -25, followers: 25000, mentalHealth: -12 },
         followUpText:
           "Episode one drops and trends worldwide. The producers are pushing drama hard — manufactured fights, misleading edits. You're famous, but the version of you on screen isn't really you. The comments section is a warzone.",
         socialReaction: {
@@ -292,13 +292,13 @@ export const empireEvents: GameEvent[] = [
     title: "Media Company Acquisition",
     emoji: "🏢",
     text: "A struggling digital media company with solid infrastructure and a back catalog of content is up for sale. Meanwhile, a larger media conglomerate has been quietly asking about acquiring YOUR brand.",
-    weight: 5,
+    weight: 7,
     minPhase: "empire",
     choices: [
       {
         id: "acquire_company",
         text: "Buy the media company — expand your empire",
-        effects: { money: -50000, fame: 20, followers: 30000, reputation: 12, energy: -15 },
+        effects: { money: -50000, fame: 18, followers: 20000, reputation: 12, energy: -15 },
         setFlags: ["ownsStudio"],
         followUpText:
           "You just became a media mogul. The acquisition gives you a production pipeline, a content library, and a team of 40 experienced creators. The integration will be brutal but the upside is massive.",
@@ -328,13 +328,13 @@ export const empireEvents: GameEvent[] = [
     title: "Investor Pitch",
     emoji: "💰",
     text: "Three venture capital firms are fighting to invest in your brand. They see you as the next media empire. The term sheets are on the table — big money, but they want a board seat and creative oversight.",
-    weight: 6,
+    weight: 7,
     minPhase: "celebrity",
     choices: [
       {
         id: "take_investment",
         text: "Take the VC money — $10M for 20% equity",
-        effects: { money: 40000, fame: 12, reputation: -10, followers: 15000, energy: 10 },
+        effects: { money: 30000, fame: 10, reputation: -10, followers: 10000, energy: 10 },
         followUpText:
           "The wire hit your account and suddenly you have a board of directors. The investors are already suggesting 'content pivots' and 'audience optimization strategies.' You have resources but every creative decision now goes through a committee.",
         socialReaction: {

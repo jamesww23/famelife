@@ -43,7 +43,7 @@ export const failureEvents: GameEvent[] = [
       {
         id: "focus_on_audience",
         text: "Forget brands, fix your content",
-        effects: { followers: 9000, reputation: 13, money: -3000, energy: -20 },
+        effects: { followers: 5000, reputation: 10, money: -3000, energy: -20 },
         followUpText: "Back to basics. Your fans needed this.",
       },
     ],
@@ -60,7 +60,7 @@ export const failureEvents: GameEvent[] = [
       {
         id: "call_them_out",
         text: "Call them out publicly",
-        effects: { followers: 9000, fame: 8, reputation: -13 },
+        effects: { followers: 5000, fame: 5, reputation: -15 },
         socialReaction: { type: "tweet", text: "idk they both kinda do the same thing 🤷", author: "@neutralobserver" },
       },
       {
@@ -111,7 +111,7 @@ export const failureEvents: GameEvent[] = [
       {
         id: "make_it_content",
         text: "Make a video about the theft",
-        effects: { followers: 18000, fame: 10, reputation: 13 },
+        effects: { followers: 10000, fame: 7, reputation: 10 },
         socialReaction: { type: "tweet", text: "the AUDACITY of content farms. go support the original creator!", author: "@creditcreators" },
       },
     ],
@@ -133,7 +133,7 @@ export const failureEvents: GameEvent[] = [
       {
         id: "stand_by_take",
         text: "Double down, you meant it",
-        effects: { followers: -9000, fame: 13, reputation: -20 },
+        effects: { followers: -12000, fame: 10, reputation: -25 },
         socialReaction: { type: "tweet", text: "THEY DOUBLED DOWN 😭😭😭 this is not the move", author: "@badtakes_daily" },
       },
     ],
@@ -151,13 +151,13 @@ export const failureEvents: GameEvent[] = [
       {
         id: "get_financial_help",
         text: "Hire an accountant",
-        effects: { money: -3000, mentalHealth: 20 },
+        effects: { money: -3000, mentalHealth: 12 },
         followUpText: "Turns out you owe even more. But at least now you have a plan.",
       },
       {
         id: "desperate_sponsorships",
         text: "Take any sponsor that pays",
-        effects: { money: 15000, reputation: -20 },
+        effects: { money: 10000, reputation: -22 },
         socialReaction: { type: "comment", text: "why are they promoting EVERYTHING now 😭", author: "@concerned_viewer" },
       },
     ],
@@ -179,7 +179,7 @@ export const failureEvents: GameEvent[] = [
       {
         id: "subtweet_about_it",
         text: "Vague post about fake people",
-        effects: { followers: 6000, fame: 5, reputation: -13 },
+        effects: { followers: 3000, fame: 3, reputation: -15 },
         socialReaction: { type: "tweet", text: "who is this about 👀 the tea is PIPING", author: "@vaguepost_detective" },
       },
     ],
@@ -271,13 +271,13 @@ export const failureEvents: GameEvent[] = [
       {
         id: "push_through_burnout",
         text: "Push through the wall",
-        effects: { energy: -25, mentalHealth: -20, money: 5000 },
+        effects: { energy: -30, mentalHealth: -25, money: 3000 },
         followUpText: "The content gets made. But at what cost? You don't recognize yourself anymore.",
       },
       {
         id: "seek_help_burnout",
         text: "Get professional help",
-        effects: { money: -8000, energy: 20, mentalHealth: 25 },
+        effects: { money: -8000, energy: 15, mentalHealth: 18 },
         setFlags: ["industryRespected"],
         removeFlags: ["burnoutRisk"],
         followUpText: "A therapist, a coach, and two weeks off. You start to feel human again.",
