@@ -190,10 +190,34 @@ export interface LogEntry {
   emoji?: string;
 }
 
+// ---- Quarterly Income ----
+
+export interface QuarterlyIncome {
+  adRevenue: number;
+  sponsorships: number;
+  totalIncome: number;
+  expenses: number;
+  net: number;
+}
+
+// ---- Quarterly Activities ----
+
+export interface QuarterlyActivity {
+  id: string;
+  name: string;
+  emoji: string;
+  description: string;
+  category?: "work" | "lifestyle";
+  minMoney?: number;
+  minFollowers?: number;
+  getEffects: (state: GameState) => StatEffects;
+}
+
 // ---- Game State ----
 
 export type GamePhase =
   | "start"
+  | "activity"
   | "event"
   | "outcome"
   | "boost_offer"
@@ -231,6 +255,8 @@ export interface GameState {
   relationships: number;
   viralMoments: number;
   comebacks: number;
+  // Income & Activities
+  quarterlyIncome: QuarterlyIncome | null;
   // End
   gameOverReason: string | null;
 }

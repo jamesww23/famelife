@@ -7,10 +7,12 @@ import {
   CharacterBuild,
   GameMode,
   EventChoice,
+  QuarterlyActivity,
   GamePhase,
 } from "@/lib/game/types";
 import {
   createInitialState,
+  handleActivitySelection,
   serveNextEvent,
   resolveEventChoice,
   acceptBoost,
@@ -23,6 +25,7 @@ import { STORAGE_KEY } from "@/lib/game/constants";
 type GameContextValue = {
   state: GameState;
   startGame: (archetype: ArchetypeId, mode: GameMode, character: CharacterBuild) => void;
+  selectActivity: (activity: QuarterlyActivity) => void;
   chooseEventOption: (choice: EventChoice) => void;
   onAcceptBoost: () => void;
   onDeclineBoost: () => void;
@@ -38,6 +41,7 @@ const GameContext = createContext<GameContextValue | null>(null);
 type Action =
   | { type: "SET_STATE"; state: GameState }
   | { type: "START_GAME"; archetype: ArchetypeId; mode: GameMode; character: CharacterBuild }
+  | { type: "SELECT_ACTIVITY"; activity: QuarterlyActivity }
   | { type: "CHOOSE_EVENT"; choice: EventChoice }
   | { type: "ACCEPT_BOOST" }
   | { type: "DECLINE_BOOST" }
@@ -52,9 +56,12 @@ function reducer(state: GameState, action: Action): GameState {
     case "SET_STATE":
       return action.state;
     case "START_GAME": {
-      const initial = createInitialState(action.archetype, action.mode, action.character);
-      // Immediately serve the first event
-      return serveNextEvent(initial);
+      // Start in activity phase — player picks their first action
+      return createInitialState(action.archetype, action.mode, action.character);
+    }
+    case "SELECT_ACTIVITY": {
+      // Apply activity effects, then serve the quarter's random event
+      return handleActivitySelection(state, action.activity);
     }
     case "CHOOSE_EVENT":
       return resolveEventChoice(state, action.choice);
@@ -76,9 +83,8 @@ function reducer(state: GameState, action: Action): GameState {
       return endTurn(state);
     }
     case "EXTEND_GAME": {
-      // Switch to full mode and continue playing
-      const extended = { ...state, mode: "full" as GameMode, phase: "event" as GamePhase };
-      return serveNextEvent(extended);
+      // Switch to full mode and go to activity phase
+      return { ...state, mode: "full" as GameMode, phase: "activity" as GamePhase };
     }
     case "DECLINE_EXTEND": {
       const years = Math.ceil(state.week / 4);
@@ -100,7 +106,7 @@ const INITIAL: GameState = {
   week: 0,
   mode: "full",
   archetype: "comedy",
-  character: { name: "", avatar: "😎", traitId: "street_smart" },
+  character: { name: "", avatar: "\uD83D\uDE0E", traitId: "street_smart" },
   stats: { followers: 0, fame: 0, reputation: 0, money: 0, energy: 0, mentalHealth: 0 },
   flags: [],
   careerTier: "new_creator",
@@ -118,6 +124,7 @@ const INITIAL: GameState = {
   relationships: 0,
   viralMoments: 0,
   comebacks: 0,
+  quarterlyIncome: null,
   gameOverReason: null,
 };
 
@@ -156,6 +163,10 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
   const startGame = useCallback((archetype: ArchetypeId, mode: GameMode, character: CharacterBuild) => {
     localStorage.removeItem(STORAGE_KEY);
     dispatch({ type: "START_GAME", archetype, mode, character });
+  }, []);
+
+  const selectActivity = useCallback((activity: QuarterlyActivity) => {
+    dispatch({ type: "SELECT_ACTIVITY", activity });
   }, []);
 
   const chooseEventOption = useCallback((choice: EventChoice) => {
@@ -203,6 +214,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
       value={{
         state,
         startGame,
+        selectActivity,
         chooseEventOption,
         onAcceptBoost,
         onDeclineBoost,

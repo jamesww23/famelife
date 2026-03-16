@@ -46,7 +46,7 @@ export const STAT_EMOJI: Record<keyof Stats, string> = {
 };
 
 export const MAX_RECENT_EVENTS = 12;
-export const STORAGE_KEY = "influencer-life-save-v5";
+export const STORAGE_KEY = "influencer-life-save-v6";
 
 // Game length in quarters (each turn = 1 quarter = 3 months)
 export const QUICK_GAME_TURNS = 12;  // 3 years

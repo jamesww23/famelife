@@ -9,6 +9,7 @@ import {
   applyEffectsSimple,
   applyEventChoice,
   applyBoost,
+  applyActivity,
   advanceWeek,
   addMilestone,
 } from "./reducers";
@@ -19,6 +20,7 @@ import {
   GameMode,
   EventChoice,
   RewardedBoost,
+  QuarterlyActivity,
 } from "./types";
 import { traits } from "@/data/traits";
 
@@ -33,7 +35,7 @@ export function createInitialState(archetypeId: ArchetypeId, mode: GameMode, cha
   }
 
   return {
-    phase: "event",
+    phase: "activity",
     week: 1,
     mode,
     archetype: archetypeId,
@@ -41,7 +43,7 @@ export function createInitialState(archetypeId: ArchetypeId, mode: GameMode, cha
     stats,
     flags: [],
     careerTier: getTierForFollowers(stats.followers),
-    log: [{ week: 1, text: `${character.name} started their career as ${arch.name}`, type: "system", emoji: "🎬" }],
+    log: [{ week: 1, text: `${character.name} started their career as ${arch.name}`, type: "system", emoji: "\uD83C\uDFAC" }],
     milestones: [],
     currentEvent: null,
     currentChoiceResult: null,
@@ -55,6 +57,7 @@ export function createInitialState(archetypeId: ArchetypeId, mode: GameMode, cha
     relationships: 0,
     viralMoments: 0,
     comebacks: 0,
+    quarterlyIncome: null,
     gameOverReason: null,
   };
 }
@@ -68,6 +71,14 @@ export function serveNextEvent(state: GameState): GameState {
     phase: "event",
     currentEvent: event,
   };
+}
+
+// ---- Resolve activity selection (new turn phase) ----
+
+export function handleActivitySelection(state: GameState, activity: QuarterlyActivity): GameState {
+  const next = applyActivity(state, activity);
+  // After picking an activity, serve the random event for this quarter
+  return serveNextEvent(next);
 }
 
 // ---- Resolve player choice ----
@@ -104,12 +115,9 @@ export function declineBoost(state: GameState): GameState {
 // ---- End turn ----
 
 export function endTurn(state: GameState): GameState {
-  const next = advanceWeek(state);
-  // If not game over, serve the next event automatically
-  if (next.phase === "event") {
-    return serveNextEvent(next);
-  }
-  return next;
+  // advanceWeek sets phase to "activity" (or "game_over")
+  // The next event is served after the player picks their activity
+  return advanceWeek(state);
 }
 
 // ---- Helpers ----

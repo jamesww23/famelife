@@ -2,6 +2,7 @@
 
 import { useGame } from "@/state/game-context";
 import { StatBar } from "./stat-bar";
+import { ActivityPhase } from "./activity-phase";
 import { EventCard } from "./event-card";
 import { EventOutcome } from "./event-outcome";
 import { BoostModal } from "./boost-modal";
@@ -19,6 +20,7 @@ export function GameScreen() {
 
       {/* Center content area */}
       <div className="w-full max-w-lg flex-1 flex flex-col justify-center">
+        {state.phase === "activity" && <ActivityPhase />}
         {state.phase === "event" && state.currentEvent && <EventCard />}
         {state.phase === "outcome" && <EventOutcome />}
       </div>

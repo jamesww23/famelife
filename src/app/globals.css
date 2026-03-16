@@ -215,6 +215,38 @@
   animation: statFlash 0.6s ease-out;
 }
 
+/* Activity buttons */
+.activity-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 8px;
+  background: white;
+  border: 2px solid #e8e0f0;
+  border-radius: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  min-height: 100px;
+}
+.activity-btn:hover {
+  border-color: #e040fb;
+  background: #fdf2ff;
+  transform: scale(1.02);
+}
+.activity-btn:active {
+  transform: scale(0.97);
+}
+.activity-btn-lifestyle {
+  border-color: #fde68a;
+  background: #fffbeb;
+}
+.activity-btn-lifestyle:hover {
+  border-color: #f59e0b;
+  background: #fef3c7;
+}
+
 /* Boost modal */
 .boost-overlay {
   background: rgba(0, 0, 0, 0.6);
@@ -242,6 +274,11 @@
   .choice-btn {
     padding: 12px 14px;
     font-size: 0.875rem;
+    border-radius: 0.75rem;
+  }
+  .activity-btn {
+    padding: 10px 6px;
+    min-height: 85px;
     border-radius: 0.75rem;
   }
   .social-bubble {

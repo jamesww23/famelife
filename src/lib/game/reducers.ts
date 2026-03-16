@@ -9,8 +9,10 @@ import {
   EventChoice,
   GameEvent,
   RewardedBoost,
+  QuarterlyActivity,
   LogEntry,
 } from "./types";
+import { calculateQuarterlyIncome } from "./income";
 import { EVENT_EMOJI } from "./constants";
 
 /** Apply stat effects to a stats object, clamping bounded stats. Returns new stats + deltas. */
@@ -149,10 +151,35 @@ export function applyBoost(state: GameState, boost: RewardedBoost): GameState {
   };
 }
 
+/** Apply a quarterly activity choice. */
+export function applyActivity(state: GameState, activity: QuarterlyActivity): GameState {
+  const effects = activity.getEffects(state);
+  const { stats } = applyEffects(state.stats, effects);
+  const careerTier = getTierForFollowers(stats.followers);
+
+  const logEntry: LogEntry = {
+    week: state.week,
+    text: `${activity.name}`,
+    type: "system",
+    emoji: activity.emoji,
+  };
+
+  return {
+    ...state,
+    stats,
+    careerTier,
+    log: [...state.log, logEntry],
+  };
+}
+
 /** Advance to the next week. Applies per-turn pressure mechanics. */
 export function advanceWeek(state: GameState): GameState {
   const stats = { ...state.stats };
   let flags = [...state.flags];
+
+  // ---- Quarterly Income (calculated before recovery) ----
+  const income = calculateQuarterlyIncome(state);
+  stats.money += income.net;
 
   // ---- Per-turn recovery ----
   stats.energy = clamp(stats.energy + ENERGY_RECOVERY, 0, 100);
@@ -187,17 +214,32 @@ export function advanceWeek(state: GameState): GameState {
   const newWeek = state.week + 1;
   const gameOverReason = checkGameOver({ ...state, stats, flags, week: newWeek });
 
+  // Income log entry
+  const logEntries: LogEntry[] = [];
+  if (income.net !== 0) {
+    logEntries.push({
+      week: newWeek,
+      text: income.net >= 0
+        ? `Earned $${income.net.toLocaleString()} this quarter`
+        : `Lost $${Math.abs(income.net).toLocaleString()} in expenses`,
+      type: "system",
+      emoji: income.net >= 0 ? "\uD83D\uDCB0" : "\uD83D\uDCC9",
+    });
+  }
+
   return {
     ...state,
     stats,
     flags,
     week: newWeek,
-    phase: gameOverReason ? "game_over" : "event",
+    phase: gameOverReason ? "game_over" : "activity",
     gameOverReason,
+    quarterlyIncome: income,
     currentEvent: null,
     currentChoiceResult: null,
     pendingBoost: null,
     pendingMilestones: [],
+    log: [...state.log, ...logEntries],
   };
 }
 
