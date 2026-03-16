@@ -1,15 +1,17 @@
 "use client";
 
+import { useState } from "react";
 import { useGame } from "@/state/game-context";
 import { workActivities, lifestyleActivities } from "@/data/activities";
 import { STAT_EMOJI } from "@/lib/game/constants";
-import { formatQuarter } from "@/lib/game/progression";
-import { Stats, QuarterlyActivity } from "@/lib/game/types";
+import { formatQuarter, formatMoney } from "@/lib/game/progression";
+import { Stats, QuarterlyActivity, ActivityTier } from "@/lib/game/types";
 
 export function ActivityPhase() {
   const { state, selectActivity } = useGame();
   const income = state.quarterlyIncome;
   const isFirstTurn = state.week === 1;
+  const [expandedActivity, setExpandedActivity] = useState<QuarterlyActivity | null>(null);
 
   // Filter lifestyle activities based on current money and followers
   const availableLifestyle = lifestyleActivities.filter((a) => {
@@ -18,9 +20,121 @@ export function ActivityPhase() {
     return true;
   });
 
+  // Handle selecting a tier from an expanded activity
+  const handleTierSelect = (activity: QuarterlyActivity, tier: ActivityTier) => {
+    selectActivity({
+      ...activity,
+      name: `${activity.name}: ${tier.name}`,
+      emoji: tier.emoji,
+      getEffects: () => tier.effects,
+    });
+    setExpandedActivity(null);
+  };
+
+  // Handle clicking a lifestyle activity
+  const handleLifestyleClick = (activity: QuarterlyActivity) => {
+    if (activity.tiers && activity.tiers.length > 0) {
+      setExpandedActivity(activity);
+    } else {
+      selectActivity(activity);
+    }
+  };
+
+  // ---- Tier Selection View ----
+  if (expandedActivity && expandedActivity.tiers) {
+    const affordableTiers = expandedActivity.tiers.filter((tier) => {
+      const cost = Math.abs(tier.effects.money ?? 0);
+      return state.stats.money >= cost;
+    });
+    const lockedTiers = expandedActivity.tiers.filter((tier) => {
+      const cost = Math.abs(tier.effects.money ?? 0);
+      return state.stats.money < cost;
+    });
+
+    return (
+      <div className="animate-scale-in" key={`tier-${expandedActivity.id}`}>
+        <div className="game-card p-4 sm:p-5">
+          <button
+            onClick={() => setExpandedActivity(null)}
+            className="text-xs font-semibold text-gray-400 hover:text-gray-600 transition-colors mb-3"
+          >
+            {"\u2190"} Back
+          </button>
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-2xl">{expandedActivity.emoji}</span>
+            <div>
+              <h3 className="font-bold text-gray-900 text-sm">{expandedActivity.name}</h3>
+              <p className="text-[10px] text-gray-400">Pick your style</p>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            {affordableTiers.map((tier) => {
+              const cost = Math.abs(tier.effects.money ?? 0);
+              return (
+                <button
+                  key={tier.id}
+                  onClick={() => handleTierSelect(expandedActivity, tier)}
+                  className="tier-btn"
+                >
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <span className="text-2xl shrink-0">{tier.emoji}</span>
+                    <div className="text-left min-w-0">
+                      <div className="font-bold text-sm text-gray-800">{tier.name}</div>
+                      <div className="flex flex-wrap gap-1 mt-0.5">
+                        {Object.entries(tier.effects)
+                          .filter(([k, v]) => k !== "money" && v !== 0)
+                          .map(([key, val]) => {
+                            const v = val as number;
+                            const emoji = STAT_EMOJI[key as keyof Stats] || "";
+                            const display =
+                              Math.abs(v) >= 1000
+                                ? `${v > 0 ? "+" : ""}${(v / 1000).toFixed(Math.abs(v) >= 10000 ? 0 : 1)}K`
+                                : `${v > 0 ? "+" : ""}${v}`;
+                            return (
+                              <span
+                                key={key}
+                                className={`text-[9px] font-bold ${v > 0 ? "text-emerald-500" : "text-red-400"}`}
+                              >
+                                {emoji}{display}
+                              </span>
+                            );
+                          })}
+                      </div>
+                    </div>
+                  </div>
+                  <span className="text-sm font-bold text-red-500 shrink-0">
+                    {formatMoney(-cost)}
+                  </span>
+                </button>
+              );
+            })}
+
+            {lockedTiers.map((tier) => {
+              const cost = Math.abs(tier.effects.money ?? 0);
+              return (
+                <div key={tier.id} className="tier-btn tier-btn-locked">
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <span className="text-2xl shrink-0 opacity-40">{tier.emoji}</span>
+                    <div className="text-left min-w-0">
+                      <div className="font-bold text-sm text-gray-400">{tier.name}</div>
+                      <div className="text-[10px] text-gray-300">Need {formatMoney(cost)}</div>
+                    </div>
+                  </div>
+                  <span className="text-sm text-gray-300 shrink-0">{"\uD83D\uDD12"}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ---- Main Activity View ----
   return (
     <div className="animate-scale-in" key={`activity-${state.week}`}>
-      {/* Income Report (not shown on first turn) */}
+      {/* Income Report */}
       {!isFirstTurn && income && (income.totalIncome > 0 || income.expenses > 0) && (
         <div className="game-card p-4 sm:p-5 mb-3">
           <div className="flex items-center justify-between mb-3">
@@ -70,11 +184,11 @@ export function ActivityPhase() {
 
         <div className="grid grid-cols-2 gap-2 mt-3">
           {workActivities.map((activity) => (
-            <ActivityButton key={activity.id} activity={activity} />
+            <WorkActivityButton key={activity.id} activity={activity} />
           ))}
         </div>
 
-        {/* Lifestyle Spending (unlocks with money) */}
+        {/* Lifestyle Spending */}
         {availableLifestyle.length > 0 && (
           <>
             <div className="flex items-center gap-2 mt-4 mb-2">
@@ -86,7 +200,18 @@ export function ActivityPhase() {
             </div>
             <div className="grid grid-cols-2 gap-2">
               {availableLifestyle.map((activity) => (
-                <ActivityButton key={activity.id} activity={activity} isLifestyle />
+                <button
+                  key={activity.id}
+                  onClick={() => handleLifestyleClick(activity)}
+                  className="activity-btn activity-btn-lifestyle"
+                >
+                  <span className="text-2xl mb-1">{activity.emoji}</span>
+                  <span className="font-bold text-xs text-gray-800">{activity.name}</span>
+                  <span className="text-[10px] text-gray-400 leading-tight">{activity.description}</span>
+                  {activity.tiers && (
+                    <span className="text-[9px] font-bold text-amber-500 mt-1">Tap to choose {"\u2192"}</span>
+                  )}
+                </button>
               ))}
             </div>
           </>
@@ -96,19 +221,18 @@ export function ActivityPhase() {
   );
 }
 
-function ActivityButton({ activity, isLifestyle }: { activity: QuarterlyActivity; isLifestyle?: boolean }) {
+function WorkActivityButton({ activity }: { activity: QuarterlyActivity }) {
   const { state, selectActivity } = useGame();
   const effects = activity.getEffects(state);
 
   return (
     <button
       onClick={() => selectActivity(activity)}
-      className={`activity-btn ${isLifestyle ? "activity-btn-lifestyle" : ""}`}
+      className="activity-btn"
     >
       <span className="text-2xl mb-1">{activity.emoji}</span>
       <span className="font-bold text-xs text-gray-800">{activity.name}</span>
       <span className="text-[10px] text-gray-400 leading-tight">{activity.description}</span>
-      {/* Mini stat preview */}
       <div className="flex flex-wrap justify-center gap-1 mt-1.5">
         {Object.entries(effects)
           .filter(([, v]) => v !== 0)

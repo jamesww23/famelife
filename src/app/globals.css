@@ -247,6 +247,40 @@
   background: #fef3c7;
 }
 
+/* Tier selection buttons */
+.tier-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 12px 14px;
+  background: white;
+  border: 2px solid #e8e0f0;
+  border-radius: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  gap: 8px;
+}
+.tier-btn:hover {
+  border-color: #f59e0b;
+  background: #fffbeb;
+  transform: scale(1.01);
+}
+.tier-btn:active {
+  transform: scale(0.98);
+}
+.tier-btn-locked {
+  cursor: default;
+  opacity: 0.5;
+  border-style: dashed;
+}
+.tier-btn-locked:hover {
+  border-color: #e8e0f0;
+  background: white;
+  transform: none;
+}
+
 /* Boost modal */
 .boost-overlay {
   background: rgba(0, 0, 0, 0.6);

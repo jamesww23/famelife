@@ -202,6 +202,13 @@ export interface QuarterlyIncome {
 
 // ---- Quarterly Activities ----
 
+export interface ActivityTier {
+  id: string;
+  name: string;
+  emoji: string;
+  effects: StatEffects;
+}
+
 export interface QuarterlyActivity {
   id: string;
   name: string;
@@ -210,6 +217,7 @@ export interface QuarterlyActivity {
   category?: "work" | "lifestyle";
   minMoney?: number;
   minFollowers?: number;
+  tiers?: ActivityTier[];
   getEffects: (state: GameState) => StatEffects;
 }
 
