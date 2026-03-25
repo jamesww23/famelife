@@ -5,6 +5,8 @@ import { useGame } from "@/state/game-context";
 import { archetypes } from "@/data/archetypes";
 import { traits } from "@/data/traits";
 import { ArchetypeId, TraitId } from "@/lib/game/types";
+import { Logo } from "./logo";
+import { playTap, playGameStart, playSwoosh } from "@/lib/sounds";
 
 type Step = "intro" | "gender" | "avatar" | "trait" | "archetype" | "goal";
 type Gender = "male" | "female" | "random";
@@ -32,6 +34,7 @@ export function StartScreen() {
   const [selectedArchetype, setSelectedArchetype] = useState<ArchetypeId | null>(null);
 
   const handleGender = (g: Gender) => {
+    playTap();
     setGender(g);
     if (g === "male") {
       setName(pickRandom(MALE_NAMES));
@@ -49,6 +52,7 @@ export function StartScreen() {
 
   const handleStart = () => {
     if (!selectedArchetype || !avatar || !traitId || !name.trim()) return;
+    playGameStart();
     startGame(selectedArchetype, "full", {
       name: name.trim(),
       avatar,
@@ -63,10 +67,8 @@ export function StartScreen() {
       <div className="w-full max-w-lg">
         {/* Logo — only on intro */}
         {step === "intro" && (
-          <div className="text-center mb-5 sm:mb-6 animate-slide-down">
-            <h1 className="text-4xl sm:text-5xl font-black text-white mb-2 drop-shadow-lg">
-              FAME LIFE
-            </h1>
+          <div className="mb-3 sm:mb-4 animate-slide-down">
+            <Logo />
           </div>
         )}
 
@@ -116,8 +118,8 @@ export function StartScreen() {
               </div>
 
               <button
-                onClick={() => setStep("gender")}
-                className="w-full py-3.5 sm:py-4 rounded-2xl font-bold text-base sm:text-lg bg-white text-[#e040fb] hover:scale-[1.02] active:scale-[0.98] shadow-lg transition-all"
+                onClick={() => { playTap(); setStep("gender"); }}
+                className="w-full py-3.5 sm:py-4 rounded-2xl font-bold text-base sm:text-lg bg-white text-[#e040fb] hover:scale-[1.02] active:scale-[0.98] shadow-lg btn-glow transition-all"
               >
                 Start Your Fame Story
               </button>
@@ -194,7 +196,7 @@ export function StartScreen() {
                   Back
                 </button>
                 <button
-                  onClick={() => avatar && setStep("trait")}
+                  onClick={() => { if (avatar) { playSwoosh(); setStep("trait"); } }}
                   disabled={!avatar}
                   className={`flex-1 py-3.5 sm:py-4 rounded-2xl font-bold text-base sm:text-lg transition-all ${
                     avatar
@@ -241,7 +243,7 @@ export function StartScreen() {
                   Back
                 </button>
                 <button
-                  onClick={() => traitId && setStep("archetype")}
+                  onClick={() => { if (traitId) { playSwoosh(); setStep("archetype"); } }}
                   disabled={!traitId}
                   className={`flex-1 py-3.5 sm:py-4 rounded-2xl font-bold text-base sm:text-lg transition-all ${
                     traitId
@@ -286,7 +288,7 @@ export function StartScreen() {
                   Back
                 </button>
                 <button
-                  onClick={() => selectedArchetype && setStep("goal")}
+                  onClick={() => { if (selectedArchetype) { playSwoosh(); setStep("goal"); } }}
                   disabled={!selectedArchetype}
                   className={`flex-1 py-3.5 sm:py-4 rounded-2xl font-bold text-base sm:text-lg transition-all ${
                     selectedArchetype

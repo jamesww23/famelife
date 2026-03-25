@@ -1,13 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useGame } from "@/state/game-context";
+import { playBoost, playTap } from "@/lib/sounds";
 
 export function BoostModal() {
   const { state, onAcceptBoost, onDeclineBoost } = useGame();
   const boost = state.pendingBoost;
   const [loading, setLoading] = useState(false);
   const [method, setMethod] = useState<"ad" | "share" | null>(null);
+
+  useEffect(() => {
+    if (boost) playBoost();
+  }, [boost]);
 
   if (!boost) return null;
 
@@ -67,19 +72,21 @@ export function BoostModal() {
             {/* Action buttons */}
             <div className="space-y-2.5">
               <button
-                onClick={() => handleAccept("ad")}
+                onClick={() => { playTap(); handleAccept("ad"); }}
                 className="w-full py-3.5 bg-gradient-to-r from-[#e040fb] to-[#ff6b9d] text-white rounded-xl font-bold text-base hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg"
+                style={{ boxShadow: "0 4px 20px rgba(224, 64, 251, 0.3)" }}
               >
                 Watch Ad
               </button>
               <button
-                onClick={() => handleAccept("share")}
+                onClick={() => { playTap(); handleAccept("share"); }}
                 className="w-full py-3.5 bg-[#00e5ff] text-gray-900 rounded-xl font-bold text-base hover:scale-[1.02] active:scale-[0.98] transition-all"
+                style={{ boxShadow: "0 4px 16px rgba(0, 229, 255, 0.25)" }}
               >
                 Share with Friends
               </button>
               <button
-                onClick={onDeclineBoost}
+                onClick={() => { playTap(); onDeclineBoost(); }}
                 className="w-full py-3 text-gray-400 font-medium hover:text-gray-600 transition-colors text-sm"
               >
                 Skip

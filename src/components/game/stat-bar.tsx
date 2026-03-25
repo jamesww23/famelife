@@ -5,12 +5,22 @@ import { useGame } from "@/state/game-context";
 import { STAT_EMOJI } from "@/lib/game/constants";
 import { formatFollowers, formatMoney, getTierName, getTierEmoji, getMaxTurns, formatQuarter } from "@/lib/game/progression";
 import { Stats, StatKey } from "@/lib/game/types";
+import { playMoney, playLevelUp } from "@/lib/sounds";
 
 export function StatBar() {
   const { state } = useGame();
   const { stats, week, careerTier } = state;
   const maxTurns = getMaxTurns(state);
   const progress = Math.min((week / maxTurns) * 100, 100);
+  const prevTierRef = useRef(careerTier);
+
+  // Play level up sound on tier change
+  useEffect(() => {
+    if (prevTierRef.current !== careerTier) {
+      playLevelUp();
+      prevTierRef.current = careerTier;
+    }
+  }, [careerTier]);
 
   // Track previous stats for delta animations
   const prevStatsRef = useRef<Stats>(stats);
@@ -31,6 +41,10 @@ export function StatBar() {
 
     if (hasChange) {
       setDeltas(newDeltas);
+      // Ka-ching when earning money
+      if (newDeltas.money && newDeltas.money > 0) {
+        playMoney();
+      }
       // Clear deltas after animation
       const timer = setTimeout(() => setDeltas({}), 1200);
       return () => clearTimeout(timer);

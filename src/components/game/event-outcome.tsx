@@ -1,12 +1,25 @@
 "use client";
 
+import { useEffect } from "react";
 import { useGame } from "@/state/game-context";
 import { STAT_EMOJI } from "@/lib/game/constants";
 import { StatDelta } from "@/lib/game/types";
+import { playPositive, playNegative, playMoney, playTap } from "@/lib/sounds";
 
 export function EventOutcome() {
   const { state, proceedFromOutcome } = useGame();
   const result = state.currentChoiceResult;
+
+  // Play sound based on outcome
+  useEffect(() => {
+    if (!result) return;
+    const { deltas } = result;
+    const netPositive = deltas.reduce((sum: number, d: StatDelta) => sum + (d.delta > 0 ? 1 : -1), 0);
+    const hasMoney = deltas.some((d: StatDelta) => d.stat === "money" && d.delta > 5000);
+    if (hasMoney) playMoney();
+    else if (netPositive > 0) playPositive();
+    else playNegative();
+  }, [result]);
 
   if (!result) return null;
 
@@ -47,8 +60,8 @@ export function EventOutcome() {
       </div>
 
       <button
-        onClick={proceedFromOutcome}
-        className="w-full py-3.5 sm:py-4 bg-white rounded-2xl font-bold text-[#e040fb] text-base sm:text-lg shadow-lg active:scale-[0.98] transition-all"
+        onClick={() => { playTap(); proceedFromOutcome(); }}
+        className="w-full py-3.5 sm:py-4 bg-white rounded-2xl font-bold text-[#e040fb] text-base sm:text-lg shadow-lg btn-glow active:scale-[0.98] transition-all"
       >
         Continue
       </button>
@@ -68,8 +81,8 @@ function DeltaBadge({ delta, delay }: { delta: StatDelta; delay: number }) {
     <span
       className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-bold animate-pop-in ${
         isPositive
-          ? "bg-emerald-50 text-emerald-600"
-          : "bg-red-50 text-red-500"
+          ? "delta-badge-positive text-emerald-600"
+          : "delta-badge-negative text-red-500"
       }`}
       style={{ animationDelay: `${delay}ms` }}
     >

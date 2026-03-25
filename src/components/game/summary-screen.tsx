@@ -1,14 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useGame, generateSummary } from "@/state/game-context";
 import { formatFollowers, formatMoney } from "@/lib/game/progression";
+import { playGameOver, playTap } from "@/lib/sounds";
 
 export function SummaryScreen() {
   const { state, restartGame } = useGame();
   const summary = generateSummary(state);
   const [shared, setShared] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    playGameOver();
+  }, []);
 
   const shareText = `${state.character.avatar} ${state.character.name} — ${summary.earnedTitleEmoji} ${summary.earnedTitle}\n${summary.fameRankEmoji} ${summary.fameRank} | Fame Score: ${summary.fameScore}/1000\n\n"${summary.headline}"\n\n${summary.storyRecap}\n\n👥 ${formatFollowers(summary.followers)} followers\n💰 ${formatMoney(summary.money)}\n🏆 Top ${100 - summary.percentile}% of players\n🔥 ${summary.viralMoments} viral moments\n😱 ${summary.scandals} scandals\n\nPlay Fame Life: `;
 
@@ -76,7 +81,7 @@ export function SummaryScreen() {
             </div>
             <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-[#e040fb] to-[#ff6b9d] transition-all duration-1000"
+                className="h-full rounded-full score-bar-fill transition-all duration-1000"
                 style={{ width: `${scorePct}%` }}
               />
             </div>
@@ -131,19 +136,19 @@ export function SummaryScreen() {
         {/* Share & Actions */}
         <div className="space-y-2.5">
           <button
-            onClick={handleShare}
-            className="w-full py-3.5 bg-white text-[#e040fb] rounded-2xl font-bold text-base active:scale-[0.98] transition-all shadow-lg flex items-center justify-center gap-2"
+            onClick={() => { playTap(); handleShare(); }}
+            className="w-full py-3.5 bg-white text-[#e040fb] rounded-2xl font-bold text-base active:scale-[0.98] transition-all btn-glow flex items-center justify-center gap-2"
           >
             {shared ? "Shared!" : "📤 Share Your Fame Story"}
           </button>
           <button
-            onClick={handleCopy}
+            onClick={() => { playTap(); handleCopy(); }}
             className="w-full py-3 bg-white/20 text-white rounded-2xl font-semibold text-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2"
           >
             {copied ? "✅ Copied!" : "📋 Copy Results"}
           </button>
           <button
-            onClick={restartGame}
+            onClick={() => { playTap(); restartGame(); }}
             className="w-full py-3.5 bg-white/10 text-white rounded-2xl font-bold text-base hover:bg-white/20 active:scale-[0.98] transition-all"
           >
             🔄 Play Again

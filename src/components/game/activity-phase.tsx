@@ -6,6 +6,7 @@ import { workActivities, lifestyleActivities } from "@/data/activities";
 import { STAT_EMOJI } from "@/lib/game/constants";
 import { formatQuarter, formatMoney } from "@/lib/game/progression";
 import { Stats, QuarterlyActivity, ActivityTier } from "@/lib/game/types";
+import { playTap, playSwoosh, playMoney } from "@/lib/sounds";
 
 export function ActivityPhase() {
   const { state, selectActivity } = useGame();
@@ -22,6 +23,7 @@ export function ActivityPhase() {
 
   // Handle selecting a tier from an expanded activity
   const handleTierSelect = (activity: QuarterlyActivity, tier: ActivityTier) => {
+    playMoney();
     selectActivity({
       ...activity,
       name: `${activity.name}: ${tier.name}`,
@@ -33,6 +35,7 @@ export function ActivityPhase() {
 
   // Handle clicking a lifestyle activity
   const handleLifestyleClick = (activity: QuarterlyActivity) => {
+    playTap();
     if (activity.tiers && activity.tiers.length > 0) {
       setExpandedActivity(activity);
     } else {
@@ -136,7 +139,7 @@ export function ActivityPhase() {
     <div className="animate-scale-in" key={`activity-${state.week}`}>
       {/* Income Report */}
       {!isFirstTurn && income && (income.totalIncome > 0 || income.expenses > 0) && (
-        <div className="game-card p-4 sm:p-5 mb-3">
+        <div className="game-card income-card p-4 sm:p-5 mb-3">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <span className="text-lg">{"\uD83D\uDCB0"}</span>
@@ -227,7 +230,7 @@ function WorkActivityButton({ activity }: { activity: QuarterlyActivity }) {
 
   return (
     <button
-      onClick={() => selectActivity(activity)}
+      onClick={() => { playSwoosh(); selectActivity(activity); }}
       className="activity-btn"
     >
       <span className="text-2xl mb-1">{activity.emoji}</span>
