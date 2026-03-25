@@ -3,13 +3,26 @@
 import { useState, useEffect } from "react";
 import { useGame, generateSummary } from "@/state/game-context";
 import { formatFollowers, formatMoney } from "@/lib/game/progression";
+import { processRunEnd, getNextGoals, RunUnlocks } from "@/lib/game/legacy";
+import { UnlockSummary } from "./unlock-summary";
 import { playGameOver, playTap } from "@/lib/sounds";
+
+/** Process run end once and cache the result across renders. */
+function useRunUnlocks(state: Parameters<typeof processRunEnd>[0]): RunUnlocks {
+  const [unlocks] = useState<RunUnlocks>(() => processRunEnd(state));
+  return unlocks;
+}
+
+type View = "summary" | "unlocks";
 
 export function SummaryScreen() {
   const { state, restartGame } = useGame();
   const summary = generateSummary(state);
   const [shared, setShared] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [view, setView] = useState<View>("summary");
+
+  const unlocks = useRunUnlocks(state);
 
   useEffect(() => {
     playGameOver();
@@ -45,6 +58,28 @@ export function SummaryScreen() {
 
   // Score bar fill percentage
   const scorePct = Math.min(100, (summary.fameScore / 1000) * 100);
+
+  if (view === "unlocks") {
+    const nextGoals = getNextGoals(unlocks.updatedLegacy);
+    return (
+      <div className="min-h-screen min-h-[100dvh] flex items-center justify-center p-3 sm:p-4">
+        <div className="w-full max-w-lg">
+          <div className="text-center mb-4">
+            <h2 className="text-xl sm:text-2xl font-black text-white">Career Legacy</h2>
+            <p className="text-white/60 text-xs mt-1">Run #{unlocks.updatedLegacy.totalRuns} complete</p>
+          </div>
+          <UnlockSummary
+            newBadges={unlocks.newBadges}
+            newTitles={unlocks.newTitles}
+            nextGoals={nextGoals}
+            onContinue={() => setView("summary")}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  const hasUnlocks = unlocks.newBadges.length > 0 || unlocks.newTitles.length > 0;
 
   return (
     <div className="min-h-screen min-h-[100dvh] flex items-center justify-center p-3 sm:p-4">
@@ -133,8 +168,17 @@ export function SummaryScreen() {
           </div>
         )}
 
-        {/* Share & Actions */}
+        {/* Actions */}
         <div className="space-y-2.5">
+          {/* View Unlocks button */}
+          {hasUnlocks && (
+            <button
+              onClick={() => { playTap(); setView("unlocks"); }}
+              className="w-full py-3.5 bg-gradient-to-r from-[#e040fb] to-[#ab47bc] text-white rounded-2xl font-bold text-base active:scale-[0.98] transition-all shadow-lg flex items-center justify-center gap-2 animate-pulse-glow"
+            >
+              🏆 View {unlocks.newBadges.length + unlocks.newTitles.length} New Unlock{(unlocks.newBadges.length + unlocks.newTitles.length) !== 1 ? "s" : ""}
+            </button>
+          )}
           <button
             onClick={() => { playTap(); handleShare(); }}
             className="w-full py-3.5 bg-white text-[#e040fb] rounded-2xl font-bold text-base active:scale-[0.98] transition-all btn-glow flex items-center justify-center gap-2"

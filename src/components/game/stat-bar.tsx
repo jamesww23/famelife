@@ -1,62 +1,73 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useGame } from "@/state/game-context";
 import { STAT_EMOJI } from "@/lib/game/constants";
 import { formatFollowers, formatMoney, getTierName, getTierEmoji, getMaxTurns, formatQuarter } from "@/lib/game/progression";
 import { Stats, StatKey } from "@/lib/game/types";
 import { playMoney, playLevelUp } from "@/lib/sounds";
 
+interface DeltaState {
+  prevStats: Stats;
+  prevTier: string;
+  deltas: Partial<Record<StatKey, number>>;
+  deltaKey: number;
+  moneyGained: boolean;
+  tierChanged: boolean;
+}
+
 export function StatBar() {
   const { state } = useGame();
   const { stats, week, careerTier } = state;
-  const maxTurns = getMaxTurns(state);
+  const maxTurns = getMaxTurns();
   const progress = Math.min((week / maxTurns) * 100, 100);
-  const prevTierRef = useRef(careerTier);
 
-  // Play level up sound on tier change
-  useEffect(() => {
-    if (prevTierRef.current !== careerTier) {
-      playLevelUp();
-      prevTierRef.current = careerTier;
-    }
-  }, [careerTier]);
+  // Track deltas via "adjusting state during render" pattern.
+  // React allows setState during render when syncing state to new props/context.
+  // This avoids both refs-during-render and setState-in-effects violations.
+  const [deltaState, setDeltaState] = useState<DeltaState>({
+    prevStats: stats,
+    prevTier: careerTier,
+    deltas: {},
+    deltaKey: 0,
+    moneyGained: false,
+    tierChanged: false,
+  });
 
-  // Track previous stats for delta animations
-  const prevStatsRef = useRef<Stats>(stats);
-  const [deltas, setDeltas] = useState<Partial<Record<StatKey, number>>>({});
-
-  useEffect(() => {
-    const prev = prevStatsRef.current;
+  // Compute deltas by comparing current stats to tracked previous stats
+  if (stats !== deltaState.prevStats) {
     const newDeltas: Partial<Record<StatKey, number>> = {};
     let hasChange = false;
-
     for (const key of Object.keys(stats) as StatKey[]) {
-      const diff = stats[key] - prev[key];
+      const diff = stats[key] - deltaState.prevStats[key];
       if (diff !== 0) {
         newDeltas[key] = diff;
         hasChange = true;
       }
     }
-
     if (hasChange) {
-      setDeltas(newDeltas);
-      // Ka-ching when earning money
-      if (newDeltas.money && newDeltas.money > 0) {
-        playMoney();
-      }
-      // Clear deltas after animation
-      const timer = setTimeout(() => setDeltas({}), 1200);
-      return () => clearTimeout(timer);
+      setDeltaState({
+        prevStats: stats,
+        prevTier: careerTier,
+        deltas: newDeltas,
+        deltaKey: deltaState.deltaKey + 1,
+        moneyGained: (newDeltas.money ?? 0) > 0,
+        tierChanged: careerTier !== deltaState.prevTier,
+      });
+    } else {
+      setDeltaState(prev => ({ ...prev, prevStats: stats, prevTier: careerTier }));
     }
+  } else if (careerTier !== deltaState.prevTier) {
+    setDeltaState(prev => ({ ...prev, prevTier: careerTier, tierChanged: true, deltaKey: prev.deltaKey + 1 }));
+  }
 
-    prevStatsRef.current = stats;
-  }, [stats]);
+  const { deltas, deltaKey, moneyGained, tierChanged } = deltaState;
 
-  // Update ref after deltas are set
+  // Sound effects — depend on deltaKey which only increments on real changes
   useEffect(() => {
-    prevStatsRef.current = stats;
-  });
+    if (moneyGained) playMoney();
+    if (tierChanged) playLevelUp();
+  }, [deltaKey, moneyGained, tierChanged]);
 
   return (
     <div className="w-full">
@@ -85,13 +96,13 @@ export function StatBar() {
 
       {/* Stats grid */}
       <div className="grid grid-cols-3 gap-1 sm:gap-1.5">
-        <StatPill label="Followers" emoji={STAT_EMOJI.followers} value={formatFollowers(stats.followers)} delta={deltas.followers} deltaFormat="followers" />
-        <StatPill label="Money" emoji={STAT_EMOJI.money} value={formatMoney(stats.money)} delta={deltas.money} deltaFormat="money" />
-        <StatPill label="Fame" emoji={STAT_EMOJI.fame} value={`${stats.fame}`} bar barValue={stats.fame} barColor="#a855f7" delta={deltas.fame} />
-        <StatPill label="Rep" emoji={STAT_EMOJI.reputation} value={`${stats.reputation}`} bar barValue={stats.reputation} barColor="#10b981" delta={deltas.reputation} />
-        <StatPill label="Energy" emoji={STAT_EMOJI.energy} value={`${stats.energy}`} bar barValue={stats.energy} barColor="#f59e0b" delta={deltas.energy} />
+        <StatPill label="Followers" emoji={STAT_EMOJI.followers} value={formatFollowers(stats.followers)} delta={deltas.followers} deltaKey={deltaKey} deltaFormat="followers" />
+        <StatPill label="Money" emoji={STAT_EMOJI.money} value={formatMoney(stats.money)} delta={deltas.money} deltaKey={deltaKey} deltaFormat="money" />
+        <StatPill label="Fame" emoji={STAT_EMOJI.fame} value={`${stats.fame}`} bar barValue={stats.fame} barColor="#a855f7" delta={deltas.fame} deltaKey={deltaKey} />
+        <StatPill label="Rep" emoji={STAT_EMOJI.reputation} value={`${stats.reputation}`} bar barValue={stats.reputation} barColor="#10b981" delta={deltas.reputation} deltaKey={deltaKey} />
+        <StatPill label="Energy" emoji={STAT_EMOJI.energy} value={`${stats.energy}`} bar barValue={stats.energy} barColor="#f59e0b" delta={deltas.energy} deltaKey={deltaKey} />
         <StatPill label="Mental" emoji={STAT_EMOJI.mentalHealth} value={`${stats.mentalHealth}`} bar barValue={stats.mentalHealth} barColor="#3b82f6"
-          danger={stats.mentalHealth < 25} delta={deltas.mentalHealth}
+          danger={stats.mentalHealth < 25} delta={deltas.mentalHealth} deltaKey={deltaKey}
         />
       </div>
     </div>
@@ -107,6 +118,7 @@ function StatPill({
   barColor,
   danger,
   delta,
+  deltaKey,
   deltaFormat,
 }: {
   label: string;
@@ -117,6 +129,7 @@ function StatPill({
   barColor?: string;
   danger?: boolean;
   delta?: number;
+  deltaKey: number;
   deltaFormat?: "followers" | "money";
 }) {
   const hasChanged = delta !== undefined && delta !== 0;
@@ -156,9 +169,10 @@ function StatPill({
           />
         </div>
       )}
-      {/* Floating delta */}
+      {/* Floating delta — key forces remount so CSS animation replays; forwards fill auto-hides */}
       {hasChanged && (
         <span
+          key={deltaKey}
           className={`stat-delta ${isPositive ? "stat-delta-up" : "stat-delta-down"}`}
         >
           {deltaDisplay}

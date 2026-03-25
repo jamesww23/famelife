@@ -5,10 +5,12 @@ import { useGame } from "@/state/game-context";
 import { archetypes } from "@/data/archetypes";
 import { traits } from "@/data/traits";
 import { ArchetypeId, TraitId } from "@/lib/game/types";
+import { loadLegacy } from "@/lib/game/legacy";
 import { Logo } from "./logo";
+import { ProfileScreen } from "./profile-screen";
 import { playTap, playGameStart, playSwoosh } from "@/lib/sounds";
 
-type Step = "intro" | "gender" | "avatar" | "trait" | "archetype" | "goal";
+type Step = "intro" | "gender" | "avatar" | "trait" | "archetype" | "goal" | "profile";
 type Gender = "male" | "female" | "random";
 
 const MALE_NAMES = ["Jake", "Marcus", "Tyler", "Ethan", "Kai", "Liam", "Noah", "Jayden", "Adrian", "Caleb", "Dex", "Remi", "Leo", "Zane", "Miles"];
@@ -32,7 +34,6 @@ export function StartScreen() {
   const [avatar, setAvatar] = useState<string | null>(null);
   const [traitId, setTraitId] = useState<TraitId | null>(null);
   const [selectedArchetype, setSelectedArchetype] = useState<ArchetypeId | null>(null);
-
   const handleGender = (g: Gender) => {
     playTap();
     setGender(g);
@@ -53,7 +54,7 @@ export function StartScreen() {
   const handleStart = () => {
     if (!selectedArchetype || !avatar || !traitId || !name.trim()) return;
     playGameStart();
-    startGame(selectedArchetype, "full", {
+    startGame(selectedArchetype, {
       name: name.trim(),
       avatar,
       traitId,
@@ -61,6 +62,12 @@ export function StartScreen() {
   };
 
   const stepIndex = STEPS.indexOf(step);
+
+  // Profile screen
+  if (step === "profile") {
+    const legacy = loadLegacy();
+    return <ProfileScreen legacy={legacy} onClose={() => setStep("intro")} />;
+  }
 
   return (
     <div className="min-h-screen min-h-[100dvh] flex items-center justify-center p-3 sm:p-4">
@@ -122,6 +129,12 @@ export function StartScreen() {
                 className="w-full py-3.5 sm:py-4 rounded-2xl font-bold text-base sm:text-lg bg-white text-[#e040fb] hover:scale-[1.02] active:scale-[0.98] shadow-lg btn-glow transition-all"
               >
                 Start Your Fame Story
+              </button>
+              <button
+                onClick={() => { playTap(); setStep("profile"); }}
+                className="w-full py-3 mt-2.5 rounded-2xl font-bold text-sm text-white/70 hover:text-white transition-colors"
+              >
+                🏆 Career Legacy
               </button>
             </>
           )}
@@ -315,7 +328,7 @@ export function StartScreen() {
                   {traits.find(t => t.id === traitId)?.name}
                 </p>
 
-                <div className="border-t border-gray-100 pt-4">
+                <div className="border-t border-gray-100 pt-3">
                   <p className="text-sm text-gray-500 leading-relaxed">
                     The algorithm doesn&apos;t care who you are yet.
                     <br />

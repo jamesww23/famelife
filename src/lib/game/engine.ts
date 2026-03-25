@@ -10,6 +10,7 @@ import {
   applyEventChoice,
   applyBoost,
   applyActivity,
+  applyPurchase,
   advanceWeek,
   addMilestone,
 } from "./reducers";
@@ -17,16 +18,16 @@ import {
   ArchetypeId,
   CharacterBuild,
   GameState,
-  GameMode,
   EventChoice,
   RewardedBoost,
   QuarterlyActivity,
+  ShopItem,
 } from "./types";
 import { traits } from "@/data/traits";
 
 // ---- Initial State ----
 
-export function createInitialState(archetypeId: ArchetypeId, mode: GameMode, character: CharacterBuild): GameState {
+export function createInitialState(archetypeId: ArchetypeId, character: CharacterBuild): GameState {
   const arch = archetypes.find((a) => a.id === archetypeId)!;
   const trait = traits.find((t) => t.id === character.traitId);
   let stats = applyEffectsSimple({ ...DEFAULT_STATS }, arch.startingModifiers);
@@ -37,7 +38,7 @@ export function createInitialState(archetypeId: ArchetypeId, mode: GameMode, cha
   return {
     phase: "activity",
     week: 1,
-    mode,
+    mode: "full",
     archetype: archetypeId,
     character,
     stats,
@@ -57,6 +58,9 @@ export function createInitialState(archetypeId: ArchetypeId, mode: GameMode, cha
     relationships: 0,
     viralMoments: 0,
     comebacks: 0,
+    riskLevel: 0,
+    scheduledEvents: [],
+    purchases: [],
     quarterlyIncome: null,
     gameOverReason: null,
   };
@@ -65,12 +69,35 @@ export function createInitialState(archetypeId: ArchetypeId, mode: GameMode, cha
 // ---- Serve next event (Reigns-style: events come to you) ----
 
 export function serveNextEvent(state: GameState): GameState {
+  // Check for scheduled (delayed consequence) events first
+  const dueEvent = state.scheduledEvents.find(se => se.triggerWeek <= state.week);
+  if (dueEvent) {
+    const scheduledEvent = allEvents.find(e => e.id === dueEvent.eventId);
+    if (scheduledEvent) {
+      const scheduledEvents = state.scheduledEvents.filter(se => se !== dueEvent);
+      return {
+        ...state,
+        phase: "event",
+        currentEvent: scheduledEvent,
+        scheduledEvents,
+      };
+    }
+  }
+
   const event = selectEvent(allEvents, state);
   return {
     ...state,
     phase: "event",
     currentEvent: event,
   };
+}
+
+// ---- Handle shop purchase (stays in activity phase) ----
+
+export function purchaseItem(state: GameState, item: ShopItem): GameState {
+  let next = applyPurchase(state, item);
+  next = checkMilestones(next);
+  return next;
 }
 
 // ---- Resolve activity selection (new turn phase) ----
@@ -136,8 +163,10 @@ function findEligibleBoost(state: GameState): RewardedBoost | null {
   const lastEvent = state.currentChoiceResult?.event;
   if (!lastEvent) return null;
 
-  // Only show boosts some of the time
-  if (Math.random() > BOOST_CHANCE) return null;
+  // Risky choices have higher boost chance (reward the risk-taker with ad opportunities)
+  const lastChoice = state.currentChoiceResult?.choice;
+  const riskBonus = lastChoice?.riskTag ? 0.15 : 0;
+  if (Math.random() > BOOST_CHANCE + riskBonus) return null;
 
   const candidates = rewardedBoosts.filter((boost) => {
     switch (boost.triggerCondition) {

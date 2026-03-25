@@ -177,6 +177,19 @@ function scoreEvent(event: GameEvent, state: GameState): number {
     weight *= 0.25;
   }
 
+  // ---- Risk level amplification ----
+  // High risk level attracts more volatile events
+  if (state.riskLevel > 30) {
+    const riskMul = 1 + (state.riskLevel - 30) * 0.015; // up to 1.0x extra at max risk
+    if (event.type === "drama" || event.type === "failure") {
+      weight *= riskMul;
+    }
+    // Also boost high-reward events at high risk
+    if (event.type === "celebrity" || event.type === "empire") {
+      weight *= 1 + (state.riskLevel - 30) * 0.008;
+    }
+  }
+
   // ---- Chaos injection: small chance of wild card events ----
   // 6% chance to boost a random drama/failure/celebrity event
   if (Math.random() < 0.06) {
@@ -188,27 +201,72 @@ function scoreEvent(event: GameEvent, state: GameState): number {
   return Math.max(weight, 0.01);
 }
 
+/** Check eligibility with relaxed rules (ignores stat conditions, keeps tier/phase/flag gates). */
+function isEligibleRelaxed(event: GameEvent, state: GameState): boolean {
+  // Still respect tier gates
+  if (event.minTier && !isTierAtLeast(state.careerTier, event.minTier)) return false;
+  if (event.maxTier && !isTierAtMost(state.careerTier, event.maxTier)) return false;
+
+  // Still respect phase gates
+  const phase = getPhaseForState(state);
+  if (event.minPhase && !isPhaseAtLeast(phase, event.minPhase)) return false;
+  if (event.maxPhase && !isPhaseAtMost(phase, event.maxPhase)) return false;
+
+  // Skip chain events (they have complex gating)
+  if (event.chainId) return false;
+
+  // Skip flag-gated events (don't show impossible storylines)
+  if (event.requiredFlags?.some((f) => !state.flags.includes(f))) return false;
+  if (event.excludedFlags?.some((f) => state.flags.includes(f))) return false;
+
+  // Relaxed: ignore stat conditions
+  return true;
+}
+
+/** Last-resort fallback: only basic non-chain, non-gated events. */
+const SAFE_FALLBACK_TYPES: EventCategory[] = ["viral", "platform", "lifestyle", "recovery"];
+
+function isSafeFallback(event: GameEvent): boolean {
+  return (
+    !event.chainId &&
+    !event.requiredFlags?.length &&
+    !event.minTier &&
+    !event.minPhase &&
+    SAFE_FALLBACK_TYPES.includes(event.type)
+  );
+}
+
 /** Select one random event from all available events. */
 export function selectEvent(
   allEvents: GameEvent[],
   state: GameState,
 ): GameEvent {
+  // Primary: fully eligible events
   const eligible = allEvents.filter((e) => isEligible(e, state));
 
-  if (eligible.length === 0) {
-    // Fallback: return any event ignoring chain conditions
-    const fallback = allEvents.filter(e => !e.chainId || e.chainStep === 0);
-    const scored: ScoredEvent[] = fallback.map((event) => ({
+  if (eligible.length > 0) {
+    const scored: ScoredEvent[] = eligible.map((event) => ({
       event,
       weight: scoreEvent(event, state),
     }));
     return weightedRandom(scored).event;
   }
 
-  const scored: ScoredEvent[] = eligible.map((event) => ({
+  // Fallback 1: relax stat conditions but keep tier/phase/flag gates
+  const relaxed = allEvents.filter((e) => isEligibleRelaxed(e, state));
+  if (relaxed.length > 0) {
+    const scored: ScoredEvent[] = relaxed.map((event) => ({
+      event,
+      weight: scoreEvent(event, state),
+    }));
+    return weightedRandom(scored).event;
+  }
+
+  // Fallback 2: safe, ungated events only (should always have candidates)
+  const safe = allEvents.filter(isSafeFallback);
+  const scored: ScoredEvent[] = safe.map((event) => ({
     event,
     weight: scoreEvent(event, state),
   }));
-
   return weightedRandom(scored).event;
 }

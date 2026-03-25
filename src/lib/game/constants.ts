@@ -1,4 +1,4 @@
-import { CareerTier, CareerTierDef, CareerPhase, Stats } from "./types";
+import { CareerTier, CareerTierDef, CareerPhase, Stats, RiskTag } from "./types";
 
 export const CAREER_TIERS: CareerTierDef[] = [
   { id: "new_creator", name: "New Creator", emoji: "📱", minFollowers: 0 },
@@ -22,7 +22,7 @@ export const DEFAULT_STATS: Stats = {
   followers: 500,
   fame: 5,
   reputation: 50,
-  money: 1500,
+  money: 3000,
   energy: 80,
   mentalHealth: 75,
 };
@@ -49,8 +49,7 @@ export const MAX_RECENT_EVENTS = 12;
 export const STORAGE_KEY = "influencer-life-save-v6";
 
 // Game length in quarters (each turn = 1 quarter = 3 months)
-export const QUICK_GAME_TURNS = 12;  // 3 years
-export const FULL_GAME_TURNS = 40;   // 10 years
+export const GAME_TURNS = 40; // 10 years
 
 // Boost chance per turn (was 0.35 — reduced to prevent free stat inflation every 3 turns)
 export const BOOST_CHANCE = 0.22;
@@ -102,3 +101,29 @@ export const EVENT_EMOJI: Record<string, string> = {
   recovery: "💪",
   empire: "🏰",
 };
+
+// Risk system constants
+export const RISK_TAG_LABELS: Record<RiskTag, string> = {
+  high_risk: "High Risk / High Reward",
+  reputation_risk: "Reputation Risk",
+  big_opportunity: "Big Opportunity",
+};
+
+export const RISK_TAG_COLORS: Record<RiskTag, string> = {
+  high_risk: "#ef4444",
+  reputation_risk: "#f59e0b",
+  big_opportunity: "#10b981",
+};
+
+export const RISK_TAG_EMOJI: Record<RiskTag, string> = {
+  high_risk: "🎲",
+  reputation_risk: "⚠️",
+  big_opportunity: "🌟",
+};
+
+/** How much risk level increases per risky choice */
+export const RISK_INCREASE_PER_CHOICE = 8;
+/** Risk level decay per turn */
+export const RISK_DECAY_PER_TURN = 3;
+/** Risk level threshold for "high volatility" */
+export const HIGH_RISK_THRESHOLD = 40;

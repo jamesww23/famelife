@@ -23,11 +23,24 @@ export function EventOutcome() {
 
   if (!result) return null;
 
-  const { choice, event, deltas } = result;
+  const { choice, event, deltas, riskOutcome } = result;
 
   return (
     <div className="animate-scale-in" key={`outcome-${event.id}-${state.week}`}>
       <div className="game-card p-4 sm:p-6 mb-3 sm:mb-4">
+        {/* Risk outcome banner */}
+        {riskOutcome && (
+          <div
+            className={`text-center py-2 px-3 rounded-xl mb-3 font-bold text-sm animate-scale-in ${
+              riskOutcome === "lucky"
+                ? "bg-gradient-to-r from-emerald-50 to-green-50 text-emerald-600 border border-emerald-200"
+                : "bg-gradient-to-r from-red-50 to-orange-50 text-red-500 border border-red-200"
+            }`}
+          >
+            {riskOutcome === "lucky" ? "🍀 Lucky Break!" : "💥 It Backfired..."}
+          </div>
+        )}
+
         {/* Result text */}
         <p className="text-gray-700 text-sm leading-relaxed mb-4">
           {choice.followUpText || `You chose: "${choice.text}"`}

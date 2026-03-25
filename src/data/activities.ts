@@ -55,6 +55,126 @@ export const workActivities: QuarterlyActivity[] = [
   },
 ];
 
+// ---- Flex content activities (require luxury purchases) ----
+
+export const flexActivities: QuarterlyActivity[] = [
+  {
+    id: "flex_ride",
+    name: "Flex Your Ride",
+    emoji: "🏎️",
+    description: "Film with your sports car",
+    category: "lifestyle",
+    requiresPurchases: ["sports_car"],
+    getEffects: () => ({ followers: 3000, fame: 2, reputation: -3 }),
+    tiers: [
+      {
+        id: "full_flex",
+        name: "Full Flex Video",
+        emoji: "📹",
+        effects: { followers: 6000, fame: 4, reputation: -6, energy: -8 },
+      },
+      {
+        id: "subtle_flex",
+        name: "Subtle Background Flex",
+        emoji: "😏",
+        effects: { followers: 2500, fame: 2, reputation: 3 },
+      },
+    ],
+  },
+  {
+    id: "flex_penthouse",
+    name: "Penthouse Tour",
+    emoji: "🌇",
+    description: "Tour your luxury penthouse on camera",
+    category: "lifestyle",
+    requiresPurchases: ["penthouse"],
+    getEffects: () => ({ followers: 4000, fame: 3 }),
+    tiers: [
+      {
+        id: "full_tour",
+        name: "Full Crib Tour",
+        emoji: "🎥",
+        effects: { followers: 8000, fame: 5, reputation: -4, energy: -8 },
+      },
+      {
+        id: "tasteful_shots",
+        name: "Tasteful Shots Only",
+        emoji: "📸",
+        effects: { followers: 3000, fame: 2, reputation: 5 },
+      },
+    ],
+  },
+  {
+    id: "flex_yacht",
+    name: "Yacht Day Content",
+    emoji: "🛥️",
+    description: "Invite creators aboard for content",
+    category: "lifestyle",
+    requiresPurchases: ["yacht"],
+    getEffects: () => ({ followers: 6000, fame: 4 }),
+    tiers: [
+      {
+        id: "yacht_party",
+        name: "Yacht Party Video",
+        emoji: "🎉",
+        effects: { followers: 12000, fame: 6, reputation: -5, energy: -12, money: -5000 },
+      },
+      {
+        id: "yacht_collab",
+        name: "Chill Collab Session",
+        emoji: "🤝",
+        effects: { followers: 6000, fame: 3, reputation: 5, energy: -6 },
+      },
+    ],
+  },
+  {
+    id: "flex_jet",
+    name: "Private Jet Content",
+    emoji: "✈️",
+    description: "Film from 40,000 feet",
+    category: "lifestyle",
+    requiresPurchases: ["private_jet"],
+    getEffects: () => ({ followers: 10000, fame: 6 }),
+    tiers: [
+      {
+        id: "jet_flex",
+        name: "Full Luxury Vlog",
+        emoji: "💎",
+        effects: { followers: 18000, fame: 8, reputation: -8, energy: -10 },
+      },
+      {
+        id: "jet_travel",
+        name: "Travel Content",
+        emoji: "🌍",
+        effects: { followers: 8000, fame: 4, reputation: 5, energy: -8, mentalHealth: 8 },
+      },
+    ],
+  },
+  {
+    id: "flex_wardrobe",
+    name: "Outfit of the Day",
+    emoji: "👗",
+    description: "Show off your designer wardrobe",
+    category: "lifestyle",
+    requiresPurchases: ["designer_wardrobe"],
+    getEffects: () => ({ followers: 2000, fame: 1 }),
+    tiers: [
+      {
+        id: "full_haul",
+        name: "Designer Haul Video",
+        emoji: "🛍️",
+        effects: { followers: 4000, fame: 3, reputation: -3, energy: -6 },
+      },
+      {
+        id: "style_tips",
+        name: "Style Tips & Fits",
+        emoji: "✨",
+        effects: { followers: 2500, fame: 1, reputation: 5 },
+      },
+    ],
+  },
+];
+
 // ---- Lifestyle spending activities with tiered choices ----
 
 export const lifestyleActivities: QuarterlyActivity[] = [

@@ -129,4 +129,37 @@ export const milestones: Milestone[] = [
     description: "The industry sees you as a serious player.",
     check: (s: GameState) => s.flags.includes("industryRespected"),
   },
+  // ---- Economy & Luxury milestones ----
+  {
+    id: "first_purchase",
+    title: "First Upgrade",
+    emoji: "🛒",
+    description: "You bought your first item. The grind is real.",
+    check: (s: GameState) => s.purchases.length >= 1,
+  },
+  {
+    id: "luxury_life",
+    title: "Luxury Life",
+    emoji: "✨",
+    description: "You own 3+ luxury items. Living the dream.",
+    check: (s: GameState) => {
+      const luxuryIds = ["designer_wardrobe", "luxury_watch", "sports_car", "penthouse", "yacht", "private_jet"];
+      return s.purchases.filter(p => luxuryIds.includes(p)).length >= 3;
+    },
+  },
+  {
+    id: "business_mogul",
+    title: "Business Mogul",
+    emoji: "💼",
+    description: "Manager, merch line, and a studio. You're a brand.",
+    check: (s: GameState) =>
+      s.purchases.includes("manager") && s.purchases.includes("merch_line") && s.purchases.includes("production_studio"),
+  },
+  {
+    id: "quarter_mil",
+    title: "Quarter Millionaire",
+    emoji: "💰",
+    description: "$250K in the bank. Money moves.",
+    check: (s: GameState) => s.stats.money >= 250_000,
+  },
 ];

@@ -1,4 +1,4 @@
-import { MAX_RECENT_EVENTS, ENERGY_RECOVERY, MENTAL_HEALTH_RECOVERY } from "./constants";
+import { MAX_RECENT_EVENTS, ENERGY_RECOVERY, MENTAL_HEALTH_RECOVERY, RISK_INCREASE_PER_CHOICE, RISK_DECAY_PER_TURN } from "./constants";
 import { clamp } from "./random";
 import { getTierForFollowers, checkGameOver } from "./progression";
 import {
@@ -11,9 +11,11 @@ import {
   RewardedBoost,
   QuarterlyActivity,
   LogEntry,
+  ShopItem,
 } from "./types";
 import { calculateQuarterlyIncome } from "./income";
 import { EVENT_EMOJI } from "./constants";
+import { computePassiveEffects } from "@/data/shop";
 
 /** Apply stat effects to a stats object, clamping bounded stats. Returns new stats + deltas. */
 export function applyEffects(stats: Stats, effects: StatEffects): { stats: Stats; deltas: StatDelta[] } {
@@ -43,13 +45,62 @@ export function applyEffectsSimple(stats: Stats, effects: StatEffects): Stats {
   return applyEffects(stats, effects).stats;
 }
 
+/**
+ * Apply outcome variance for risky choices.
+ * Lucky: amplify positive effects, soften negatives.
+ * Unlucky: amplify negative effects, soften positives.
+ */
+function applyRiskVariance(
+  effects: StatEffects,
+  riskLevel: number,
+): { effects: StatEffects; outcome: "lucky" | "unlucky" } {
+  // Higher risk level makes luck less likely (45% base → down to 25% at max risk)
+  const luckChance = 0.45 - (riskLevel * 0.002);
+  const isLucky = Math.random() < luckChance;
+
+  // Variance range widens with risk level
+  const spread = 1.3 + (riskLevel * 0.007); // 1.3x to 2.0x at max risk
+
+  const varied: StatEffects = {};
+  for (const [key, val] of Object.entries(effects)) {
+    if (val === undefined || val === 0) { varied[key as keyof StatEffects] = val; continue; }
+    if (isLucky) {
+      // Lucky: amplify positive, soften negative
+      varied[key as keyof StatEffects] = val > 0
+        ? Math.round(val * spread)
+        : Math.round(val * 0.5);
+    } else {
+      // Unlucky: soften positive, amplify negative
+      varied[key as keyof StatEffects] = val > 0
+        ? Math.round(val * 0.5)
+        : Math.round(val * spread);
+    }
+  }
+  return { effects: varied, outcome: isLucky ? "lucky" : "unlucky" };
+}
+
 /** Process player choosing an event choice. */
 export function applyEventChoice(
   state: GameState,
   event: GameEvent,
   choice: EventChoice
 ): GameState {
-  const { stats, deltas } = applyEffects(state.stats, choice.effects);
+  // Apply risk variance for high-risk choices
+  let finalEffects = { ...choice.effects };
+  let riskOutcome: "lucky" | "unlucky" | null = null;
+  if (choice.riskTag === "high_risk") {
+    const result = applyRiskVariance(choice.effects, state.riskLevel);
+    finalEffects = result.effects;
+    riskOutcome = result.outcome;
+  }
+
+  // PR Team: reduce reputation damage from scandal events
+  const passive = computePassiveEffects(state.purchases);
+  if (passive.scandalReduction && finalEffects.reputation && finalEffects.reputation < 0) {
+    finalEffects.reputation = Math.round(finalEffects.reputation * (1 - passive.scandalReduction));
+  }
+
+  const { stats, deltas } = applyEffects(state.stats, finalEffects);
   let flags = [...state.flags];
   let brandDeals = state.brandDeals;
   let scandals = state.scandals;
@@ -57,7 +108,22 @@ export function applyEventChoice(
   let relationships = state.relationships;
   let viralMoments = state.viralMoments;
   let comebacks = state.comebacks;
-  let activeChains = { ...state.activeChains };
+  const activeChains = { ...state.activeChains };
+
+  // Risk level increases for risky choices
+  let riskLevel = state.riskLevel;
+  if (choice.riskTag) {
+    riskLevel = clamp(riskLevel + RISK_INCREASE_PER_CHOICE, 0, 100);
+  }
+
+  // Schedule delayed events
+  const scheduledEvents = [...state.scheduledEvents];
+  if (choice.scheduledEvent) {
+    scheduledEvents.push({
+      eventId: choice.scheduledEvent.eventId,
+      triggerWeek: state.week + choice.scheduledEvent.delay,
+    });
+  }
 
   // Set/remove flags
   if (choice.setFlags) {
@@ -123,8 +189,10 @@ export function applyEventChoice(
     comebacks,
     activeChains,
     recentEventIds,
+    riskLevel,
+    scheduledEvents,
     currentEvent: null,
-    currentChoiceResult: { choice, event, deltas },
+    currentChoiceResult: { choice, event, deltas, riskOutcome },
     phase: "outcome",
     log: [...state.log, ...logEntries],
   };
@@ -153,7 +221,14 @@ export function applyBoost(state: GameState, boost: RewardedBoost): GameState {
 
 /** Apply a quarterly activity choice. */
 export function applyActivity(state: GameState, activity: QuarterlyActivity): GameState {
-  const effects = activity.getEffects(state);
+  const effects = { ...activity.getEffects(state) };
+  // Apply follower gain multiplier from purchases
+  if (effects.followers && effects.followers > 0) {
+    const passive = computePassiveEffects(state.purchases);
+    if (passive.followerGainMultiplier) {
+      effects.followers = Math.floor(effects.followers * (1 + passive.followerGainMultiplier));
+    }
+  }
   const { stats } = applyEffects(state.stats, effects);
   const careerTier = getTierForFollowers(stats.followers);
 
@@ -172,18 +247,56 @@ export function applyActivity(state: GameState, activity: QuarterlyActivity): Ga
   };
 }
 
+/** Apply a shop purchase. */
+export function applyPurchase(state: GameState, item: ShopItem): GameState {
+  const purchases = [...state.purchases, item.id];
+  const { stats } = item.onPurchaseEffects
+    ? applyEffects(state.stats, { ...item.onPurchaseEffects, money: -(item.cost) })
+    : applyEffects(state.stats, { money: -(item.cost) });
+
+  const flags = [...state.flags];
+  if (item.setFlags) {
+    for (const f of item.setFlags) {
+      if (!flags.includes(f)) flags.push(f);
+    }
+  }
+
+  const careerTier = getTierForFollowers(stats.followers);
+  const logEntry: LogEntry = {
+    week: state.week,
+    text: `Purchased ${item.name}`,
+    type: "system",
+    emoji: item.emoji,
+  };
+
+  return {
+    ...state,
+    stats,
+    flags,
+    purchases,
+    careerTier,
+    log: [...state.log, logEntry],
+  };
+}
+
 /** Advance to the next week. Applies per-turn pressure mechanics. */
 export function advanceWeek(state: GameState): GameState {
   const stats = { ...state.stats };
   let flags = [...state.flags];
 
+  // Decay risk level
+  const riskLevel = clamp(state.riskLevel - RISK_DECAY_PER_TURN, 0, 100);
+
   // ---- Quarterly Income (calculated before recovery) ----
   const income = calculateQuarterlyIncome(state);
   stats.money += income.net;
 
-  // ---- Per-turn recovery ----
-  stats.energy = clamp(stats.energy + ENERGY_RECOVERY, 0, 100);
-  stats.mentalHealth = clamp(stats.mentalHealth + MENTAL_HEALTH_RECOVERY, 0, 100);
+  // ---- Per-turn recovery (with purchase bonuses) ----
+  const passive = computePassiveEffects(state.purchases);
+  const energyBonus = passive.energyRecoveryBonus || 0;
+  const mentalBonus = passive.mentalHealthRecoveryBonus || 0;
+  stats.energy = clamp(stats.energy + ENERGY_RECOVERY + energyBonus, 0, 100);
+  stats.mentalHealth = clamp(stats.mentalHealth + MENTAL_HEALTH_RECOVERY + mentalBonus, 0, 100);
 
   // ---- Overexposure pressure: high fame drains mental health ----
   if (stats.fame > 75 && state.stats.followers > 500_000) {
@@ -212,7 +325,8 @@ export function advanceWeek(state: GameState): GameState {
   }
 
   const newWeek = state.week + 1;
-  const gameOverReason = checkGameOver({ ...state, stats, flags, week: newWeek });
+  const nextState = { ...state, stats, flags, week: newWeek };
+  const gameOverReason = checkGameOver(nextState);
 
   // Income log entry
   const logEntries: LogEntry[] = [];
@@ -232,6 +346,7 @@ export function advanceWeek(state: GameState): GameState {
     stats,
     flags,
     week: newWeek,
+    riskLevel,
     phase: gameOverReason ? "game_over" : "activity",
     gameOverReason,
     quarterlyIncome: income,

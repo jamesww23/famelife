@@ -7,7 +7,6 @@ import { EventCard } from "./event-card";
 import { EventOutcome } from "./event-outcome";
 import { BoostModal } from "./boost-modal";
 import { MilestonePopup } from "./milestone-popup";
-
 export function GameScreen() {
   const { state, restartGame } = useGame();
 

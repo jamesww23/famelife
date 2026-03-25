@@ -89,7 +89,7 @@ export interface CareerTierDef {
 
 // ---- Game Mode ----
 
-export type GameMode = "quick" | "full";
+export type GameMode = "full";
 
 // ---- Events (Reigns-style) ----
 
@@ -104,6 +104,20 @@ export type EventCategory =
   | "recovery"
   | "empire";
 
+// ---- Risk System ----
+
+export type RiskTag = "high_risk" | "reputation_risk" | "big_opportunity";
+
+export interface RiskStakes {
+  upside: string;
+  downside: string;
+}
+
+export interface ScheduledEvent {
+  eventId: string;
+  triggerWeek: number;
+}
+
 export interface EventChoice {
   id: string;
   text: string;         // short label for button
@@ -113,6 +127,11 @@ export interface EventChoice {
   followUpText?: string; // narrative result
   triggerChain?: string; // chain ID to continue after this choice
   socialReaction?: SocialReaction; // fake social media reaction
+  // Risk system
+  riskTag?: RiskTag;
+  stakes?: RiskStakes;
+  requiresConfirmation?: boolean;
+  scheduledEvent?: { eventId: string; delay: number }; // fires N turns later
 }
 
 export interface SocialReaction {
@@ -190,12 +209,53 @@ export interface LogEntry {
   emoji?: string;
 }
 
+// ---- Shop System ----
+
+export type ShopCategory = "growth" | "business" | "luxury" | "access" | "risk";
+
+export interface PassiveEffects {
+  followerGainMultiplier?: number; // e.g. 0.1 = +10%
+  incomeMultiplier?: number;       // all income
+  adRevenueMultiplier?: number;
+  sponsorshipMultiplier?: number;
+  businessIncome?: number;         // flat quarterly business income
+  scandalReduction?: number;       // e.g. 0.5 = 50% less scandal damage
+  energyRecoveryBonus?: number;
+  mentalHealthRecoveryBonus?: number;
+}
+
+export interface ShopItem {
+  id: string;
+  name: string;
+  emoji: string;
+  description: string;
+  category: ShopCategory;
+  cost: number;
+  upkeep: number; // quarterly
+  onPurchaseEffects?: StatEffects;
+  passiveEffects?: PassiveEffects;
+  requires?: {
+    minFollowers?: number;
+    minFame?: number;
+    minPhase?: CareerPhase;
+    purchases?: string[]; // prerequisite item IDs
+  };
+  enablesFlex?: boolean;
+  setFlags?: string[];
+}
+
 // ---- Quarterly Income ----
 
 export interface QuarterlyIncome {
   adRevenue: number;
   sponsorships: number;
+  donations: number;
+  subscriptions: number;
+  affiliates: number;
+  businessIncome: number;
   totalIncome: number;
+  itemUpkeep: number;
+  lifestyleExpenses: number;
   expenses: number;
   net: number;
 }
@@ -217,6 +277,7 @@ export interface QuarterlyActivity {
   category?: "work" | "lifestyle";
   minMoney?: number;
   minFollowers?: number;
+  requiresPurchases?: string[]; // item IDs needed to see this activity
   tiers?: ActivityTier[];
   getEffects: (state: GameState) => StatEffects;
 }
@@ -230,7 +291,6 @@ export type GamePhase =
   | "outcome"
   | "boost_offer"
   | "milestone"
-  | "extend_offer"
   | "game_over";
 
 export interface GameState {
@@ -250,6 +310,7 @@ export interface GameState {
     choice: EventChoice;
     event: GameEvent;
     deltas: StatDelta[];
+    riskOutcome?: "lucky" | "unlucky" | null;
   } | null;
   pendingBoost: RewardedBoost | null;
   pendingMilestones: string[];
@@ -263,10 +324,63 @@ export interface GameState {
   relationships: number;
   viralMoments: number;
   comebacks: number;
+  // Risk system
+  riskLevel: number; // 0-100, affects outcome variance
+  scheduledEvents: ScheduledEvent[];
+  // Purchases & Economy
+  purchases: string[]; // owned shop item IDs
   // Income & Activities
   quarterlyIncome: QuarterlyIncome | null;
   // End
   gameOverReason: string | null;
+}
+
+// ---- Career Legacy (persistent across runs) ----
+
+export type BadgeRarity = "common" | "rare" | "epic" | "legendary";
+export type BadgeCategory = "growth" | "wealth" | "fame" | "drama" | "comeback" | "empire" | "social" | "meta";
+
+export interface BadgeDef {
+  id: string;
+  name: string;
+  emoji: string;
+  description: string;
+  rarity: BadgeRarity;
+  category: BadgeCategory;
+  /** Check against final run state + lifetime legacy */
+  check: (run: GameState, legacy: CareerLegacy) => boolean;
+}
+
+export interface RunRecord {
+  date: string;           // ISO date
+  characterName: string;
+  avatar: string;
+  archetype: ArchetypeId;
+  earnedTitle: string;
+  earnedTitleEmoji: string;
+  fameScore: number;
+  followers: number;
+  money: number;
+  quartersPlayed: number;
+  endingReason: string;
+  newBadges: string[];    // badge IDs unlocked this run
+  newTitles: string[];    // title IDs unlocked this run
+}
+
+export interface CareerLegacy {
+  version: number;
+  totalRuns: number;
+  lifetimeEarnings: number;
+  bestFollowers: number;
+  bestFame: number;
+  bestFameScore: number;
+  bestMoney: number;
+  longestRun: number;       // quarters
+  mostScandals: number;
+  fastestTo1M: number | null; // quarters, null if never achieved
+  unlockedBadges: string[]; // badge IDs
+  unlockedTitles: string[]; // title IDs (from earned titles)
+  runHistory: RunRecord[];  // last 20 runs
 }
 
 // ---- Summary ----

@@ -74,7 +74,7 @@ export function Logo() {
 
       {/* Subtitle */}
       <p className="logo-subtitle text-sm sm:text-base font-bold tracking-widest uppercase">
-        Rise to Glory
+        Go Viral. Get Rich. Become an Internet Legend.
       </p>
 
       {/* Decorative line */}

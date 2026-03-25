@@ -41,4 +41,21 @@ export const rewardedBoosts: RewardedBoost[] = [
     effects: { energy: 35, mentalHealth: 15 },
     triggerCondition: "low_energy",
   },
+  // Risk recovery boosts — offered after risky choices
+  {
+    id: "pr_recovery",
+    name: "PR Recovery",
+    emoji: "🧹",
+    description: "A crisis PR firm can spin this in your favor.",
+    effects: { reputation: 25, mentalHealth: 10, fame: 3 },
+    triggerCondition: "post_scandal",
+  },
+  {
+    id: "viral_momentum",
+    name: "Viral Momentum",
+    emoji: "📈",
+    description: "Ride the controversy wave — all press is good press.",
+    effects: { followers: 15000, fame: 12 },
+    triggerCondition: "post_content",
+  },
 ];

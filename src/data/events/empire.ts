@@ -15,6 +15,9 @@ export const empireEvents: GameEvent[] = [
         text: "Go all in — build the dream studio",
         effects: { money: -45000, fame: 18, followers: 30000, energy: -15 },
         setFlags: ["ownsStudio"],
+        riskTag: "big_opportunity",
+        stakes: { upside: "30K followers, empire HQ", downside: "$45K investment, energy drain" },
+        requiresConfirmation: true,
         followUpText:
           "Construction starts next week. You just signed a 5-year lease and hired a full build-out crew. This is either your empire's HQ or the most expensive mistake of your life.",
         socialReaction: {
@@ -38,7 +41,7 @@ export const empireEvents: GameEvent[] = [
     ],
   },
   {
-    id: "creator_house",
+    id: "empire_creator_house",
     type: "empire",
     title: "Creator House",
     emoji: "🏠",
@@ -121,6 +124,9 @@ export const empireEvents: GameEvent[] = [
         id: "go_all_out_giveaway",
         text: "Go nuclear — $500K giveaway",
         effects: { money: -50000, followers: 60000, fame: 20, energy: -20, reputation: 5 },
+        riskTag: "high_risk",
+        stakes: { upside: "60K followers, platform records", downside: "$50K cost, exhaustion" },
+        requiresConfirmation: true,
         followUpText:
           "The video hit 80 million views. You gave away 10 cars, paid off someone's student loans, and the internet lost its mind. Your subscriber count is climbing faster than ever.",
         socialReaction: {
@@ -264,6 +270,9 @@ export const empireEvents: GameEvent[] = [
         id: "take_reality_show",
         text: "Sign the deal — let the cameras roll",
         effects: { money: 25000, fame: 20, reputation: -15, energy: -25, followers: 25000, mentalHealth: -12 },
+        riskTag: "high_risk",
+        stakes: { upside: "$25K + fame + 25K followers", downside: "Reputation, energy, mental health" },
+        requiresConfirmation: true,
         followUpText:
           "Episode one drops and trends worldwide. The producers are pushing drama hard — manufactured fights, misleading edits. You're famous, but the version of you on screen isn't really you. The comments section is a warzone.",
         socialReaction: {
@@ -300,6 +309,9 @@ export const empireEvents: GameEvent[] = [
         text: "Buy the media company — expand your empire",
         effects: { money: -50000, fame: 18, followers: 20000, reputation: 12, energy: -15 },
         setFlags: ["ownsStudio"],
+        riskTag: "big_opportunity",
+        stakes: { upside: "Media empire, 20K followers", downside: "$50K cost" },
+        requiresConfirmation: true,
         followUpText:
           "You just became a media mogul. The acquisition gives you a production pipeline, a content library, and a team of 40 experienced creators. The integration will be brutal but the upside is massive.",
         socialReaction: {
@@ -312,6 +324,9 @@ export const empireEvents: GameEvent[] = [
         id: "sell_brand",
         text: "Sell your brand to the conglomerate",
         effects: { money: 50000, fame: -10, followers: -20000, reputation: -8, mentalHealth: -8 },
+        riskTag: "high_risk",
+        stakes: { upside: "$50K payday", downside: "Lose followers, fame, and creative control" },
+        requiresConfirmation: true,
         followUpText:
           "The check cleared and it was life-changing money. But you're now an employee of your own brand, reporting to a board that doesn't understand creators. The golden handcuffs are tight.",
         socialReaction: {
@@ -335,6 +350,9 @@ export const empireEvents: GameEvent[] = [
         id: "take_investment",
         text: "Take the VC money — $10M for 20% equity",
         effects: { money: 30000, fame: 10, reputation: -10, followers: 10000, energy: 10 },
+        riskTag: "big_opportunity",
+        stakes: { upside: "$30K + growth capital", downside: "Lose creative freedom, reputation" },
+        requiresConfirmation: true,
         followUpText:
           "The wire hit your account and suddenly you have a board of directors. The investors are already suggesting 'content pivots' and 'audience optimization strategies.' You have resources but every creative decision now goes through a committee.",
         socialReaction: {

@@ -14,6 +14,8 @@ export const viralEvents: GameEvent[] = [
         id: "ride_wave",
         text: "Post 5 more videos NOW",
         effects: { followers: 15000, fame: 15, energy: -30, mentalHealth: -10 },
+        riskTag: "high_risk",
+        stakes: { upside: "Massive follower + fame surge", downside: "Energy + mental health crash" },
         socialReaction: { type: "comment", text: "OMG you're literally EVERYWHERE rn", author: "@viralwatcher" },
       },
       {
@@ -38,6 +40,8 @@ export const viralEvents: GameEvent[] = [
         text: "Duet them back, go all in",
         effects: { followers: 20000, fame: 18, energy: -20 },
         setFlags: ["celebrityNoticed"],
+        riskTag: "big_opportunity",
+        stakes: { upside: "20K followers, celebrity connection", downside: "Energy cost" },
         socialReaction: { type: "headline", text: "RISING CREATOR CATCHES CELEBRITY'S EYE" },
       },
       {
@@ -60,6 +64,8 @@ export const viralEvents: GameEvent[] = [
         id: "lean_into_meme",
         text: "Lean into it HARD",
         effects: { followers: 18000, fame: 14, reputation: -8 },
+        riskTag: "reputation_risk",
+        stakes: { upside: "18K followers + fame", downside: "Reputation hit" },
         socialReaction: { type: "tweet", text: "they really said 'if you can't beat em' 💀", author: "@memepages" },
       },
       {
@@ -102,6 +108,8 @@ export const viralEvents: GameEvent[] = [
         id: "do_interview",
         text: "Accept the interview",
         effects: { followers: 25000, fame: 22, reputation: 10, energy: -20 },
+        riskTag: "big_opportunity",
+        stakes: { upside: "25K followers, mainstream exposure", downside: "Energy drain" },
         socialReaction: { type: "headline", text: "INTERNET CREATOR GOES MAINSTREAM" },
       },
       {
@@ -173,6 +181,8 @@ export const viralEvents: GameEvent[] = [
         id: "milk_it",
         text: "Make it all about you",
         effects: { followers: 15000, fame: 12, reputation: -12 },
+        riskTag: "reputation_risk",
+        stakes: { upside: "15K followers + fame", downside: "Reputation drop" },
       },
     ],
   },

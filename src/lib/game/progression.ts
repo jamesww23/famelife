@@ -1,4 +1,4 @@
-import { CAREER_TIERS, TIER_ORDER, FULL_GAME_TURNS, PHASE_ORDER } from "./constants";
+import { CAREER_TIERS, TIER_ORDER, GAME_TURNS, PHASE_ORDER } from "./constants";
 import { CareerTier, CareerPhase, GameState } from "./types";
 
 export function getTierForFollowers(followers: number): CareerTier {
@@ -80,8 +80,8 @@ export function isPhaseAtMost(current: CareerPhase, max: CareerPhase): boolean {
   return getPhaseIndex(current) <= getPhaseIndex(max);
 }
 
-export function getMaxTurns(_state: GameState): number {
-  return FULL_GAME_TURNS;
+export function getMaxTurns(): number {
+  return GAME_TURNS;
 }
 
 /** Convert a 1-based turn number to "Q1 Year 1" format. */
@@ -100,7 +100,7 @@ export function checkGameOver(state: GameState): string | null {
     return "Bankruptcy. The debts caught up with you.";
   if (state.stats.energy <= 0 && state.stats.mentalHealth < 20)
     return "Complete exhaustion. You had to quit the internet.";
-  if (state.week >= getMaxTurns(state)) {
+  if (state.week > getMaxTurns()) {
     const years = Math.ceil(state.week / 4);
     return `After ${years} years, you retired from content creation.`;
   }
