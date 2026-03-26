@@ -19,10 +19,10 @@ export const TIER_ORDER: CareerTier[] = [
 ];
 
 export const DEFAULT_STATS: Stats = {
-  followers: 500,
+  followers: 1000,
   fame: 5,
   reputation: 50,
-  money: 3000,
+  money: 5000,
   energy: 80,
   mentalHealth: 75,
 };

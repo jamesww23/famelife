@@ -13,10 +13,10 @@ export const empireEvents: GameEvent[] = [
       {
         id: "invest_big_studio",
         text: "Go all in — build the dream studio",
-        effects: { money: -45000, fame: 18, followers: 30000, energy: -15 },
+        effects: { money: -80000, fame: 18, followers: 80000, energy: -15 },
         setFlags: ["ownsStudio"],
         riskTag: "big_opportunity",
-        stakes: { upside: "30K followers, empire HQ", downside: "$45K investment, energy drain" },
+        stakes: { upside: "80K followers, empire HQ", downside: "$80K investment, energy drain" },
         requiresConfirmation: true,
         followUpText:
           "Construction starts next week. You just signed a 5-year lease and hired a full build-out crew. This is either your empire's HQ or the most expensive mistake of your life.",
@@ -29,7 +29,7 @@ export const empireEvents: GameEvent[] = [
       {
         id: "start_small_studio",
         text: "Start with a modest rental space",
-        effects: { money: -12000, fame: 6, followers: 8000, energy: -5 },
+        effects: { money: -25000, fame: 6, followers: 25000, energy: -5 },
         followUpText:
           "A clean 2,000 sq ft space with good lighting and decent acoustics. Not flashy, but it gets the job done without draining your accounts.",
         socialReaction: {
@@ -52,7 +52,7 @@ export const empireEvents: GameEvent[] = [
       {
         id: "build_own_house",
         text: "Build your own creator house",
-        effects: { money: -35000, fame: 18, followers: 25000, reputation: 10, energy: -20 },
+        effects: { money: -60000, fame: 18, followers: 70000, reputation: 10, energy: -20 },
         setFlags: ["ownsStudio"],
         followUpText:
           "You bought a mansion, hired a house manager, and moved in five up-and-coming creators. Welcome to the content factory. Every room is a set.",
@@ -65,7 +65,7 @@ export const empireEvents: GameEvent[] = [
       {
         id: "join_existing_house",
         text: "Join an established creator house",
-        effects: { money: -8000, fame: 8, followers: 35000, reputation: 5, energy: -10 },
+        effects: { money: -15000, fame: 8, followers: 100000, reputation: 5, energy: -10 },
         followUpText:
           "You moved into the house and immediately got pulled into three collabs. The algorithm loves this kind of crossover content.",
         socialReaction: {
@@ -88,7 +88,7 @@ export const empireEvents: GameEvent[] = [
       {
         id: "premium_brand",
         text: "Launch a premium brand — limited drops only",
-        effects: { money: -20000, fame: 10, reputation: 12, followers: 12000 },
+        effects: { money: -35000, fame: 10, reputation: 12, followers: 40000 },
         followUpText:
           "The first drop sold out in 90 seconds. Resellers are already flipping your hoodies for 3x retail. The brand feels real — not just merch with your face on it.",
         socialReaction: {
@@ -100,7 +100,7 @@ export const empireEvents: GameEvent[] = [
       {
         id: "fast_fashion_merch",
         text: "Mass market — high volume, low price",
-        effects: { money: 15000, fame: 5, reputation: -8, followers: 10000 },
+        effects: { money: 60000, fame: 5, reputation: -8, followers: 30000 },
         followUpText:
           "The margins are thin but the volume is massive. Unfortunately someone on Twitter found the same blanks on AliExpress for $2 and the replies are rough.",
         socialReaction: {
@@ -123,9 +123,9 @@ export const empireEvents: GameEvent[] = [
       {
         id: "go_all_out_giveaway",
         text: "Go nuclear — $500K giveaway",
-        effects: { money: -50000, followers: 60000, fame: 20, energy: -20, reputation: 5 },
+        effects: { money: -100000, followers: 200000, fame: 20, energy: -20, reputation: 5 },
         riskTag: "high_risk",
-        stakes: { upside: "60K followers, platform records", downside: "$50K cost, exhaustion" },
+        stakes: { upside: "200K followers, platform records", downside: "$100K cost, exhaustion" },
         requiresConfirmation: true,
         followUpText:
           "The video hit 80 million views. You gave away 10 cars, paid off someone's student loans, and the internet lost its mind. Your subscriber count is climbing faster than ever.",
@@ -138,7 +138,7 @@ export const empireEvents: GameEvent[] = [
       {
         id: "modest_giveaway",
         text: "Keep it reasonable — $50K giveaway",
-        effects: { money: -12000, followers: 15000, fame: 8, energy: -8 },
+        effects: { money: -25000, followers: 50000, fame: 8, energy: -8 },
         followUpText:
           "A solid giveaway that made some people's day without bankrupting you. The comments are positive and the engagement spike is real, even if it's not headline material.",
         socialReaction: {
@@ -161,7 +161,7 @@ export const empireEvents: GameEvent[] = [
       {
         id: "genuine_foundation",
         text: "Build something real — fund a cause you believe in",
-        effects: { money: -30000, reputation: 20, fame: 10, mentalHealth: 12, followers: 15000 },
+        effects: { money: -60000, reputation: 20, fame: 10, mentalHealth: 12, followers: 50000 },
         setFlags: ["charityPersona"],
         followUpText:
           "You partnered with established nonprofits, hired a real executive director, and committed to transparency reports. The first grant cycle funded 12 community projects. This actually matters.",
@@ -174,7 +174,7 @@ export const empireEvents: GameEvent[] = [
       {
         id: "pr_foundation",
         text: "Make it a PR vehicle with some charity on the side",
-        effects: { money: -10000, reputation: 5, fame: 15, followers: 20000 },
+        effects: { money: -20000, reputation: 5, fame: 15, followers: 60000 },
         followUpText:
           "The launch event was beautiful. The press coverage was excellent. But a few journalists are already asking where the money actually goes. You'll need to be careful.",
         socialReaction: {
@@ -197,7 +197,7 @@ export const empireEvents: GameEvent[] = [
       {
         id: "hire_manager",
         text: "Hire a professional manager",
-        effects: { money: -15000, energy: 20, fame: 8, mentalHealth: 10, followers: 10000 },
+        effects: { money: -25000, energy: 20, fame: 8, mentalHealth: 10, followers: 30000 },
         setFlags: ["hasManager"],
         followUpText:
           "Your new manager took one look at your inbox and almost quit on the spot. But within a week, your schedule is clean, your brand deals are better, and you actually slept 8 hours for the first time in months.",
@@ -210,7 +210,7 @@ export const empireEvents: GameEvent[] = [
       {
         id: "stay_solo",
         text: "Keep doing it all yourself",
-        effects: { money: 5000, energy: -20, mentalHealth: -10, reputation: 5 },
+        effects: { money: 15000, energy: -20, mentalHealth: -10, reputation: 5 },
         followUpText:
           "You saved money, sure. But you're answering emails at 3 AM, missing deadlines, and your last three videos were rushed. The dark circles are becoming part of your brand.",
         socialReaction: {
@@ -234,7 +234,7 @@ export const empireEvents: GameEvent[] = [
       {
         id: "go_international",
         text: "Launch internationally — translate everything",
-        effects: { money: -40000, followers: 50000, fame: 18, energy: -25, reputation: 10 },
+        effects: { money: -80000, followers: 200000, fame: 18, energy: -25, reputation: 10 },
         followUpText:
           "You hired translation teams for six languages, launched regional channels, and started collaborating with international creators. Your content is being watched on every continent. The logistics are insane but the growth is unprecedented.",
         socialReaction: {
@@ -246,7 +246,7 @@ export const empireEvents: GameEvent[] = [
       {
         id: "domestic_focus",
         text: "Stay focused on the domestic market",
-        effects: { money: -10000, followers: 15000, fame: 8, energy: -10 },
+        effects: { money: -20000, followers: 50000, fame: 8, energy: -10 },
         followUpText:
           "You doubled down on what works — deeper content, better engagement, stronger community. Not as flashy as going global, but the foundation is rock solid.",
         socialReaction: {
@@ -269,9 +269,9 @@ export const empireEvents: GameEvent[] = [
       {
         id: "take_reality_show",
         text: "Sign the deal — let the cameras roll",
-        effects: { money: 25000, fame: 20, reputation: -15, energy: -25, followers: 25000, mentalHealth: -12 },
+        effects: { money: 100000, fame: 20, reputation: -15, energy: -25, followers: 80000, mentalHealth: -12 },
         riskTag: "high_risk",
-        stakes: { upside: "$25K + fame + 25K followers", downside: "Reputation, energy, mental health" },
+        stakes: { upside: "$100K + fame + 80K followers", downside: "Reputation, energy, mental health" },
         requiresConfirmation: true,
         followUpText:
           "Episode one drops and trends worldwide. The producers are pushing drama hard — manufactured fights, misleading edits. You're famous, but the version of you on screen isn't really you. The comments section is a warzone.",
@@ -307,10 +307,10 @@ export const empireEvents: GameEvent[] = [
       {
         id: "acquire_company",
         text: "Buy the media company — expand your empire",
-        effects: { money: -50000, fame: 18, followers: 20000, reputation: 12, energy: -15 },
+        effects: { money: -100000, fame: 18, followers: 80000, reputation: 12, energy: -15 },
         setFlags: ["ownsStudio"],
         riskTag: "big_opportunity",
-        stakes: { upside: "Media empire, 20K followers", downside: "$50K cost" },
+        stakes: { upside: "Media empire, 80K followers", downside: "$100K cost" },
         requiresConfirmation: true,
         followUpText:
           "You just became a media mogul. The acquisition gives you a production pipeline, a content library, and a team of 40 experienced creators. The integration will be brutal but the upside is massive.",
@@ -323,9 +323,9 @@ export const empireEvents: GameEvent[] = [
       {
         id: "sell_brand",
         text: "Sell your brand to the conglomerate",
-        effects: { money: 50000, fame: -10, followers: -20000, reputation: -8, mentalHealth: -8 },
+        effects: { money: 200000, fame: -10, followers: -20000, reputation: -8, mentalHealth: -8 },
         riskTag: "high_risk",
-        stakes: { upside: "$50K payday", downside: "Lose followers, fame, and creative control" },
+        stakes: { upside: "$200K payday", downside: "Lose followers, fame, and creative control" },
         requiresConfirmation: true,
         followUpText:
           "The check cleared and it was life-changing money. But you're now an employee of your own brand, reporting to a board that doesn't understand creators. The golden handcuffs are tight.",
@@ -349,9 +349,9 @@ export const empireEvents: GameEvent[] = [
       {
         id: "take_investment",
         text: "Take the VC money — $10M for 20% equity",
-        effects: { money: 30000, fame: 10, reputation: -10, followers: 10000, energy: 10 },
+        effects: { money: 150000, fame: 10, reputation: -10, followers: 40000, energy: 10 },
         riskTag: "big_opportunity",
-        stakes: { upside: "$30K + growth capital", downside: "Lose creative freedom, reputation" },
+        stakes: { upside: "$150K + growth capital", downside: "Lose creative freedom, reputation" },
         requiresConfirmation: true,
         followUpText:
           "The wire hit your account and suddenly you have a board of directors. The investors are already suggesting 'content pivots' and 'audience optimization strategies.' You have resources but every creative decision now goes through a committee.",

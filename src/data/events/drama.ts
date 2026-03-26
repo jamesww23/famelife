@@ -17,7 +17,7 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "clap_back",
         text: "Fire back with receipts",
-        effects: { followers: 8000, fame: 12, reputation: -15, energy: -20 },
+        effects: { followers: 30000, fame: 12, reputation: -15, energy: -20 },
         setFlags: ["startedFeud"],
         triggerChain: "rival_feud",
         riskTag: "high_risk",
@@ -27,7 +27,7 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "take_high_road",
         text: "Post a calm response",
-        effects: { followers: 3000, fame: 5, reputation: 15 },
+        effects: { followers: 10000, fame: 5, reputation: 15 },
         socialReaction: { type: "comment", text: "maturity is so rare on this app", author: "@wholesomefan" },
       },
     ],
@@ -46,7 +46,7 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "leak_their_dms",
         text: "Leak THEIR DMs back",
-        effects: { followers: 12000, fame: 15, reputation: -30, mentalHealth: -25 },
+        effects: { followers: 50000, fame: 15, reputation: -30, mentalHealth: -25 },
         triggerChain: "rival_feud",
         setFlags: ["scandalMagnet"],
         riskTag: "high_risk",
@@ -57,7 +57,7 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "address_honestly",
         text: "Go live and address it",
-        effects: { followers: 5000, fame: 7, reputation: 10, energy: -20, mentalHealth: -15 },
+        effects: { followers: 15000, fame: 7, reputation: 10, energy: -20, mentalHealth: -15 },
         triggerChain: "rival_feud",
       },
     ],
@@ -76,14 +76,14 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "public_makeup",
         text: "Collab video together",
-        effects: { followers: 25000, fame: 18, reputation: 20, money: 4000 },
+        effects: { followers: 80000, fame: 18, reputation: 20, money: 15000 },
         removeFlags: ["startedFeud"],
         socialReaction: { type: "tweet", text: "THE COLLAB WE NEVER EXPECTED. i'm literally crying rn", author: "@fanpage_central" },
       },
       {
         id: "scorched_earth",
         text: "Destroy them one final time",
-        effects: { followers: 15000, fame: 22, reputation: -40, mentalHealth: -25 },
+        effects: { followers: 60000, fame: 22, reputation: -40, mentalHealth: -25 },
         removeFlags: ["startedFeud"],
         setFlags: ["scandalMagnet"],
         riskTag: "high_risk",
@@ -135,7 +135,7 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "report_and_warn",
         text: "Warn fans + report it",
-        effects: { followers: 6000, reputation: 13, energy: -10 },
+        effects: { followers: 20000, reputation: 13, energy: -10 },
         socialReaction: { type: "tweet", text: "the fact they have to deal with this... protect our creator at all costs", author: "@loyalfan99" },
       },
       {
@@ -156,7 +156,7 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "own_it",
         text: "Post a no-filter photo",
-        effects: { followers: 8000, fame: 6, reputation: 20 },
+        effects: { followers: 30000, fame: 6, reputation: 20 },
         socialReaction: { type: "comment", text: "THIS is what we need more of 👏", author: "@realbeauty" },
       },
       {
@@ -180,7 +180,7 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "public_response",
         text: "Expose them right back",
-        effects: { followers: 10000, fame: 10, reputation: -15, mentalHealth: -18 },
+        effects: { followers: 35000, fame: 10, reputation: -15, mentalHealth: -18 },
         socialReaction: { type: "headline", text: "INFLUENCER BEST FRIENDS DESTROY EACH OTHER ON SOCIAL MEDIA" },
       },
       {
@@ -201,13 +201,13 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "laugh_it_off",
         text: "Make it a bit, own it",
-        effects: { followers: 6000, fame: 10, reputation: -15, money: -3000 },
+        effects: { followers: 20000, fame: 10, reputation: -15, money: -5000 },
         socialReaction: { type: "tweet", text: "NOT THEM ROASTING THEIR OWN SPONSOR LIVE 😭😭😭", author: "@livestreamfails" },
       },
       {
         id: "damage_control",
         text: "Apologize to the sponsor",
-        effects: { reputation: 8, money: -1500, mentalHealth: -10 },
+        effects: { reputation: 8, money: -3000, mentalHealth: -10 },
       },
     ],
   },
@@ -223,13 +223,13 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "prove_its_fake",
         text: "Get experts to debunk it",
-        effects: { followers: 5000, fame: 10, reputation: 15, money: -6000, energy: -30 },
+        effects: { followers: 20000, fame: 10, reputation: 15, money: -10000, energy: -30 },
         socialReaction: { type: "headline", text: "INFLUENCER FIGHTS BACK AGAINST AI DEEPFAKE" },
       },
       {
         id: "emotional_video",
         text: "Post a tearful response",
-        effects: { followers: 8000, fame: 6, reputation: 10, mentalHealth: -25 },
+        effects: { followers: 30000, fame: 6, reputation: 10, mentalHealth: -25 },
         socialReaction: { type: "comment", text: "this is so scary... nobody deserves this", author: "@empatheticviewer" },
       },
     ],
@@ -247,13 +247,13 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "go_all_in",
         text: "24-hour stream to win it",
-        effects: { followers: 12000, fame: 10, energy: -50, mentalHealth: -15 },
+        effects: { followers: 50000, fame: 10, energy: -50, mentalHealth: -15 },
         socialReaction: { type: "tweet", text: "they're actually doing a 24 HOUR STREAM for this 😂 respect", author: "@streamhighlights" },
       },
       {
         id: "stay_chill",
         text: "Congrats to whoever wins",
-        effects: { followers: 6000, reputation: 20 },
+        effects: { followers: 20000, reputation: 20 },
       },
     ],
   },
@@ -271,7 +271,7 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "fuel_the_fire",
         text: "Fan cam + 'my army is unmatched'",
-        effects: { fame: 10, reputation: -18, followers: 8000 },
+        effects: { fame: 10, reputation: -18, followers: 30000 },
         setFlags: ["scandalMagnet"],
         riskTag: "reputation_risk",
         stakes: { upside: "Fame + followers", downside: "Reputation tank, scandal magnet" },
@@ -299,13 +299,13 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "clap_back_brand",
         text: "Clap back publicly",
-        effects: { fame: 10, reputation: -12, money: -8000 },
+        effects: { fame: 10, reputation: -12, money: -15000 },
         socialReaction: { type: "headline", text: "INFLUENCER FIRES BACK AT BRAND: 'I MADE YOU RELEVANT'" },
       },
       {
         id: "take_it_gracefully",
         text: "Accept it gracefully",
-        effects: { reputation: 8, money: -3000 },
+        effects: { reputation: 8, money: -5000 },
         followUpText: "You take the L with dignity. Other brands quietly take note of your maturity.",
         socialReaction: { type: "comment", text: "handling it with class. respect.", author: "@pr_professional" },
       },
@@ -323,7 +323,7 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "fire_back_diss",
         text: "Drop your own diss track",
-        effects: { fame: 12, reputation: -12, followers: 10000, energy: -15 },
+        effects: { fame: 12, reputation: -12, followers: 40000, energy: -15 },
         socialReaction: { type: "tweet", text: "THE RESPONSE TRACK IS ACTUALLY FIRE?? this beef produced bangers", author: "@musicdrama" },
       },
       {
@@ -346,7 +346,7 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "spill_the_tea",
         text: "Spill everything on live",
-        effects: { fame: 15, reputation: -18, followers: 12000 },
+        effects: { fame: 15, reputation: -18, followers: 50000 },
         removeFlags: ["publicRelationship"],
         setFlags: ["controversial"],
         riskTag: "high_risk",
@@ -402,14 +402,14 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "show_full_context",
         text: "Post the full conversation",
-        effects: { followers: 5000, fame: 8, reputation: 10, energy: -15 },
+        effects: { followers: 15000, fame: 8, reputation: 10, energy: -15 },
         followUpText: "With full context, people calm down. But the violation of privacy stings.",
         socialReaction: { type: "tweet", text: "ok the full DMs actually change everything. we owe them an apology", author: "@contextmatters" },
       },
       {
         id: "threaten_legal",
         text: "Threaten legal action",
-        effects: { fame: 12, reputation: -8, money: -5000, mentalHealth: -15 },
+        effects: { fame: 12, reputation: -8, money: -10000, mentalHealth: -15 },
         socialReaction: { type: "headline", text: "INFLUENCER THREATENS LAWSUIT OVER LEAKED PRIVATE MESSAGES" },
       },
     ],
@@ -426,7 +426,7 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "clap_back_ex",
         text: "Drop your own tell-all",
-        effects: { followers: 15000, fame: 15, reputation: -25, mentalHealth: -20 },
+        effects: { followers: 60000, fame: 15, reputation: -25, mentalHealth: -20 },
         setFlags: ["controversial"],
         riskTag: "high_risk",
         stakes: { upside: "Massive follower surge", downside: "Reputation + mental health crash" },
@@ -489,7 +489,7 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "move_apartments",
         text: "Move and go dark for a week",
-        effects: { money: -8000, mentalHealth: -20, energy: -15, followers: -5000 },
+        effects: { money: -15000, mentalHealth: -20, energy: -15, followers: -5000 },
         followUpText: "New address, no more apartment tours. Some things aren't worth the content.",
       },
     ],
@@ -506,7 +506,7 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "debunk_with_evidence",
         text: "Post proof it's fake",
-        effects: { followers: 8000, fame: 8, reputation: 12, energy: -15 },
+        effects: { followers: 30000, fame: 8, reputation: 12, energy: -15 },
         socialReaction: { type: "tweet", text: "the way they just dismantled that rumor with RECEIPTS \uD83D\uDCCB chef's kiss", author: "@receipts_daily" },
       },
       {
@@ -529,13 +529,13 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "fire_leaker",
         text: "Fire the leaker publicly",
-        effects: { fame: 10, reputation: -8, followers: 5000 },
+        effects: { fame: 10, reputation: -8, followers: 15000 },
         socialReaction: { type: "tweet", text: "they just FIRED someone on camera for leaking \uD83D\uDE32 that's boss energy or toxic energy depending who you ask", author: "@workplacedrama" },
       },
       {
         id: "pivot_announcement",
         text: "Pivot and do a surprise reveal now",
-        effects: { followers: 10000, fame: 8, energy: -20 },
+        effects: { followers: 35000, fame: 8, energy: -20 },
         followUpText: "You flip the script and drop it early. The chaotic energy actually works. Sometimes the best plan is no plan.",
         socialReaction: { type: "comment", text: "WAIT THEY JUST DROPPED IT EARLY?? let's gooooo", author: "@hype_central" },
       },
@@ -552,7 +552,7 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "own_drunk_stream",
         text: "Post a hungover apology",
-        effects: { followers: 8000, fame: 8, reputation: -10, mentalHealth: -8 },
+        effects: { followers: 25000, fame: 8, reputation: -10, mentalHealth: -8 },
         socialReaction: { type: "tweet", text: "the hungover apology video is sending me \uD83D\uDE02 at least they're honest", author: "@nightowl_clips" },
       },
       {
@@ -576,14 +576,14 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "respond_point_by_point",
         text: "Respond to each point",
-        effects: { followers: 5000, fame: 10, reputation: 8, energy: -30, mentalHealth: -15 },
+        effects: { followers: 15000, fame: 10, reputation: 8, energy: -30, mentalHealth: -15 },
         followUpText: "You address every single claim. Some you own, some you debunk. It takes 4 hours. You're exhausted but thorough.",
         socialReaction: { type: "tweet", text: "they actually responded to ALL 47 TWEETS. respect the dedication even if you disagree", author: "@thread_watcher" },
       },
       {
         id: "meme_the_thread",
         text: "Turn it into a meme",
-        effects: { followers: 12000, fame: 12, reputation: -12 },
+        effects: { followers: 45000, fame: 12, reputation: -12 },
         riskTag: "reputation_risk",
         stakes: { upside: "Followers + fame", downside: "Reputation hit" },
         socialReaction: { type: "tweet", text: "NOT THEM MAKING FUN OF THEIR OWN CALLOUT THREAD \uD83D\uDE2D this is either genius or delusional", author: "@memeeconomy" },
@@ -601,13 +601,13 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "deny_dating",
         text: "Deny it clearly",
-        effects: { reputation: 5, followers: 3000 },
+        effects: { reputation: 5, followers: 10000 },
         followUpText: "Nobody believes you. The fan edits keep coming. You've learned that denial only fuels the fire.",
       },
       {
         id: "lean_into_ship",
         text: "Lean into the shipping",
-        effects: { followers: 10000, fame: 8, reputation: -5 },
+        effects: { followers: 40000, fame: 8, reputation: -5 },
         socialReaction: { type: "tweet", text: "THEY LIKED THE SHIP EDIT \uD83D\uDE31\uD83D\uDE31\uD83D\uDE31 it's basically confirmed", author: "@shipper_nation" },
       },
     ],
@@ -626,9 +626,9 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "drop_the_bomb",
         text: "Publish everything",
-        effects: { followers: 40000, fame: 25, reputation: -20, mentalHealth: -20, energy: -25 },
+        effects: { followers: 150000, fame: 25, reputation: -20, mentalHealth: -20, energy: -25 },
         riskTag: "high_risk",
-        stakes: { upside: "40K+ followers, massive fame", downside: "Reputation destroyed, burnout" },
+        stakes: { upside: "150K+ followers, massive fame", downside: "Reputation destroyed, burnout" },
         requiresConfirmation: true,
         scheduledEvent: { eventId: "brand_drops_you", delay: 2 },
         followUpText: "The video drops at midnight. By sunrise, you're the most talked about person on the internet. The celebrity's team is threatening legal action. The internet is split. You're shaking.",
@@ -655,7 +655,7 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "take_the_triple",
         text: "Take the $75K — how bad can it be?",
-        effects: { money: 30000, fame: 18, reputation: -25, followers: 15000 },
+        effects: { money: 75000, fame: 18, reputation: -25, followers: 50000 },
         riskTag: "high_risk",
         stakes: { upside: "$75K + fame surge", downside: "Reputation tanks, brands may drop you" },
         requiresConfirmation: true,
@@ -665,7 +665,7 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "decline_triple",
         text: "No amount of money is worth my reputation",
-        effects: { reputation: 12, mentalHealth: 8, money: 5000 },
+        effects: { reputation: 12, mentalHealth: 8, money: 15000 },
         followUpText: "You take the standard deal instead. Boring? Maybe. But your integrity is intact and the brand respects the boundary.",
         socialReaction: { type: "comment", text: "the fact they turned down easy money for principles... that's rare", author: "@industry_watcher" },
       },
@@ -683,7 +683,7 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "go_live_raw",
         text: "Go live. Say everything.",
-        effects: { followers: 20000, fame: 15, reputation: -10, mentalHealth: 15, energy: -30 },
+        effects: { followers: 80000, fame: 15, reputation: -10, mentalHealth: 15, energy: -30 },
         riskTag: "high_risk",
         stakes: { upside: "Authentic connection, followers surge", downside: "Energy drained, reputation gamble" },
         followUpText: "You go live for 47 minutes. You cry. You laugh. You tell the truth about everything. 2 million people watch. Half call you brave. Half call you unhinged. But for the first time in months, you feel like yourself.",
@@ -709,7 +709,7 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "show_receipts_charity",
         text: "Post every receipt and bank statement",
-        effects: { reputation: 20, followers: 5000, energy: -15, mentalHealth: -10 },
+        effects: { reputation: 20, followers: 15000, energy: -15, mentalHealth: -10 },
         setFlags: ["charityPersona"],
         followUpText: "Full transparency. Every dollar accounted for. The accuser quietly deletes their post.",
         socialReaction: { type: "tweet", text: "they showed RECEIPTS for every single dollar. the accuser is SILENT now \uD83E\uDD21", author: "@justiceserved" },
@@ -717,7 +717,7 @@ export const dramaEvents: GameEvent[] = [
       {
         id: "threaten_defamation",
         text: "Threaten a defamation lawsuit",
-        effects: { fame: 8, reputation: -5, money: -3000 },
+        effects: { fame: 8, reputation: -5, money: -5000 },
         socialReaction: { type: "headline", text: "INFLUENCER THREATENS LEGAL ACTION OVER CHARITY FRAUD CLAIMS" },
       },
     ],
