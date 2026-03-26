@@ -251,7 +251,11 @@ function generateHeadline(state: GameState): string {
   }
 
   if (state.stats.money >= 100_000) {
-    parts.push(`banked $${Math.floor(state.stats.money / 1000)}K`);
+    const m = state.stats.money;
+    const moneyStr = m >= 1_000_000
+      ? `$${(m / 1_000_000).toFixed(2)}M`
+      : `$${Math.floor(m / 1000)}K`;
+    parts.push(`banked ${moneyStr}`);
   } else if (state.stats.money < 0) {
     parts.push(`went broke`);
   }
