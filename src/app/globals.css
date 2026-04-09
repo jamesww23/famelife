@@ -159,15 +159,16 @@
 
 /* ===== Card styles — glass morphism upgrade ===== */
 .game-card {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border-radius: 1.25rem;
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.7);
   box-shadow:
-    0 10px 40px rgba(0, 0, 0, 0.08),
-    0 2px 10px rgba(0, 0, 0, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    0 12px 48px rgba(0, 0, 0, 0.10),
+    0 4px 16px rgba(0, 0, 0, 0.06),
+    0 0 0 0.5px rgba(255, 255, 255, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
   transition: transform 0.2s ease, box-shadow 0.3s ease;
   position: relative;
   overflow: hidden;
@@ -184,28 +185,56 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.4),
+    rgba(255, 255, 255, 0.35),
     transparent
   );
-  animation: shimmer 4s ease-in-out infinite;
+  animation: shimmer 5s ease-in-out infinite;
   pointer-events: none;
   z-index: 1;
 }
 
+/* Colored top accent strip for event cards */
+.game-card-accent {
+  border-top: 3px solid var(--card-accent, #e040fb);
+}
+.game-card-accent::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: linear-gradient(180deg, var(--card-accent-bg, rgba(224, 64, 251, 0.06)), transparent);
+  pointer-events: none;
+}
+
+/* ===== Stat header dark glass ===== */
+.stat-header {
+  background: rgba(15, 10, 30, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-radius: 1.25rem;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
 /* ===== Stat bar pill — enhanced ===== */
 .stat-pill {
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border-radius: 0.75rem;
+  border-radius: 0.625rem;
   padding: 6px 10px;
   font-size: 0.75rem;
   font-weight: 600;
   display: flex;
   align-items: flex-start;
   gap: 2px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   transition: box-shadow 0.3s ease, transform 0.2s ease;
 }
 
@@ -223,6 +252,7 @@
   width: 100%;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .choice-btn::after {
@@ -242,7 +272,7 @@
   border-color: #e040fb;
   background: #fdf2ff;
   transform: scale(1.02);
-  box-shadow: 0 4px 20px rgba(224, 64, 251, 0.15);
+  box-shadow: 0 6px 24px rgba(224, 64, 251, 0.18);
 }
 
 .choice-btn:hover::after {
@@ -251,7 +281,8 @@
 }
 
 .choice-btn:active {
-  transform: scale(0.98);
+  transform: scale(0.97);
+  box-shadow: 0 2px 8px rgba(224, 64, 251, 0.1);
 }
 
 /* ===== Gradient text ===== */
@@ -264,16 +295,16 @@
 
 /* ===== Progress bar ===== */
 .stat-bar {
-  height: 6px;
+  height: 5px;
   border-radius: 3px;
-  background: #f0e4f7;
+  background: rgba(255, 255, 255, 0.08);
   overflow: hidden;
 }
 .stat-bar-fill {
   height: 100%;
   border-radius: 3px;
   transition: width 0.5s ease;
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
 }
 
 /* ===== Social reaction bubble ===== */
@@ -281,10 +312,21 @@
   background: linear-gradient(135deg, #f8f9fa, #f3e5f5);
   border-left: 3px solid #e040fb;
   border-radius: 0 0.75rem 0.75rem 0;
-  padding: 10px 14px;
+  padding: 12px 16px;
   font-size: 0.85rem;
   animation: slideUp 0.5s ease-out 0.3s both;
-  box-shadow: 0 2px 8px rgba(224, 64, 251, 0.08);
+  box-shadow: 0 4px 12px rgba(224, 64, 251, 0.08);
+  position: relative;
+}
+.social-bubble::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -3px;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, #e040fb, #ff6b9d);
+  border-radius: 3px 0 0 3px;
 }
 
 /* ===== Stat delta floating animations ===== */
@@ -297,9 +339,9 @@
   100% { transform: translateY(-28px); opacity: 0; }
 }
 @keyframes statFlash {
-  0% { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); }
-  30% { box-shadow: 0 0 16px rgba(224, 64, 251, 0.5), 0 0 4px rgba(224, 64, 251, 0.3); }
-  100% { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); }
+  0% { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); }
+  30% { box-shadow: 0 0 16px rgba(224, 64, 251, 0.5), 0 0 4px rgba(224, 64, 251, 0.3); background: rgba(224, 64, 251, 0.12); }
+  100% { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); }
 }
 
 .stat-delta {
@@ -312,14 +354,14 @@
   white-space: nowrap;
 }
 .stat-delta-up {
-  color: #10b981;
+  color: #34d399;
   animation: deltaFloatUp 1.2s ease-out forwards;
-  text-shadow: 0 0 6px rgba(16, 185, 129, 0.4);
+  text-shadow: 0 0 8px rgba(52, 211, 153, 0.6);
 }
 .stat-delta-down {
-  color: #ef4444;
+  color: #f87171;
   animation: deltaFloatDown 1.2s ease-out forwards;
-  text-shadow: 0 0 6px rgba(239, 68, 68, 0.4);
+  text-shadow: 0 0 8px rgba(248, 113, 113, 0.6);
 }
 .stat-pill-flash {
   animation: statFlash 0.6s ease-out;
@@ -332,7 +374,7 @@
   align-items: center;
   justify-content: center;
   padding: 14px 8px;
-  background: rgba(255, 255, 255, 0.98);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(245, 240, 255, 0.95));
   border: 2px solid #e8e0f0;
   border-radius: 1rem;
   cursor: pointer;
@@ -341,24 +383,26 @@
   min-height: 100px;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 .activity-btn:hover {
   border-color: #e040fb;
-  background: #fdf2ff;
-  transform: scale(1.02);
-  box-shadow: 0 4px 16px rgba(224, 64, 251, 0.12);
+  background: linear-gradient(145deg, #fdf2ff, #f5e6ff);
+  transform: scale(1.03);
+  box-shadow: 0 6px 20px rgba(224, 64, 251, 0.15);
 }
 .activity-btn:active {
-  transform: scale(0.97);
+  transform: scale(0.96);
+  box-shadow: 0 2px 6px rgba(224, 64, 251, 0.1);
 }
 .activity-btn-lifestyle {
   border-color: #fde68a;
-  background: linear-gradient(135deg, #fffbeb, #fef3c7);
+  background: linear-gradient(145deg, #fffbeb, #fef3c7);
 }
 .activity-btn-lifestyle:hover {
   border-color: #f59e0b;
-  background: linear-gradient(135deg, #fef3c7, #fde68a);
-  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.15);
+  background: linear-gradient(145deg, #fef3c7, #fde68a);
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.18);
 }
 
 /* ===== Tier selection buttons ===== */
@@ -368,22 +412,23 @@
   justify-content: space-between;
   width: 100%;
   padding: 12px 14px;
-  background: rgba(255, 255, 255, 0.98);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(255, 251, 235, 0.95));
   border: 2px solid #e8e0f0;
   border-radius: 0.875rem;
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: left;
   gap: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 .tier-btn:hover {
   border-color: #f59e0b;
-  background: #fffbeb;
-  transform: scale(1.01);
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.12);
+  background: linear-gradient(135deg, #fffbeb, #fef3c7);
+  transform: scale(1.02);
+  box-shadow: 0 6px 16px rgba(245, 158, 11, 0.15);
 }
 .tier-btn:active {
-  transform: scale(0.98);
+  transform: scale(0.97);
 }
 .tier-btn-locked {
   cursor: default;
@@ -455,20 +500,21 @@
 /* ===== Enhanced delta badges ===== */
 .delta-badge-positive {
   background: linear-gradient(135deg, #ecfdf5, #d1fae5);
-  border: 1px solid rgba(16, 185, 129, 0.2);
-  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  box-shadow: 0 2px 10px rgba(16, 185, 129, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 .delta-badge-negative {
   background: linear-gradient(135deg, #fef2f2, #fee2e2);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  box-shadow: 0 2px 10px rgba(239, 68, 68, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 /* ===== Drama card accent ===== */
 .drama-card {
   border-left: 4px solid #ef4444;
-  box-shadow: 0 10px 40px rgba(239, 68, 68, 0.1), 0 2px 10px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 12px 48px rgba(239, 68, 68, 0.12), 0 4px 16px rgba(0, 0, 0, 0.06);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.97), rgba(255, 245, 245, 0.97));
 }
 
 /* ===== Risk system styles ===== */
@@ -525,16 +571,45 @@
 
 /* ===== Button glow effects ===== */
 .btn-glow {
-  box-shadow: 0 4px 20px rgba(224, 64, 251, 0.3), 0 0 40px rgba(224, 64, 251, 0.1);
+  box-shadow: 0 4px 24px rgba(224, 64, 251, 0.3), 0 0 48px rgba(224, 64, 251, 0.1);
   transition: all 0.2s ease;
+  border: 1px solid rgba(224, 64, 251, 0.15);
 }
 .btn-glow:hover {
-  box-shadow: 0 6px 30px rgba(224, 64, 251, 0.4), 0 0 60px rgba(224, 64, 251, 0.15);
+  box-shadow: 0 6px 32px rgba(224, 64, 251, 0.4), 0 0 64px rgba(224, 64, 251, 0.15);
+}
+
+/* Primary gradient CTA */
+.btn-primary-gradient {
+  background: linear-gradient(135deg, #e040fb, #ff6b9d);
+  color: white;
+  font-weight: 700;
+  border: none;
+  box-shadow: 0 4px 20px rgba(224, 64, 251, 0.35);
+  transition: all 0.2s ease;
+}
+.btn-primary-gradient:hover {
+  box-shadow: 0 6px 28px rgba(224, 64, 251, 0.45);
+  transform: scale(1.02);
+}
+.btn-primary-gradient:active {
+  transform: scale(0.98);
 }
 
 /* ===== Income card ===== */
 .income-card {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(236, 253, 245, 0.95));
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.97), rgba(236, 253, 245, 0.97));
+  border-top: 3px solid #10b981;
+}
+.income-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  background: linear-gradient(180deg, rgba(16, 185, 129, 0.06), transparent);
+  pointer-events: none;
 }
 
 /* ===== Mobile Responsive Styles ===== */
@@ -546,6 +621,9 @@
 
 /* Small phones (iPhone SE, Galaxy S series small — 320-374px) */
 @media (max-width: 374px) {
+  .stat-header {
+    padding: 10px 10px;
+  }
   .stat-pill {
     padding: 4px 6px;
     font-size: 0.65rem;
@@ -594,6 +672,9 @@
   .choice-btn {
     padding: 10px 16px;
     min-height: 40px;
+  }
+  .stat-header {
+    padding: 8px 10px;
   }
   .stat-pill {
     padding: 2px 6px;

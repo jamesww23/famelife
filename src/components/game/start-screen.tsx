@@ -142,7 +142,7 @@ export function StartScreen() {
 
               <button
                 onClick={() => { playTap(); setStep("gender"); }}
-                className="w-full py-3.5 sm:py-4 rounded-2xl font-bold text-base sm:text-lg bg-white text-[#e040fb] hover:scale-[1.02] active:scale-[0.98] shadow-lg btn-glow transition-all"
+                className="w-full py-3.5 sm:py-4 rounded-2xl text-base sm:text-lg btn-primary-gradient active:scale-[0.98] transition-all"
               >
                 Start Your Fame Story
               </button>

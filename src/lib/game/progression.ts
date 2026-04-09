@@ -101,7 +101,7 @@ export function checkGameOver(state: GameState): string | null {
   if (state.stats.energy <= 0 && state.stats.mentalHealth < 20)
     return "Complete exhaustion. You had to quit the internet.";
   if (state.week > getMaxTurns()) {
-    const years = Math.ceil(state.week / 4);
+    const years = getMaxTurns() / 4;
     return `After ${years} years, you retired from content creation.`;
   }
   return null;

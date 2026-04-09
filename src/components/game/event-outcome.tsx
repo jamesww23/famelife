@@ -74,7 +74,7 @@ export function EventOutcome() {
 
       <button
         onClick={() => { playTap(); proceedFromOutcome(); }}
-        className="w-full py-3.5 sm:py-4 bg-white rounded-2xl font-bold text-[#e040fb] text-base sm:text-lg shadow-lg btn-glow active:scale-[0.98] transition-all"
+        className="w-full py-3.5 sm:py-4 rounded-2xl text-base sm:text-lg btn-primary-gradient active:scale-[0.98] transition-all"
       >
         Continue
       </button>

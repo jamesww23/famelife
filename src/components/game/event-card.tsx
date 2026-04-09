@@ -62,9 +62,15 @@ function EventCardInner() {
     <>
       <div className="animate-scale-in" key={event.id + state.week}>
         {/* Event card */}
-        <div className={`game-card p-4 sm:p-6 mb-3 sm:mb-4 ${isDrama ? "drama-card" : ""}`}>
+        <div
+          className={`game-card game-card-accent p-4 sm:p-6 mb-3 sm:mb-4 ${isDrama ? "drama-card" : ""}`}
+          style={{
+            "--card-accent": color,
+            "--card-accent-bg": color + "10",
+          } as React.CSSProperties}
+        >
           {/* Category badge + risk indicator */}
-          <div className="flex items-center gap-2 mb-2 sm:mb-3 flex-wrap">
+          <div className="flex items-center gap-2 mb-2 sm:mb-3 flex-wrap relative z-[2]">
             <span
               className="event-badge text-[10px] sm:text-xs font-bold uppercase tracking-wider px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-white"
               style={{ backgroundColor: color }}

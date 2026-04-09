@@ -66,32 +66,35 @@ export function StatBar() {
   }, [snap.deltaKey, snap.moneyGained, snap.tierChanged]);
 
   return (
-    <div className="w-full">
-      {/* Quarter progress bar */}
-      <div className="h-1 bg-white/20 rounded-full mb-2 overflow-hidden">
-        <div
-          className="h-full bg-white/60 rounded-full transition-all duration-500"
-          style={{ width: `${progress}%` }}
-        />
-      </div>
-
+    <div className="stat-header w-full">
       {/* Top row: character + quarter + tier */}
-      <div className="flex items-center justify-between mb-2 px-1">
+      <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-1.5">
           <span className="text-sm">{state.character.avatar}</span>
           <span className="text-white font-bold text-xs">{state.character.name}</span>
-          <span className="text-white/50 text-xs">·</span>
-          <span className="text-white/80 text-xs font-semibold">
+          <span className="text-white/30 text-xs">·</span>
+          <span className="text-white/70 text-xs font-semibold">
             {formatQuarter(week)}
           </span>
         </div>
-        <span className="text-white text-xs font-bold">
+        <span className="text-white/90 text-xs font-bold">
           {getTierEmoji(careerTier)} {getTierName(careerTier)}
         </span>
       </div>
 
+      {/* Quarter progress bar */}
+      <div className="h-1 bg-white/10 rounded-full mb-2.5 overflow-hidden">
+        <div
+          className="h-full rounded-full transition-all duration-500"
+          style={{
+            width: `${progress}%`,
+            background: "linear-gradient(90deg, #e040fb, #ff6b9d, #ffd700)",
+          }}
+        />
+      </div>
+
       {/* Stats grid */}
-      <div className="grid grid-cols-3 gap-1 sm:gap-1.5">
+      <div className="grid grid-cols-3 gap-1.5">
         <StatPill label="Followers" emoji={STAT_EMOJI.followers} value={formatFollowers(stats.followers)} delta={snap.deltas.followers} deltaKey={snap.deltaKey} deltaFormat="followers" />
         <StatPill label="Money" emoji={STAT_EMOJI.money} value={formatMoney(stats.money)} delta={snap.deltas.money} deltaKey={snap.deltaKey} deltaFormat="money" />
         <StatPill label="Fame" emoji={STAT_EMOJI.fame} value={`${stats.fame}`} bar barValue={stats.fame} barColor="#a855f7" delta={snap.deltas.fame} deltaKey={snap.deltaKey} />
@@ -153,10 +156,10 @@ function StatPill({
       role="status"
       aria-label={`${label}: ${value}${danger ? " — critically low!" : ""}${hasChanged && delta ? ` (${delta > 0 ? "+" : ""}${delta})` : ""}`}
     >
-      <div className="text-[9px] sm:text-[10px] font-semibold text-gray-400 uppercase tracking-wider leading-none mb-0.5">{label}</div>
+      <div className="text-[9px] sm:text-[10px] font-semibold text-white/40 uppercase tracking-wider leading-none mb-0.5">{label}</div>
       <div className="flex items-center gap-1 w-full">
         <span className="text-xs">{emoji}</span>
-        <span className={`text-xs font-bold ${danger ? "text-red-500" : "text-gray-800"}`}>{value}</span>
+        <span className={`text-xs font-bold ${danger ? "text-red-400" : "text-white/90"}`}>{value}</span>
       </div>
       {bar && (
         <div className="stat-bar w-full mt-1">
