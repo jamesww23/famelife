@@ -2,6 +2,7 @@ import { archetypes } from "@/data/archetypes";
 import { GameEvent, GameState, EventCategory } from "./types";
 import { isTierAtLeast, isTierAtMost, getPhaseForState, isPhaseAtLeast, isPhaseAtMost } from "./progression";
 import { weightedRandom } from "./random";
+import { getSynergyBonus, getSynergyEventWeight } from "./synergy";
 
 interface ScoredEvent {
   event: GameEvent;
@@ -51,6 +52,10 @@ function scoreEvent(event: GameEvent, state: GameState): number {
   if (arch?.eventWeightModifiers[event.type]) {
     weight *= arch.eventWeightModifiers[event.type]!;
   }
+
+  // Hidden trait–archetype synergy event affinity
+  const synergy = getSynergyBonus(state.character.traitId, state.archetype);
+  weight *= getSynergyEventWeight(synergy, event.type);
 
   // Anti-repetition penalty
   if (state.recentEventIds.includes(event.id)) {

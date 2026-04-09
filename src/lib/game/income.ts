@@ -1,5 +1,7 @@
 import { GameState, QuarterlyIncome } from "./types";
 import { computePassiveEffects, computeUpkeep } from "@/data/shop";
+import { getSynergyBonus, getSynergyIncomeBonus } from "./synergy";
+import { getPhaseForState } from "./progression";
 
 /**
  * Calculate quarterly passive income based on followers, reputation, flags,
@@ -78,8 +80,18 @@ export function calculateQuarterlyIncome(state: GameState): QuarterlyIncome {
   // ---- 6. Business Income: from owned businesses ----
   const businessIncome = Math.floor(passive.businessIncome || 0);
 
+  // ---- Hidden trait–archetype synergy income bonuses ----
+  const synergy = getSynergyBonus(state.character.traitId, state.archetype);
+  const phase = getPhaseForState(state);
+  const synergyIncome = getSynergyIncomeBonus(synergy, phase);
+  if (synergyIncome.adRevenue) adRevenue = Math.floor(adRevenue * (1 + synergyIncome.adRevenue));
+  if (synergyIncome.sponsorships) sponsorships = Math.floor(sponsorships * (1 + synergyIncome.sponsorships));
+  if (synergyIncome.donations) donations = Math.floor(donations * (1 + synergyIncome.donations));
+  if (synergyIncome.subscriptions) subscriptions = Math.floor(subscriptions * (1 + synergyIncome.subscriptions));
+
   // ---- Apply global income multiplier from purchases ----
   let totalIncome = adRevenue + sponsorships + donations + subscriptions + affiliates + businessIncome;
+  totalIncome += synergyIncome.flatBonus;
   if (passive.incomeMultiplier) {
     const bonus = Math.floor((totalIncome - businessIncome) * passive.incomeMultiplier);
     totalIncome += bonus;

@@ -16,6 +16,8 @@ import {
 import { calculateQuarterlyIncome } from "./income";
 import { EVENT_EMOJI } from "./constants";
 import { computePassiveEffects } from "@/data/shop";
+import { getSynergyBonus, applySynergyToEffects } from "./synergy";
+import { getPhaseForState } from "./progression";
 
 /** Apply stat effects to a stats object, clamping bounded stats. Returns new stats + deltas. */
 export function applyEffects(stats: Stats, effects: StatEffects): { stats: Stats; deltas: StatDelta[] } {
@@ -93,6 +95,11 @@ export function applyEventChoice(
     finalEffects = result.effects;
     riskOutcome = result.outcome;
   }
+
+  // Hidden trait–archetype synergy bonuses (phase-aware)
+  const synergy = getSynergyBonus(state.character.traitId, state.archetype);
+  const currentPhase = getPhaseForState(state);
+  finalEffects = applySynergyToEffects(finalEffects, synergy, currentPhase);
 
   // PR Team: reduce reputation damage from scandal events
   const passive = computePassiveEffects(state.purchases);
@@ -221,7 +228,13 @@ export function applyBoost(state: GameState, boost: RewardedBoost): GameState {
 
 /** Apply a quarterly activity choice. */
 export function applyActivity(state: GameState, activity: QuarterlyActivity): GameState {
-  const effects = { ...activity.getEffects(state) };
+  let effects = { ...activity.getEffects(state) };
+
+  // Hidden trait–archetype synergy bonuses (phase-aware)
+  const synergy = getSynergyBonus(state.character.traitId, state.archetype);
+  const currentPhase = getPhaseForState(state);
+  effects = applySynergyToEffects(effects, synergy, currentPhase);
+
   // Apply follower gain multiplier from purchases
   if (effects.followers && effects.followers > 0) {
     const passive = computePassiveEffects(state.purchases);
@@ -293,8 +306,9 @@ export function advanceWeek(state: GameState): GameState {
 
   // ---- Per-turn recovery (scales inversely with fame — spotlight makes recovery harder) ----
   const passive = computePassiveEffects(state.purchases);
-  const energyBonus = passive.energyRecoveryBonus || 0;
-  const mentalBonus = passive.mentalHealthRecoveryBonus || 0;
+  const synergy = getSynergyBonus(state.character.traitId, state.archetype);
+  const energyBonus = (passive.energyRecoveryBonus || 0) + (synergy.energyRecovery || 0);
+  const mentalBonus = (passive.mentalHealthRecoveryBonus || 0) + (synergy.mentalRecovery || 0);
   // At fame 0: full recovery; at fame 80+: recovery drops to ~55% of base
   const famePenalty = Math.max(0.55, 1 - (stats.fame * 0.0056));
   const effectiveEnergyRecovery = Math.round((ENERGY_RECOVERY + energyBonus) * famePenalty);
