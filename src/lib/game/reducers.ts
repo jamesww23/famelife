@@ -307,8 +307,8 @@ export function advanceWeek(state: GameState): GameState {
   // ---- Per-turn recovery (scales inversely with fame — spotlight makes recovery harder) ----
   const passive = computePassiveEffects(state.purchases);
   const synergy = getSynergyBonus(state.character.traitId, state.archetype);
-  const energyBonus = (passive.energyRecoveryBonus || 0) + (synergy.energyRecovery || 0);
-  const mentalBonus = (passive.mentalHealthRecoveryBonus || 0) + (synergy.mentalRecovery || 0);
+  const energyBonus = (passive.energyRecoveryBonus || 0) + (synergy.energyRecovery || 0) - (synergy.energyDrain || 0);
+  const mentalBonus = (passive.mentalHealthRecoveryBonus || 0) + (synergy.mentalRecovery || 0) - (synergy.mentalDrain || 0);
   // At fame 0: full recovery; at fame 80+: recovery drops to ~55% of base
   const famePenalty = Math.max(0.55, 1 - (stats.fame * 0.0056));
   const effectiveEnergyRecovery = Math.round((ENERGY_RECOVERY + energyBonus) * famePenalty);
