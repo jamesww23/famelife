@@ -190,9 +190,9 @@ function scoreEvent(event: GameEvent, state: GameState): number {
     }
   }
 
-  // ---- Chaos injection: small chance of wild card events ----
-  // 6% chance to boost a random drama/failure/celebrity event
-  if (Math.random() < 0.06) {
+  // ---- Chaos injection: rare wild card boost ----
+  // 1.5% chance to boost a random drama/failure/celebrity event
+  if (Math.random() < 0.015) {
     if (event.type === "drama" || event.type === "celebrity" || event.type === "failure") {
       weight *= 2.0;
     }

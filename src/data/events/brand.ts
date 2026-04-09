@@ -214,4 +214,83 @@ export const brandEvents: GameEvent[] = [
       },
     ],
   },
+
+  // === BREAKOUT PHASE BRAND EVENTS ===
+  {
+    id: "first_major_sponsor",
+    type: "brand",
+    title: "First Major Sponsor",
+    emoji: "🎯",
+    text: "A Fortune 500 company just emailed. They want you for a national campaign. This is the big leagues. The contract is thick and the lawyers are serious.",
+    weight: 8,
+    minPhase: "breakout",
+    maxPhase: "famous",
+    choices: [
+      {
+        id: "sign_major_deal",
+        text: "Sign the deal — go corporate",
+        effects: { money: 40000, fame: 12, reputation: -5, followers: 20000 },
+        setFlags: ["brandSafe"],
+        followUpText: "Your face is on billboards. Actual billboards. Your mom took a photo and cried.",
+        socialReaction: { type: "headline", text: "RISING CREATOR LANDS NATIONAL AD CAMPAIGN WITH MAJOR BRAND" },
+      },
+      {
+        id: "negotiate_creative",
+        text: "Only if I get creative control",
+        effects: { money: 20000, fame: 8, reputation: 10 },
+        followUpText: "They agreed to most of your terms. The ad is actually... good. You're proud of it.",
+        socialReaction: { type: "comment", text: "this is the first sponsored post I've actually enjoyed watching", author: "@adreview" },
+      },
+    ],
+  },
+  {
+    id: "ambassador_offer",
+    type: "brand",
+    title: "Brand Ambassador Offer",
+    emoji: "🏆",
+    text: "A brand wants you as their year-long ambassador. Steady monthly payments, product drops, exclusive events. But you can't work with any competitors.",
+    weight: 7,
+    minPhase: "breakout",
+    choices: [
+      {
+        id: "take_ambassador",
+        text: "Lock in the steady income",
+        effects: { money: 30000, fame: 5, reputation: 5, followers: 10000 },
+        setFlags: ["brandSafe"],
+        followUpText: "Monthly checks hit like clockwork. You're wearing their stuff in every post. It's comfortable. Maybe too comfortable.",
+      },
+      {
+        id: "stay_freelance",
+        text: "Keep your options open",
+        effects: { reputation: 8 },
+        followUpText: "Three months later, a better brand offers double. Good call.",
+      },
+    ],
+  },
+  {
+    id: "crypto_spon",
+    type: "brand",
+    title: "Crypto Sponsorship",
+    emoji: "🪙",
+    text: "A crypto exchange is offering $80K for one post. Your fans trust you. The money is life-changing. But you've seen what happens to creators who shill crypto.",
+    weight: 7,
+    minPhase: "breakout",
+    choices: [
+      {
+        id: "take_crypto",
+        text: "Take the money, disclose properly",
+        effects: { money: 80000, reputation: -20, followers: -15000, fame: 5 },
+        riskTag: "reputation_risk",
+        stakes: { upside: "$80K payday", downside: "Major reputation damage" },
+        socialReaction: { type: "tweet", text: "not another creator shilling crypto... I'm so tired 😭 unfollowed", author: "@crypto_skeptic" },
+      },
+      {
+        id: "decline_crypto",
+        text: "Hard pass — not worth the trust",
+        effects: { reputation: 15, mentalHealth: 5 },
+        followUpText: "The crypto exchange collapsed 3 months later. Every creator who promoted it got dragged. You dodged a nuke.",
+        socialReaction: { type: "comment", text: "remember when they turned down the crypto deal? looking like a genius now", author: "@hindsight_hero" },
+      },
+    ],
+  },
 ];

@@ -1,5 +1,5 @@
 import { archetypes } from "@/data/archetypes";
-import { getTierName } from "./progression";
+import { getTierName, formatMoney } from "./progression";
 import { GameState, GameSummary } from "./types";
 
 /** Calculate a composite fame score (0-1000) based on all stats and achievements. */
@@ -251,11 +251,7 @@ function generateHeadline(state: GameState): string {
   }
 
   if (state.stats.money >= 100_000) {
-    const m = state.stats.money;
-    const moneyStr = m >= 1_000_000
-      ? `$${(m / 1_000_000).toFixed(2)}M`
-      : `$${Math.floor(m / 1000)}K`;
-    parts.push(`banked ${moneyStr}`);
+    parts.push(`banked ${formatMoney(state.stats.money)}`);
   } else if (state.stats.money < 0) {
     parts.push(`went broke`);
   }

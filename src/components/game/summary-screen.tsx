@@ -8,8 +8,17 @@ import { UnlockSummary } from "./unlock-summary";
 import { playGameOver, playTap } from "@/lib/sounds";
 
 /** Process run end once and cache the result across renders. */
-function useRunUnlocks(state: Parameters<typeof processRunEnd>[0]): RunUnlocks {
-  const [unlocks] = useState<RunUnlocks>(() => processRunEnd(state));
+function useRunUnlocks(state: Parameters<typeof processRunEnd>[0]): RunUnlocks | null {
+  const [unlocks, setUnlocks] = useState<RunUnlocks | null>(null);
+  const processed = useState(false);
+  useEffect(() => {
+    if (processed[0]) return;
+    processed[1](true);
+    processRunEnd(state).then(setUnlocks).catch(() => {
+      // Fallback with empty unlocks if native storage fails
+      setUnlocks({ newBadges: [], newTitles: [], updatedLegacy: { version: 1, totalRuns: 0, lifetimeEarnings: 0, bestFollowers: 0, bestFame: 0, bestFameScore: 0, bestMoney: 0, longestRun: 0, mostScandals: 0, fastestTo1M: null, unlockedBadges: [], unlockedTitles: [], runHistory: [] } });
+    });
+  }, [state, processed]);
   return unlocks;
 }
 
@@ -59,7 +68,7 @@ export function SummaryScreen() {
   // Score bar fill percentage
   const scorePct = Math.min(100, (summary.fameScore / 1000) * 100);
 
-  if (view === "unlocks") {
+  if (view === "unlocks" && unlocks) {
     const nextGoals = getNextGoals(unlocks.updatedLegacy);
     return (
       <div className="min-h-screen min-h-[100dvh] flex items-center justify-center p-3 sm:p-4">
@@ -79,7 +88,7 @@ export function SummaryScreen() {
     );
   }
 
-  const hasUnlocks = unlocks.newBadges.length > 0 || unlocks.newTitles.length > 0;
+  const hasUnlocks = unlocks ? unlocks.newBadges.length > 0 || unlocks.newTitles.length > 0 : false;
 
   return (
     <div className="min-h-screen min-h-[100dvh] flex items-center justify-center p-3 sm:p-4">
@@ -171,7 +180,7 @@ export function SummaryScreen() {
         {/* Actions */}
         <div className="space-y-2.5">
           {/* View Unlocks button */}
-          {hasUnlocks && (
+          {hasUnlocks && unlocks && (
             <button
               onClick={() => { playTap(); setView("unlocks"); }}
               className="w-full py-3.5 bg-gradient-to-r from-[#e040fb] to-[#ab47bc] text-white rounded-2xl font-bold text-base active:scale-[0.98] transition-all shadow-lg flex items-center justify-center gap-2 animate-pulse-glow"

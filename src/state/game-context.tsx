@@ -20,7 +20,18 @@ import {
   purchaseItem,
 } from "@/lib/game/engine";
 import { generateSummary } from "@/lib/game/summary";
+import { loadLegacyAsync } from "@/lib/game/legacy";
 import { STORAGE_KEY } from "@/lib/game/constants";
+import {
+  getItem,
+  setItem,
+  removeItem,
+  initNativeServices,
+  reportMilestoneAchievement,
+  maybeShowInterstitial,
+  resetAdState,
+  trackEvent,
+} from "@/lib/native";
 
 type GameContextValue = {
   state: GameState;
@@ -127,41 +138,75 @@ const INITIAL: GameState = {
 export function GameProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(reducer, INITIAL);
   const initialized = useRef(false);
+  const prevMilestones = useRef<string[]>([]);
 
-  // Load saved state on mount
+  // Initialize native services + warm legacy cache on mount
+  useEffect(() => {
+    initNativeServices().catch(() => {
+      // Native services are optional — game works without them
+    });
+    // Eagerly load legacy from Preferences (UserDefaults) so that
+    // synchronous `loadLegacy()` reads from a warm cache on native.
+    loadLegacyAsync().catch(() => {});
+  }, []);
+
+  // Load saved state on mount — async for native storage
   useEffect(() => {
     if (initialized.current) return;
     initialized.current = true;
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved) as GameState;
-        if (parsed.phase !== "start" && parsed.week > 0) {
-          // Migrate old saves missing new fields
-          if (!parsed.purchases) parsed.purchases = [];
-          if (!parsed.scheduledEvents) parsed.scheduledEvents = [];
-          if (parsed.riskLevel === undefined) parsed.riskLevel = 0;
-          dispatch({ type: "SET_STATE", state: parsed });
+
+    (async () => {
+      try {
+        const saved = await getItem(STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved) as GameState;
+          if (parsed.phase !== "start" && parsed.week > 0) {
+            // Migrate old saves missing new fields
+            if (!parsed.purchases) parsed.purchases = [];
+            if (!parsed.scheduledEvents) parsed.scheduledEvents = [];
+            if (parsed.riskLevel === undefined) parsed.riskLevel = 0;
+            dispatch({ type: "SET_STATE", state: parsed });
+          }
         }
+      } catch {
+        // Ignore invalid saves
       }
-    } catch {
-      // Ignore invalid saves
-    }
+    })();
   }, []);
 
-  // Persist state on change
+  // Persist state on change — async for native storage
   useEffect(() => {
     if (state.phase !== "start" && state.week > 0) {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      } catch {
-        // Storage full
-      }
+      setItem(STORAGE_KEY, JSON.stringify(state)).catch(() => {
+        // Storage error — non-fatal
+      });
     }
   }, [state]);
 
+  // Report new milestones to Game Center
+  useEffect(() => {
+    if (state.milestones.length > prevMilestones.current.length) {
+      const newMilestones = state.milestones.filter(
+        (m) => !prevMilestones.current.includes(m)
+      );
+      for (const milestoneId of newMilestones) {
+        reportMilestoneAchievement(milestoneId).catch(() => {});
+      }
+    }
+    prevMilestones.current = state.milestones;
+  }, [state.milestones]);
+
+  // Show interstitial ad between turns
+  useEffect(() => {
+    if (state.phase === "activity" && state.week > 1) {
+      maybeShowInterstitial().catch(() => {});
+    }
+  }, [state.phase, state.week]);
+
   const startGame = useCallback((archetype: ArchetypeId, character: CharacterBuild) => {
-    localStorage.removeItem(STORAGE_KEY);
+    removeItem(STORAGE_KEY).catch(() => {});
+    resetAdState();
+    trackEvent("game_start", { archetype, character: character.name });
     dispatch({ type: "START_GAME", archetype, character });
   }, []);
 
@@ -201,7 +246,8 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const restartGame = useCallback(() => {
-    localStorage.removeItem(STORAGE_KEY);
+    removeItem(STORAGE_KEY).catch(() => {});
+    trackEvent("game_restart");
     dispatch({ type: "RESTART" });
   }, []);
 

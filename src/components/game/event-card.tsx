@@ -131,6 +131,7 @@ function ChoiceButton({
   return (
     <button
       onClick={onClick}
+      aria-label={`Choose: ${choice.text}${tag ? `. ${RISK_TAG_LABELS[tag]}` : ""}`}
       className={`choice-btn ${isRisky ? "choice-btn-risky" : ""} ${tag === "big_opportunity" ? "choice-btn-opportunity" : ""}`}
     >
       {/* Risk tag */}
@@ -182,6 +183,9 @@ function ConfirmationModal({
 
   return (
     <div
+      role="alertdialog"
+      aria-modal="true"
+      aria-label="Confirm risky choice"
       className="fixed inset-0 flex items-center justify-center z-50 p-4 animate-fade-in"
       style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)" }}
     >

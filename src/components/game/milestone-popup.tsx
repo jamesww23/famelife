@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useGame } from "@/state/game-context";
 import { milestones } from "@/data/milestones";
 import { badges, RARITY_COLORS, RARITY_LABELS } from "@/data/badges";
-import { loadLegacy } from "@/lib/game/legacy";
+import { CareerLegacy } from "@/lib/game/types";
+import { loadLegacy, loadLegacyAsync } from "@/lib/game/legacy";
 import { playMilestone, playTap } from "@/lib/sounds";
 
 const CONFETTI_COLORS = ["#e040fb", "#00e5ff", "#ff6b9d", "#f59e0b", "#10b981", "#a855f7", "#3b82f6", "#ef4444", "#ffd700", "#ff4081"];
@@ -47,11 +48,32 @@ function generateConfetti(): ConfettiParticle[] {
 export function MilestonePopup() {
   const { state, proceedFromMilestone } = useGame();
   const currentMilestoneId = state.pendingMilestones[0] ?? null;
+  const [legacy, setLegacy] = useState<CareerLegacy | null>(() => {
+    // On native cold launch, localStorage may be empty — loadLegacy() returns
+    // from cache or localStorage. If the async cache is already warm (game-context
+    // calls loadLegacyAsync on mount), this returns the real data.
+    const sync = loadLegacy();
+    return sync.totalRuns > 0 || sync.unlockedBadges.length > 0 ? sync : null;
+  });
 
   useEffect(() => {
     if (currentMilestoneId) {
       playMilestone();
     }
+  }, [currentMilestoneId]);
+
+  // Always load from native storage to ensure correctness on iOS
+  useEffect(() => {
+    let active = true;
+    loadLegacyAsync().then((loaded) => {
+      if (active) setLegacy(loaded);
+    }).catch(() => {
+      // Keep whatever we have
+    });
+
+    return () => {
+      active = false;
+    };
   }, [currentMilestoneId]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps -- regenerate when milestone changes
@@ -65,7 +87,6 @@ export function MilestonePopup() {
   // Check if this milestone corresponds to a badge the player hasn't unlocked yet
   const badgeId = MILESTONE_BADGE_MAP[currentMilestoneId];
   const badge = badgeId ? badges.find(b => b.id === badgeId) : null;
-  const legacy = badge ? loadLegacy() : null;
   const isNewBadge = badge && legacy && !legacy.unlockedBadges.includes(badge.id);
 
   return (

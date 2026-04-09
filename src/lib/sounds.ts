@@ -6,11 +6,14 @@
 
 let ctx: AudioContext | null = null;
 
-function getCtx(): AudioContext {
+function getCtx(): AudioContext | null {
+  if (typeof window === "undefined" || typeof AudioContext === "undefined") {
+    return null;
+  }
   if (!ctx) {
     ctx = new AudioContext();
   }
-  // Resume if suspended (autoplay policy)
+  // Resume if suspended (autoplay policy — required for iOS WKWebView)
   if (ctx.state === "suspended") {
     ctx.resume();
   }
@@ -25,6 +28,7 @@ function playTone(
   delay = 0,
 ) {
   const c = getCtx();
+  if (!c) return;
   const osc = c.createOscillator();
   const gain = c.createGain();
   osc.type = type;
@@ -39,6 +43,7 @@ function playTone(
 
 function playNoise(duration: number, volume = 0.08, delay = 0) {
   const c = getCtx();
+  if (!c) return;
   const bufferSize = c.sampleRate * duration;
   const buffer = c.createBuffer(1, bufferSize, c.sampleRate);
   const data = buffer.getChannelData(0);
@@ -70,6 +75,7 @@ export function playTap() {
 /** Card swoosh transition */
 export function playSwoosh() {
   const c = getCtx();
+  if (!c) return;
   const osc = c.createOscillator();
   const gain = c.createGain();
   osc.type = "sine";

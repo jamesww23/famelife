@@ -1,20 +1,25 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useGame } from "@/state/game-context";
 import { STAT_EMOJI } from "@/lib/game/constants";
 import { formatFollowers, formatMoney, getTierName, getTierEmoji, getMaxTurns, formatQuarter } from "@/lib/game/progression";
 import { Stats, StatKey } from "@/lib/game/types";
 import { playMoney, playLevelUp } from "@/lib/sounds";
 
-interface DeltaState {
-  prevStats: Stats;
-  prevTier: string;
+interface DeltaSnapshot {
   deltas: Partial<Record<StatKey, number>>;
   deltaKey: number;
   moneyGained: boolean;
   tierChanged: boolean;
 }
+
+const INITIAL_SNAPSHOT: DeltaSnapshot = {
+  deltas: {},
+  deltaKey: 0,
+  moneyGained: false,
+  tierChanged: false,
+};
 
 export function StatBar() {
   const { state } = useGame();
@@ -22,52 +27,43 @@ export function StatBar() {
   const maxTurns = getMaxTurns();
   const progress = Math.min((week / maxTurns) * 100, 100);
 
-  // Track deltas via "adjusting state during render" pattern.
-  // React allows setState during render when syncing state to new props/context.
-  // This avoids both refs-during-render and setState-in-effects violations.
-  const [deltaState, setDeltaState] = useState<DeltaState>({
-    prevStats: stats,
-    prevTier: careerTier,
-    deltas: {},
-    deltaKey: 0,
-    moneyGained: false,
-    tierChanged: false,
-  });
+  // Track previous stats/tier via ref to compute deltas
+  const prevRef = useRef<{ stats: Stats; tier: string }>({ stats, tier: careerTier });
+  const [snap, setSnap] = useState<DeltaSnapshot>(INITIAL_SNAPSHOT);
 
-  // Compute deltas by comparing current stats to tracked previous stats
-  if (stats !== deltaState.prevStats) {
+  // Single setState per change — avoids multiple set-state-in-effect calls
+  useEffect(() => {
+    const prev = prevRef.current;
     const newDeltas: Partial<Record<StatKey, number>> = {};
     let hasChange = false;
+
     for (const key of Object.keys(stats) as StatKey[]) {
-      const diff = stats[key] - deltaState.prevStats[key];
+      const diff = stats[key] - prev.stats[key];
       if (diff !== 0) {
         newDeltas[key] = diff;
         hasChange = true;
       }
     }
-    if (hasChange) {
-      setDeltaState({
-        prevStats: stats,
-        prevTier: careerTier,
-        deltas: newDeltas,
-        deltaKey: deltaState.deltaKey + 1,
+
+    const tierDidChange = careerTier !== prev.tier;
+
+    if (hasChange || tierDidChange) {
+      setSnap(prev => ({
+        deltas: hasChange ? newDeltas : {},
+        deltaKey: prev.deltaKey + 1,
         moneyGained: (newDeltas.money ?? 0) > 0,
-        tierChanged: careerTier !== deltaState.prevTier,
-      });
-    } else {
-      setDeltaState(prev => ({ ...prev, prevStats: stats, prevTier: careerTier }));
+        tierChanged: tierDidChange,
+      }));
     }
-  } else if (careerTier !== deltaState.prevTier) {
-    setDeltaState(prev => ({ ...prev, prevTier: careerTier, tierChanged: true, deltaKey: prev.deltaKey + 1 }));
-  }
 
-  const { deltas, deltaKey, moneyGained, tierChanged } = deltaState;
+    prevRef.current = { stats, tier: careerTier };
+  }, [stats, careerTier]);
 
-  // Sound effects — depend on deltaKey which only increments on real changes
+  // Sound effects — fires when deltaKey increments
   useEffect(() => {
-    if (moneyGained) playMoney();
-    if (tierChanged) playLevelUp();
-  }, [deltaKey, moneyGained, tierChanged]);
+    if (snap.moneyGained) playMoney();
+    if (snap.tierChanged) playLevelUp();
+  }, [snap.deltaKey, snap.moneyGained, snap.tierChanged]);
 
   return (
     <div className="w-full">
@@ -96,13 +92,13 @@ export function StatBar() {
 
       {/* Stats grid */}
       <div className="grid grid-cols-3 gap-1 sm:gap-1.5">
-        <StatPill label="Followers" emoji={STAT_EMOJI.followers} value={formatFollowers(stats.followers)} delta={deltas.followers} deltaKey={deltaKey} deltaFormat="followers" />
-        <StatPill label="Money" emoji={STAT_EMOJI.money} value={formatMoney(stats.money)} delta={deltas.money} deltaKey={deltaKey} deltaFormat="money" />
-        <StatPill label="Fame" emoji={STAT_EMOJI.fame} value={`${stats.fame}`} bar barValue={stats.fame} barColor="#a855f7" delta={deltas.fame} deltaKey={deltaKey} />
-        <StatPill label="Rep" emoji={STAT_EMOJI.reputation} value={`${stats.reputation}`} bar barValue={stats.reputation} barColor="#10b981" delta={deltas.reputation} deltaKey={deltaKey} />
-        <StatPill label="Energy" emoji={STAT_EMOJI.energy} value={`${stats.energy}`} bar barValue={stats.energy} barColor="#f59e0b" delta={deltas.energy} deltaKey={deltaKey} />
+        <StatPill label="Followers" emoji={STAT_EMOJI.followers} value={formatFollowers(stats.followers)} delta={snap.deltas.followers} deltaKey={snap.deltaKey} deltaFormat="followers" />
+        <StatPill label="Money" emoji={STAT_EMOJI.money} value={formatMoney(stats.money)} delta={snap.deltas.money} deltaKey={snap.deltaKey} deltaFormat="money" />
+        <StatPill label="Fame" emoji={STAT_EMOJI.fame} value={`${stats.fame}`} bar barValue={stats.fame} barColor="#a855f7" delta={snap.deltas.fame} deltaKey={snap.deltaKey} />
+        <StatPill label="Rep" emoji={STAT_EMOJI.reputation} value={`${stats.reputation}`} bar barValue={stats.reputation} barColor="#10b981" delta={snap.deltas.reputation} deltaKey={snap.deltaKey} />
+        <StatPill label="Energy" emoji={STAT_EMOJI.energy} value={`${stats.energy}`} bar barValue={stats.energy} barColor="#f59e0b" delta={snap.deltas.energy} deltaKey={snap.deltaKey} />
         <StatPill label="Mental" emoji={STAT_EMOJI.mentalHealth} value={`${stats.mentalHealth}`} bar barValue={stats.mentalHealth} barColor="#3b82f6"
-          danger={stats.mentalHealth < 25} delta={deltas.mentalHealth} deltaKey={deltaKey}
+          danger={stats.mentalHealth < 25} delta={snap.deltas.mentalHealth} deltaKey={snap.deltaKey}
         />
       </div>
     </div>
@@ -152,7 +148,11 @@ function StatPill({
   }
 
   return (
-    <div className={`stat-pill flex-col items-start relative ${danger ? "animate-shake" : ""} ${hasChanged ? "stat-pill-flash" : ""}`}>
+    <div
+      className={`stat-pill flex-col items-start relative ${danger ? "animate-shake" : ""} ${hasChanged ? "stat-pill-flash" : ""}`}
+      role="status"
+      aria-label={`${label}: ${value}${danger ? " — critically low!" : ""}${hasChanged && delta ? ` (${delta > 0 ? "+" : ""}${delta})` : ""}`}
+    >
       <div className="text-[9px] sm:text-[10px] font-semibold text-gray-400 uppercase tracking-wider leading-none mb-0.5">{label}</div>
       <div className="flex items-center gap-1 w-full">
         <span className="text-xs">{emoji}</span>

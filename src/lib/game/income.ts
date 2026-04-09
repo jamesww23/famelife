@@ -15,14 +15,22 @@ export function calculateQuarterlyIncome(state: GameState): QuarterlyIncome {
   const flags = state.flags;
   const passive = computePassiveEffects(state.purchases);
 
-  // ---- 1. Ad Revenue: scales with followers ----
+  // ---- Soft cap: diminishing returns past 500K followers ----
+  // effectiveFollowers grows logarithmically past the cap so late-game
+  // income stays rewarding but doesn't explode to infinity.
+  const SOFT_CAP = 500_000;
+  const effectiveFollowers = followers <= SOFT_CAP
+    ? followers
+    : SOFT_CAP + Math.floor(Math.sqrt(followers - SOFT_CAP) * 300);
+
+  // ---- 1. Ad Revenue: scales with effective followers ----
   let adRevenue = 0;
   if (followers >= 500) {
-    if (followers < 10_000) adRevenue = Math.floor(followers * 0.08);
-    else if (followers < 100_000) adRevenue = Math.floor(followers * 0.07);
-    else if (followers < 500_000) adRevenue = Math.floor(followers * 0.05);
-    else if (followers < 1_000_000) adRevenue = Math.floor(followers * 0.04);
-    else adRevenue = Math.floor(followers * 0.03);
+    if (effectiveFollowers < 10_000) adRevenue = Math.floor(effectiveFollowers * 0.08);
+    else if (effectiveFollowers < 100_000) adRevenue = Math.floor(effectiveFollowers * 0.07);
+    else if (effectiveFollowers < 500_000) adRevenue = Math.floor(effectiveFollowers * 0.05);
+    else if (effectiveFollowers < 1_000_000) adRevenue = Math.floor(effectiveFollowers * 0.04);
+    else adRevenue = Math.floor(effectiveFollowers * 0.03);
   }
   if (passive.adRevenueMultiplier) {
     adRevenue = Math.floor(adRevenue * (1 + passive.adRevenueMultiplier));
@@ -32,11 +40,11 @@ export function calculateQuarterlyIncome(state: GameState): QuarterlyIncome {
   let sponsorships = 0;
   if (followers >= 2_000 && reputation > 15) {
     const base =
-      followers < 100_000
-        ? Math.floor(followers * 0.04)
-        : followers < 1_000_000
-          ? Math.floor(followers * 0.03)
-          : Math.floor(followers * 0.02);
+      effectiveFollowers < 100_000
+        ? Math.floor(effectiveFollowers * 0.04)
+        : effectiveFollowers < 1_000_000
+          ? Math.floor(effectiveFollowers * 0.03)
+          : Math.floor(effectiveFollowers * 0.02);
 
     const repMultiplier = Math.max(0.3, reputation / 50);
     sponsorships = Math.floor(base * repMultiplier);
@@ -50,21 +58,21 @@ export function calculateQuarterlyIncome(state: GameState): QuarterlyIncome {
   // ---- 3. Livestream Donations: engagement-based ----
   let donations = 0;
   if (followers >= 2_000) {
-    donations = Math.floor(Math.sqrt(followers) * 2);
+    donations = Math.floor(Math.sqrt(effectiveFollowers) * 2);
     donations = Math.floor(donations * Math.max(0.5, reputation / 50));
   }
 
   // ---- 4. Subscriptions: loyal fan base ----
   let subscriptions = 0;
   if (followers >= 5_000) {
-    subscriptions = Math.floor(followers * 0.01);
+    subscriptions = Math.floor(effectiveFollowers * 0.01);
     subscriptions = Math.floor(subscriptions * Math.max(0.4, reputation / 50));
   }
 
   // ---- 5. Affiliate Income: requires brand trust ----
   let affiliates = 0;
   if (followers >= 5_000 && (flags.includes("brandSafe") || state.purchases.includes("sponsorship_agent"))) {
-    affiliates = Math.floor(followers * 0.006 * Math.max(0.4, reputation / 50));
+    affiliates = Math.floor(effectiveFollowers * 0.006 * Math.max(0.4, reputation / 50));
   }
 
   // ---- 6. Business Income: from owned businesses ----
@@ -80,11 +88,13 @@ export function calculateQuarterlyIncome(state: GameState): QuarterlyIncome {
     donations += Math.floor(bonus * 0.2);
   }
 
-  // ---- Expenses (minimal — upkeep removed from most items) ----
+  // ---- Expenses (scale with fame to create late-game pressure) ----
   let lifestyleExpenses = 0;
-  if (followers >= 100_000) lifestyleExpenses = 200;
-  if (fame > 60) lifestyleExpenses += 300;
-  if (fame > 80) lifestyleExpenses += 500;
+  if (followers >= 100_000) lifestyleExpenses = 500;
+  if (fame > 40) lifestyleExpenses += Math.floor(fame * 30);   // ~$1.2K at fame 40, ~$2.4K at 80
+  if (fame > 60) lifestyleExpenses += 1000;                     // threshold bump
+  if (fame > 80) lifestyleExpenses += 2000;                     // high-fame lifestyle tax
+  if (followers >= 1_000_000) lifestyleExpenses += 3000;         // entourage, security, etc.
 
   const itemUpkeep = computeUpkeep(state.purchases);
   const expenses = lifestyleExpenses + itemUpkeep;

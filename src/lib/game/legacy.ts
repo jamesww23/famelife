@@ -1,6 +1,7 @@
 import { CareerLegacy, GameState, RunRecord } from "./types";
 import { badges } from "@/data/badges";
 import { generateSummary } from "./summary";
+import { getItem, setItem, removeItem, reportBadgeAchievements, reportFameScore, trackEvent } from "@/lib/native";
 
 const LEGACY_KEY = "fame-life-legacy-v1";
 const MAX_RUN_HISTORY = 20;
@@ -25,14 +26,50 @@ function createDefaultLegacy(): CareerLegacy {
   };
 }
 
-// ---- Persistence ----
+// ---- Persistence (async, native-backed) ----
 
+/** Cached in-memory copy for synchronous access after initial load. */
+let cachedLegacy: CareerLegacy | null = null;
+
+/**
+ * Load legacy data. Uses cached copy if available, otherwise
+ * reads from native storage (async) with localStorage fallback.
+ */
+export async function loadLegacyAsync(): Promise<CareerLegacy> {
+  if (cachedLegacy) return cachedLegacy;
+
+  try {
+    const saved = await getItem(LEGACY_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved) as CareerLegacy;
+      if (parsed.version === 1) {
+        cachedLegacy = parsed;
+        return parsed;
+      }
+    }
+  } catch {
+    // Ignore corrupt data
+  }
+  cachedLegacy = createDefaultLegacy();
+  return cachedLegacy;
+}
+
+/**
+ * Synchronous legacy load — reads from cache or localStorage.
+ * Used by components that need legacy data during render.
+ */
 export function loadLegacy(): CareerLegacy {
+  if (cachedLegacy) return cachedLegacy;
+
+  // Fallback to localStorage for synchronous access
   try {
     const saved = localStorage.getItem(LEGACY_KEY);
     if (saved) {
       const parsed = JSON.parse(saved) as CareerLegacy;
-      if (parsed.version === 1) return parsed;
+      if (parsed.version === 1) {
+        cachedLegacy = parsed;
+        return parsed;
+      }
     }
   } catch {
     // Ignore corrupt data
@@ -40,16 +77,18 @@ export function loadLegacy(): CareerLegacy {
   return createDefaultLegacy();
 }
 
-export function saveLegacy(legacy: CareerLegacy): void {
+export async function saveLegacy(legacy: CareerLegacy): Promise<void> {
+  cachedLegacy = legacy;
   try {
-    localStorage.setItem(LEGACY_KEY, JSON.stringify(legacy));
+    await setItem(LEGACY_KEY, JSON.stringify(legacy));
   } catch {
-    // Storage full
+    // Storage error — non-fatal
   }
 }
 
-export function resetLegacy(): void {
-  localStorage.removeItem(LEGACY_KEY);
+export async function resetLegacy(): Promise<void> {
+  cachedLegacy = null;
+  await removeItem(LEGACY_KEY);
 }
 
 // ---- End-of-Run Processing ----
@@ -64,8 +103,8 @@ export interface RunUnlocks {
  * Process a completed run: update lifetime stats, check badge/title unlocks,
  * record run history. Returns the new unlocks and updated legacy.
  */
-export function processRunEnd(state: GameState): RunUnlocks {
-  const legacy = loadLegacy();
+export async function processRunEnd(state: GameState): Promise<RunUnlocks> {
+  const legacy = await loadLegacyAsync();
   const summary = generateSummary(state);
 
   // ---- Update lifetime stats ----
@@ -133,8 +172,28 @@ export function processRunEnd(state: GameState): RunUnlocks {
 
   legacy.runHistory = [record, ...legacy.runHistory].slice(0, MAX_RUN_HISTORY);
 
-  // ---- Save & return ----
-  saveLegacy(legacy);
+  // ---- Save & report to Game Center ----
+  await saveLegacy(legacy);
+
+  // Report new badge achievements to Game Center
+  if (newBadges.length > 0) {
+    reportBadgeAchievements(newBadges).catch(() => {});
+  }
+
+  // Report fame score to leaderboard
+  if (summary.fameScore > 0) {
+    reportFameScore(summary.fameScore).catch(() => {});
+  }
+
+  // Analytics
+  trackEvent("run_complete", {
+    fameScore: summary.fameScore,
+    followers: state.stats.followers,
+    money: state.stats.money,
+    quarters: state.week,
+    newBadges: newBadges.length,
+    reason: state.gameOverReason,
+  });
 
   return { newBadges, newTitles, updatedLegacy: legacy };
 }

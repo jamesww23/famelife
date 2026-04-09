@@ -291,12 +291,16 @@ export function advanceWeek(state: GameState): GameState {
   const income = calculateQuarterlyIncome(state);
   stats.money += income.net;
 
-  // ---- Per-turn recovery (with purchase bonuses) ----
+  // ---- Per-turn recovery (scales inversely with fame — spotlight makes recovery harder) ----
   const passive = computePassiveEffects(state.purchases);
   const energyBonus = passive.energyRecoveryBonus || 0;
   const mentalBonus = passive.mentalHealthRecoveryBonus || 0;
-  stats.energy = clamp(stats.energy + ENERGY_RECOVERY + energyBonus, 0, 100);
-  stats.mentalHealth = clamp(stats.mentalHealth + MENTAL_HEALTH_RECOVERY + mentalBonus, 0, 100);
+  // At fame 0: full recovery; at fame 80+: recovery drops to ~55% of base
+  const famePenalty = Math.max(0.55, 1 - (stats.fame * 0.0056));
+  const effectiveEnergyRecovery = Math.round((ENERGY_RECOVERY + energyBonus) * famePenalty);
+  const effectiveMentalRecovery = Math.round((MENTAL_HEALTH_RECOVERY + mentalBonus) * famePenalty);
+  stats.energy = clamp(stats.energy + effectiveEnergyRecovery, 0, 100);
+  stats.mentalHealth = clamp(stats.mentalHealth + effectiveMentalRecovery, 0, 100);
 
   // ---- Overexposure pressure: high fame drains mental health ----
   if (stats.fame > 75 && state.stats.followers > 500_000) {

@@ -124,6 +124,6 @@ export const RISK_TAG_EMOJI: Record<RiskTag, string> = {
 /** How much risk level increases per risky choice */
 export const RISK_INCREASE_PER_CHOICE = 8;
 /** Risk level decay per turn */
-export const RISK_DECAY_PER_TURN = 3;
+export const RISK_DECAY_PER_TURN = 5;
 /** Risk level threshold for "high volatility" */
 export const HIGH_RISK_THRESHOLD = 40;

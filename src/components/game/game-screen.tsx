@@ -24,10 +24,14 @@ export function GameScreen() {
         {state.phase === "outcome" && <EventOutcome />}
       </div>
 
-      {/* Quit button */}
+      {/* Quit button — small and unobtrusive but readable */}
       <button
-        onClick={restartGame}
-        className="mt-4 text-white/40 text-xs font-medium hover:text-white/70 transition-colors"
+        onClick={() => {
+          if (window.confirm("Quit this run? Progress will be lost.")) {
+            restartGame();
+          }
+        }}
+        className="mt-4 text-white/50 text-sm font-medium hover:text-white/80 transition-colors py-2 px-4"
       >
         Quit Run
       </button>

@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Capacitor - iOS build artifacts (keep ios/ project in source)
+ios/App/App/public
+ios/App/Pods
+ios/App/Podfile.lock
+ios/App/App.xcworkspace
+ios/capacitor-cordova-ios-plugins

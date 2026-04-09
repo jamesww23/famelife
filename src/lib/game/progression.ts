@@ -113,7 +113,15 @@ export function formatFollowers(n: number): string {
   return n.toString();
 }
 
+/** Trim trailing zeros after a decimal point: "3.20" → "3.2", "5.00" → "5" */
+function trimZeros(s: string): string {
+  return s.replace(/\.0+$/, "").replace(/(\.\d*?)0+$/, "$1");
+}
+
 export function formatMoney(n: number): string {
-  if (n < 0) return `-$${Math.abs(n).toLocaleString()}`;
-  return `$${n.toLocaleString()}`;
+  const abs = Math.abs(n);
+  const sign = n < 0 ? "-" : "";
+  if (abs >= 1_000_000) return `${sign}$${trimZeros((abs / 1_000_000).toFixed(2))}M`;
+  if (abs >= 1_000) return `${sign}$${trimZeros((abs / 1_000).toFixed(1))}K`;
+  return `${sign}$${abs.toLocaleString()}`;
 }

@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useGame } from "@/state/game-context";
 import { archetypes } from "@/data/archetypes";
 import { traits } from "@/data/traits";
-import { ArchetypeId, TraitId } from "@/lib/game/types";
-import { loadLegacy } from "@/lib/game/legacy";
+import { ArchetypeId, CareerLegacy, TraitId } from "@/lib/game/types";
+import { loadLegacy, loadLegacyAsync } from "@/lib/game/legacy";
 import { Logo } from "./logo";
 import { ProfileScreen } from "./profile-screen";
 import { playTap, playGameStart, playSwoosh } from "@/lib/sounds";
@@ -34,6 +34,23 @@ export function StartScreen() {
   const [avatar, setAvatar] = useState<string | null>(null);
   const [traitId, setTraitId] = useState<TraitId | null>(null);
   const [selectedArchetype, setSelectedArchetype] = useState<ArchetypeId | null>(null);
+  const [legacy, setLegacy] = useState<CareerLegacy>(() => loadLegacy());
+
+  // Warm legacy from native storage on mount — populates the in-memory cache
+  // so that even if localStorage was purged by iOS, the data is available.
+  useEffect(() => {
+    let active = true;
+    loadLegacyAsync().then((loaded) => {
+      if (active) setLegacy(loaded);
+    }).catch(() => {
+      // Keep the best available cached/local legacy state
+    });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
   const handleGender = (g: Gender) => {
     playTap();
     setGender(g);
@@ -65,7 +82,6 @@ export function StartScreen() {
 
   // Profile screen
   if (step === "profile") {
-    const legacy = loadLegacy();
     return <ProfileScreen legacy={legacy} onClose={() => setStep("intro")} />;
   }
 
@@ -367,4 +383,3 @@ function StoryStep({ emoji, text }: { emoji: string; text: string }) {
     </div>
   );
 }
-
