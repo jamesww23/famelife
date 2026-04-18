@@ -47,8 +47,10 @@ function generateConfetti(): ConfettiParticle[] {
 }
 
 export function MilestonePopup() {
-  const { state, proceedFromMilestone } = useGame();
+  const { state, proceedFromMilestone, ackAllMilestones } = useGame();
   const currentMilestoneId = state.pendingMilestones[0] ?? null;
+  const pendingCount = state.pendingMilestones.length;
+  const isMulti = pendingCount > 1;
   const [legacy, setLegacy] = useState<CareerLegacy | null>(() => {
     // On native cold launch, localStorage may be empty — loadLegacy() returns
     // from cache or localStorage. If the async cache is already warm (game-context
@@ -91,6 +93,79 @@ export function MilestonePopup() {
   const badgeId = MILESTONE_BADGE_MAP[currentMilestoneId];
   const badge = badgeId ? badges.find(b => b.id === badgeId) : null;
   const isNewBadge = badge && legacy && !legacy.unlockedBadges.includes(badge.id);
+
+  // When 2+ milestones fired in the same turn, show a single stacked card instead
+  // of making the player dismiss popups one by one (popup fatigue).
+  if (isMulti) {
+    const milestoneList = state.pendingMilestones
+      .map((id) => milestones.find((m) => m.id === id))
+      .filter((m): m is NonNullable<typeof m> => m !== undefined);
+
+    return (
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="milestone-title"
+        ref={focusRef}
+        onKeyDown={(e) => {
+          if (e.key === "Escape" || e.key === "Enter") ackAllMilestones();
+        }}
+        className="fixed inset-0 flex items-center justify-center z-50 p-4 animate-fade-in"
+        style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)" }}
+      >
+        <div className="game-card p-5 sm:p-6 w-full max-w-[calc(100%-2rem)] sm:max-w-sm text-center animate-pop-in">
+          <div className="text-4xl sm:text-5xl mb-2 animate-sparkle" aria-hidden="true">🏆</div>
+          <h3 id="milestone-title" className="text-lg sm:text-xl font-black text-gray-900 mb-1">
+            {pendingCount} Milestones Unlocked!
+          </h3>
+          <p className="text-gray-500 text-xs sm:text-sm mb-4">What a quarter.</p>
+
+          <ul className="space-y-2 text-left mb-5 max-h-64 overflow-y-auto">
+            {milestoneList.map((m) => (
+              <li
+                key={m.id}
+                className="flex items-start gap-3 p-2.5 rounded-xl bg-purple-50/50 border border-purple-100"
+              >
+                <span className="text-2xl shrink-0" aria-hidden="true">{m.emoji}</span>
+                <div className="min-w-0 flex-1">
+                  <div className="font-bold text-sm text-gray-900 leading-tight">{m.title}</div>
+                  <div className="text-[11px] text-gray-500 leading-snug mt-0.5">{m.description}</div>
+                </div>
+              </li>
+            ))}
+          </ul>
+
+          {/* Enhanced confetti */}
+          <div className="relative h-0">
+            {confetti.map((p, i) => (
+              <div
+                key={i}
+                className="milestone-particle"
+                style={{
+                  backgroundColor: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
+                  width: `${p.width}px`,
+                  height: `${p.height}px`,
+                  left: `${p.left}%`,
+                  top: `${p.top}px`,
+                  "--duration": `${p.duration}s`,
+                  "--delay": `${i * 0.08}s`,
+                  boxShadow: `0 0 4px ${CONFETTI_COLORS[i % CONFETTI_COLORS.length]}`,
+                } as React.CSSProperties}
+              />
+            ))}
+          </div>
+
+          <button
+            onClick={() => { playTap(); ackAllMilestones(); }}
+            className="w-full py-3.5 bg-gradient-to-r from-[#e040fb] to-[#ff6b9d] text-white rounded-xl font-bold hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg"
+            style={{ boxShadow: "0 4px 20px rgba(224, 64, 251, 0.4)" }}
+          >
+            Let&apos;s go!
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div

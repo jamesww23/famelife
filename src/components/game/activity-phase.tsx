@@ -9,12 +9,34 @@ import { Stats, QuarterlyActivity, ActivityTier } from "@/lib/game/types";
 import { playTap, playSwoosh, playMoney } from "@/lib/sounds";
 import { ShopPanel } from "./shop-panel";
 
+const TUTORIAL_SEEN_KEY = "fame-life-tutorial-seen";
+
+function readTutorialSeen(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.localStorage.getItem(TUTORIAL_SEEN_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
 export function ActivityPhase() {
   const { state, selectActivity } = useGame();
   const income = state.quarterlyIncome;
   const isFirstTurn = state.week === 1;
   const [expandedActivity, setExpandedActivity] = useState<QuarterlyActivity | null>(null);
   const [showShop, setShowShop] = useState(false);
+
+  // First-run tutorial card: shows on turn 1 only, once per device (localStorage flag).
+  // Derived state: `tutorialDismissed` is the only persisted bit; whether to show
+  // is a function of (isFirstTurn && !dismissed). No effect needed.
+  const [tutorialDismissed, setTutorialDismissed] = useState<boolean>(() => readTutorialSeen());
+  const showTutorial = isFirstTurn && !tutorialDismissed;
+  const dismissTutorial = () => {
+    playTap();
+    setTutorialDismissed(true);
+    try { window.localStorage.setItem(TUTORIAL_SEEN_KEY, "1"); } catch { /* ok */ }
+  };
 
   // Filter all lifestyle activities (including flex) based on current money, followers, and purchases
   const allLifestyle = [...lifestyleActivities, ...flexActivities];
@@ -195,6 +217,49 @@ export function ActivityPhase() {
         </div>
       )}
 
+      {/* First-run tutorial — turn 1 only, dismissible, remembered per-device */}
+      {showTutorial && (
+        <div
+          className="game-card p-4 sm:p-5 mb-3 border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-white animate-scale-in"
+          role="region"
+          aria-label="How to play"
+        >
+          <div className="flex items-start gap-2.5 mb-2">
+            <span className="text-2xl shrink-0" aria-hidden="true">👋</span>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-black text-sm sm:text-base text-gray-900 leading-tight">How it works</h3>
+              <p className="text-xs text-gray-600 leading-snug mt-0.5">
+                You&apos;ve got <strong>40 quarters</strong> (10 years). Each quarter: pick one action, then respond to whatever happens.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-1.5 text-[10px] mb-3">
+            <TutorialStatHint emoji={STAT_EMOJI.followers} label="Followers" hint="grows your reach" />
+            <TutorialStatHint emoji={STAT_EMOJI.money} label="Money" hint="buy upgrades" />
+            <TutorialStatHint emoji={STAT_EMOJI.fame} label="Fame" hint="opens opportunities" />
+            <TutorialStatHint emoji={STAT_EMOJI.reputation} label="Rep" hint="protects you from scandals" />
+            <TutorialStatHint emoji={STAT_EMOJI.energy} label="Energy" hint="don't burn out" />
+            <TutorialStatHint emoji={STAT_EMOJI.mentalHealth} label="Mental" hint="stay grounded" />
+          </div>
+
+          <div className="flex items-center gap-2 text-[11px] text-gray-500 mb-3">
+            <span aria-hidden="true">⚠️</span>
+            <span>
+              Stats below 20 trigger burnout events. Hit 0 money and it&apos;s over.
+            </span>
+          </div>
+
+          <button
+            type="button"
+            onClick={dismissTutorial}
+            className="w-full py-2.5 bg-purple-500 hover:bg-purple-600 text-white rounded-xl font-bold text-sm active:scale-[0.98] transition-all min-h-[44px]"
+          >
+            Got it
+          </button>
+        </div>
+      )}
+
       {/* Work Activities */}
       <div className="game-card p-4 sm:p-5">
         <div className="flex items-center justify-between mb-0.5">
@@ -253,6 +318,18 @@ export function ActivityPhase() {
           </>
         )}
       </div>
+    </div>
+  );
+}
+
+function TutorialStatHint({ emoji, label, hint }: { emoji: string; label: string; hint: string }) {
+  return (
+    <div className="bg-white/70 border border-purple-100 rounded-lg p-1.5 text-center">
+      <div className="flex items-center justify-center gap-0.5">
+        <span aria-hidden="true">{emoji}</span>
+        <span className="font-bold text-gray-800 text-[10px]">{label}</span>
+      </div>
+      <div className="text-gray-500 leading-tight mt-0.5">{hint}</div>
     </div>
   );
 }

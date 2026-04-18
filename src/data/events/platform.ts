@@ -157,7 +157,7 @@ export const platformEvents: GameEvent[] = [
         id: "diversify_income",
         text: "Focus on other revenue",
         effects: { money: 3000, reputation: 8, energy: -10 },
-        followUpText: "Patreon, merch, sponsors. The real money was never in the fund.",
+        followUpText: "Subscriptions, merch, sponsors. The real money was never in the fund.",
       },
     ],
   },

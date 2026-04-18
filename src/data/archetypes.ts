@@ -45,8 +45,10 @@ export const archetypes: Archetype[] = [
     id: "fitness",
     name: "Fitness Influencer",
     emoji: "💪",
-    description: "Workouts, transformations, and discipline. Brand safe, but expectations are high.",
-    startingModifiers: { energy: 15, reputation: 10, mentalHealth: 5 },
-    eventWeightModifiers: { brand: 1.3, recovery: 0.7, lifestyle: 1.2 },
+    description: "Workouts, transformations, and discipline. Brand safe, but the niche is crowded.",
+    // Net positive but not a free lunch: starts with a follower deficit (crowded niche)
+    // and below-average viral weight (fitness rarely breaks containment).
+    startingModifiers: { energy: 15, reputation: 10, mentalHealth: 5, followers: -500 },
+    eventWeightModifiers: { brand: 1.3, recovery: 0.7, lifestyle: 1.2, viral: 0.75, drama: 0.85 },
   },
 ];

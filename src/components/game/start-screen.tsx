@@ -4,8 +4,9 @@ import { useEffect, useState } from "react";
 import { useGame } from "@/state/game-context";
 import { archetypes } from "@/data/archetypes";
 import { traits } from "@/data/traits";
-import { ArchetypeId, CareerLegacy, TraitId } from "@/lib/game/types";
+import { ArchetypeId, Archetype, CareerLegacy, StatKey, TraitId } from "@/lib/game/types";
 import { loadLegacy, loadLegacyAsync } from "@/lib/game/legacy";
+import { STAT_EMOJI } from "@/lib/game/constants";
 import { Logo } from "./logo";
 import { ProfileScreen } from "./profile-screen";
 import { playTap, playGameStart, playSwoosh } from "@/lib/sounds";
@@ -309,6 +310,7 @@ export function StartScreen() {
                     <div className="text-2xl sm:text-3xl mb-1.5 sm:mb-2">{arch.emoji}</div>
                     <div className="font-bold text-xs sm:text-sm text-gray-900">{arch.name}</div>
                     <div className="text-[11px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1 leading-snug">{arch.description}</div>
+                    <ArchetypeStartingStats arch={arch} />
                   </button>
                 ))}
               </div>
@@ -383,6 +385,44 @@ function StoryStep({ emoji, text }: { emoji: string; text: string }) {
     <div className="flex items-center gap-2.5 py-0.5">
       <span className="text-lg shrink-0">{emoji}</span>
       <span className="text-sm font-semibold text-gray-700">{text}</span>
+    </div>
+  );
+}
+
+/** Summarize an archetype's starting modifiers as a compact pill row so
+ *  players can compare archetypes at a glance. Keeps up to 3 most-impactful
+ *  stats to avoid crowding the card. */
+function ArchetypeStartingStats({ arch }: { arch: Archetype }) {
+  const entries = Object.entries(arch.startingModifiers) as Array<[StatKey, number]>;
+  // Sort by magnitude so the most-impactful stats are shown first.
+  const sorted = entries
+    .filter(([, v]) => v !== 0)
+    .sort((a, b) => Math.abs(b[1]) - Math.abs(a[1]))
+    .slice(0, 3);
+  if (sorted.length === 0) return null;
+
+  return (
+    <div className="flex flex-wrap gap-1 mt-1.5" aria-label="Starting stat modifiers">
+      {sorted.map(([key, val]) => {
+        const sign = val > 0 ? "+" : "";
+        const display = Math.abs(val) >= 100
+          ? `${sign}${val}`
+          : `${sign}${val}`;
+        const positive = val > 0;
+        return (
+          <span
+            key={key}
+            className={`inline-flex items-center gap-0.5 text-[9px] sm:text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
+              positive
+                ? "bg-emerald-50 text-emerald-600"
+                : "bg-red-50 text-red-500"
+            }`}
+          >
+            <span aria-hidden="true">{STAT_EMOJI[key]}</span>
+            {display}
+          </span>
+        );
+      })}
     </div>
   );
 }

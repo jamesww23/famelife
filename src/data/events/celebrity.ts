@@ -98,7 +98,7 @@ export const celebrityEvents: GameEvent[] = [
     choices: [
       {
         id: "clap_back_celeb",
-        text: "Ratio them on Twitter",
+        text: "Ratio them online",
         effects: { followers: 40000, fame: 14, reputation: -10, energy: -10 },
         socialReaction: { type: "tweet", text: "THE RATIO 💀 they really said 'talentless' and got BODIED", author: "@ratioking" },
       },

@@ -42,9 +42,11 @@ export const workActivities: QuarterlyActivity[] = [
     description: "Take care of yourself",
     category: "work",
     getEffects: (state) => {
+      // Small follower decay at 10K+ — gone for a quarter and the algorithm notices.
+      // Capped at 1,500 so players in burnout aren't brutally punished for the right call.
       const followerLoss =
         state.stats.followers > 10000
-          ? -Math.min(Math.floor(state.stats.followers * 0.003), 5000)
+          ? -Math.min(Math.floor(state.stats.followers * 0.002), 1500)
           : 0;
       return { energy: 18, mentalHealth: 12, followers: followerLoss };
     },

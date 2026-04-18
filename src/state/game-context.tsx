@@ -94,6 +94,7 @@ type GameContextValue = {
   onDeclineBoost: () => void;
   proceedFromOutcome: () => void;
   proceedFromMilestone: () => void;
+  ackAllMilestones: () => void;
   restartGame: () => void;
 };
 
@@ -109,6 +110,7 @@ type Action =
   | { type: "DECLINE_BOOST" }
   | { type: "PROCEED_OUTCOME" }
   | { type: "PROCEED_MILESTONE" }
+  | { type: "ACK_ALL_MILESTONES" }
   | { type: "RESTART" };
 
 function reducer(state: GameState, action: Action): GameState {
@@ -148,6 +150,11 @@ function reducer(state: GameState, action: Action): GameState {
         return { ...state, pendingMilestones: remaining, phase: "milestone" as GamePhase };
       }
       return endTurn(state);
+    }
+    case "ACK_ALL_MILESTONES": {
+      // Dismiss all pending milestones at once. Used by the multi-unlock card
+      // to avoid popup fatigue when several milestones fire in the same turn.
+      return endTurn({ ...state, pendingMilestones: [] });
     }
     case "RESTART":
       return { ...INITIAL };
@@ -310,6 +317,10 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
     dispatch({ type: "PROCEED_MILESTONE" });
   }, []);
 
+  const ackAllMilestones = useCallback(() => {
+    dispatch({ type: "ACK_ALL_MILESTONES" });
+  }, []);
+
   const restartGame = useCallback(() => {
     removeItem(STORAGE_KEY).catch(() => {});
     trackEvent("game_restart");
@@ -328,6 +339,7 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         onDeclineBoost,
         proceedFromOutcome,
         proceedFromMilestone,
+        ackAllMilestones,
         restartGame,
       }}
     >

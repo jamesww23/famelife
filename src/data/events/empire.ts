@@ -23,7 +23,7 @@ export const empireEvents: GameEvent[] = [
         socialReaction: {
           type: "headline",
           text: "INFLUENCER DROPS MILLIONS ON MASSIVE PRODUCTION STUDIO",
-          author: "Business Insider",
+          author: "Trade Weekly",
         },
       },
       {
@@ -102,10 +102,10 @@ export const empireEvents: GameEvent[] = [
         text: "Mass market — high volume, low price",
         effects: { money: 60000, fame: 5, reputation: -8, followers: 30000 },
         followUpText:
-          "The margins are thin but the volume is massive. Unfortunately someone on Twitter found the same blanks on AliExpress for $2 and the replies are rough.",
+          "The margins are thin but the volume is massive. Unfortunately someone on social found the same blanks at a wholesale dropship site for $2 and the replies are rough.",
         socialReaction: {
           type: "tweet",
-          text: "Not them charging $40 for a $3 Alibaba tee with a logo slapped on 💀",
+          text: "Not them charging $40 for a $3 wholesale tee with a logo slapped on 💀",
           author: "@exposinginfluencers",
         },
       },
@@ -418,8 +418,8 @@ export const empireEvents: GameEvent[] = [
         id: "exclusive_license",
         text: "Sign exclusive deal — big upfront",
         effects: { money: 80000, fame: 12, reputation: -5, followers: 20000 },
-        followUpText: "The toys hit shelves. Your plushie is the #3 seller on Amazon. Your mom bought 40 of them.",
-        socialReaction: { type: "headline", text: "INFLUENCER TOY LINE SELLS OUT IN FIRST WEEK", author: "Business Insider" },
+        followUpText: "The toys hit shelves. Your plushie is the #3 seller online. Your mom bought 40 of them.",
+        socialReaction: { type: "headline", text: "INFLUENCER TOY LINE SELLS OUT IN FIRST WEEK", author: "Trade Weekly" },
       },
       {
         id: "own_brand_toys",
@@ -506,7 +506,7 @@ export const empireEvents: GameEvent[] = [
         text: "Ghostwritten self-help book, cash the check",
         effects: { money: 40000, fame: 8, reputation: -5 },
         followUpText: "Written in 3 weeks by someone named Derek. It's generic but it sells. The 1-star reviews are brutal but the bank account doesn't care.",
-        socialReaction: { type: "tweet", text: "did they really just publish 200 pages of instagram captions and call it a book 💀", author: "@booktwt" },
+        socialReaction: { type: "tweet", text: "did they really just publish 200 pages of social captions and call it a book 💀", author: "@booktwt" },
       },
     ],
   },
