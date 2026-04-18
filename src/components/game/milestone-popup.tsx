@@ -7,6 +7,7 @@ import { badges, RARITY_COLORS, RARITY_LABELS } from "@/data/badges";
 import { CareerLegacy } from "@/lib/game/types";
 import { loadLegacy, loadLegacyAsync } from "@/lib/game/legacy";
 import { playMilestone, playTap } from "@/lib/sounds";
+import { useFocusTrap } from "@/lib/use-focus-trap";
 
 const CONFETTI_COLORS = ["#e040fb", "#00e5ff", "#ff6b9d", "#f59e0b", "#10b981", "#a855f7", "#3b82f6", "#ef4444", "#ffd700", "#ff4081"];
 
@@ -79,6 +80,8 @@ export function MilestonePopup() {
   // eslint-disable-next-line react-hooks/exhaustive-deps -- regenerate when milestone changes
   const confetti = useMemo(() => generateConfetti(), [currentMilestoneId]);
 
+  const focusRef = useFocusTrap<HTMLDivElement>(!!currentMilestoneId);
+
   if (!currentMilestoneId) return null;
 
   const milestone = milestones.find(m => m.id === currentMilestoneId);
@@ -90,12 +93,20 @@ export function MilestonePopup() {
   const isNewBadge = badge && legacy && !legacy.unlockedBadges.includes(badge.id);
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 p-4 animate-fade-in"
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="milestone-title"
+      ref={focusRef}
+      onKeyDown={(e) => {
+        if (e.key === "Escape" || e.key === "Enter") proceedFromMilestone();
+      }}
+      className="fixed inset-0 flex items-center justify-center z-50 p-4 animate-fade-in"
       style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)" }}
     >
       <div className="game-card p-6 sm:p-8 w-full max-w-[calc(100%-2rem)] sm:max-w-sm text-center animate-pop-in">
-        <div className="text-5xl sm:text-6xl mb-3 animate-sparkle">{milestone.emoji}</div>
-        <h3 className="text-xl sm:text-2xl font-black text-gray-900 mb-1">{milestone.title}</h3>
+        <div className="text-5xl sm:text-6xl mb-3 animate-sparkle" aria-hidden="true">{milestone.emoji}</div>
+        <h3 id="milestone-title" className="text-xl sm:text-2xl font-black text-gray-900 mb-1">{milestone.title}</h3>
         <p className="text-gray-500 text-sm mb-4">{milestone.description}</p>
 
         {/* Badge preview */}

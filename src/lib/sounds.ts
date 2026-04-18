@@ -4,9 +4,51 @@
 // Web Audio API Sound System — procedural, no external files
 // ──────────────────────────────────────────────────────────
 
+const MUTE_STORAGE_KEY = "fame-life-muted";
 let ctx: AudioContext | null = null;
+let muted = false;
+const muteListeners = new Set<(muted: boolean) => void>();
+
+if (typeof window !== "undefined") {
+  try {
+    muted = window.localStorage.getItem(MUTE_STORAGE_KEY) === "1";
+  } catch {
+    /* storage unavailable */
+  }
+}
+
+/** Read current mute state. */
+export function isMuted(): boolean {
+  return muted;
+}
+
+/** Set mute state and persist to localStorage. */
+export function setMuted(value: boolean): void {
+  muted = value;
+  try {
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(MUTE_STORAGE_KEY, value ? "1" : "0");
+    }
+  } catch {
+    /* storage unavailable */
+  }
+  muteListeners.forEach((cb) => cb(value));
+}
+
+/** Toggle mute state. Returns the new state. */
+export function toggleMute(): boolean {
+  setMuted(!muted);
+  return muted;
+}
+
+/** Subscribe to mute changes (returns unsubscribe). */
+export function subscribeMute(cb: (muted: boolean) => void): () => void {
+  muteListeners.add(cb);
+  return () => muteListeners.delete(cb);
+}
 
 function getCtx(): AudioContext | null {
+  if (muted) return null;
   if (typeof window === "undefined" || typeof AudioContext === "undefined") {
     return null;
   }

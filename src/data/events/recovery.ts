@@ -72,7 +72,7 @@ export const recoveryEvents: GameEvent[] = [
     ],
   },
   {
-    id: "charity_stream",
+    id: "comeback_charity_stream",
     type: "recovery",
     title: "Charity Stream Idea",
     emoji: "❤️",

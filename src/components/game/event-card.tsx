@@ -5,6 +5,7 @@ import { useGame } from "@/state/game-context";
 import { EVENT_COLORS, RISK_TAG_LABELS, RISK_TAG_COLORS, RISK_TAG_EMOJI, HIGH_RISK_THRESHOLD } from "@/lib/game/constants";
 import { EventChoice } from "@/lib/game/types";
 import { playTap, playSwoosh, playDrama, playViral, playFailure } from "@/lib/sounds";
+import { useFocusTrap } from "@/lib/use-focus-trap";
 
 export function EventCard() {
   const { state } = useGame();
@@ -186,12 +187,17 @@ function ConfirmationModal({
   onCancel: () => void;
 }) {
   const tag = choice.riskTag;
+  const ref = useFocusTrap<HTMLDivElement>(true);
 
   return (
     <div
       role="alertdialog"
       aria-modal="true"
       aria-label="Confirm risky choice"
+      ref={ref}
+      onKeyDown={(e) => {
+        if (e.key === "Escape") onCancel();
+      }}
       className="fixed inset-0 flex items-center justify-center z-50 p-4 animate-fade-in"
       style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)" }}
     >

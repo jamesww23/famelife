@@ -664,14 +664,16 @@
   }
 }
 
-/* Landscape phone orientation */
+/* Landscape phone orientation. App is portrait-only on iOS but the rules
+   stay defensive so any user-rotation (or Android port) keeps tap targets
+   above the 44pt minimum. */
 @media (max-height: 500px) and (orientation: landscape) {
   .game-card {
     border-radius: 0.75rem;
   }
   .choice-btn {
     padding: 10px 16px;
-    min-height: 40px;
+    min-height: 44px;
   }
   .stat-header {
     padding: 8px 10px;
@@ -682,7 +684,9 @@
   }
 }
 
-/* Reduce motion for accessibility and battery */
+/* Reduce motion for accessibility and battery.
+   Covers every named animation in this file so vestibular-sensitive users
+   can play without continuous motion. */
 @media (prefers-reduced-motion: reduce) {
   .animate-slide-up,
   .animate-slide-down,
@@ -693,7 +697,17 @@
   .animate-shake,
   .animate-pulse-glow,
   .animate-sparkle,
-  .animate-gentle-bounce {
+  .animate-gentle-bounce,
+  .stat-delta,
+  .stat-delta-up,
+  .stat-delta-down,
+  .stat-pill-flash,
+  .event-badge,
+  .risk-tag,
+  .risk-level-badge,
+  .milestone-particle,
+  .sparkle,
+  .social-bubble {
     animation: none !important;
   }
   body {

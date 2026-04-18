@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Fame Life
 
-## Getting Started
+A Reigns-style card game where you rise from nobody to global icon. Every choice
+shapes your story across 10 years of brand deals, drama, and viral moments.
 
-First, run the development server:
+- **Stack**: Next.js 16 (static export) + React 19 + TypeScript + TailwindCSS 4
+- **Native shell**: Capacitor 8 → iOS WKWebView
+- **Bundle ID**: `com.uptap.famelife`
+- **Privacy Policy**: <https://www.uptap.com/p/privacy-policy/>
+- **Support**: <https://www.uptap.com>
+
+## Quick start
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev          # web dev at localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## iOS build
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run setup:ios    # one-shot: install + build + cap sync + pod install
+npm run build:ios    # rebuild web + sync to native after changes
+npm run open:ios     # opens Xcode workspace
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Always open `ios/App/App.xcworkspace` (the workspace), never `App.xcodeproj`.
 
-## Learn More
+## Project layout
 
-To learn more about Next.js, take a look at the following resources:
+```
+src/app/              Next.js App Router (entry, error boundaries, layout)
+src/components/game/  Screens (start, game, summary) and modals
+src/components/ui/    shadcn/ui primitives
+src/lib/game/         Pure game engine (reducers, progression, balance)
+src/lib/native/       Capacitor bridges (ads, Game Center, ATT, storage)
+src/data/             Game content (events, archetypes, shop, badges, milestones)
+src/state/            React context that wraps the engine
+ios/App/              Native Xcode project + Swift plugins
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Conventions
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Game logic in `src/lib/game/` is pure — no React, no DOM, no native imports.
+- `src/lib/native/` provides web fallbacks for every native call so the game
+  runs unmodified in the browser.
+- Save data is wrapped in a versioned envelope (`SAVE_VERSION` in
+  `src/lib/game/constants.ts`). Bump the version when the `GameState` shape
+  changes incompatibly so old saves are discarded cleanly instead of corrupted.
 
-## Deploy on Vercel
+## Submission checklist
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See [`docs/phase2-release-checklist.md`](docs/phase2-release-checklist.md) for
+the App Store submission checklist (Apple Developer enrollment, Game Center
+setup, App Store Connect metadata, screenshots, etc.).

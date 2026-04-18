@@ -309,8 +309,8 @@ export const badges: BadgeDef[] = [
   },
   {
     id: "high_roller",
-    name: "High Roller",
-    emoji: "🎰",
+    name: "High Life",
+    emoji: "🛥️",
     description: "Own a yacht or private jet",
     rarity: "epic",
     category: "wealth",

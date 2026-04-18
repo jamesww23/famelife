@@ -28,7 +28,9 @@ import { traits } from "@/data/traits";
 // ---- Initial State ----
 
 export function createInitialState(archetypeId: ArchetypeId, character: CharacterBuild): GameState {
-  const arch = archetypes.find((a) => a.id === archetypeId)!;
+  // Fall back to the first archetype if a corrupted save references one we no longer ship.
+  // This keeps the game playable rather than crashing on a stale id.
+  const arch = archetypes.find((a) => a.id === archetypeId) ?? archetypes[0];
   const trait = traits.find((t) => t.id === character.traitId);
   let stats = applyEffectsSimple({ ...DEFAULT_STATS }, arch.startingModifiers);
   if (trait) {

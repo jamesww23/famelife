@@ -147,18 +147,27 @@ export async function reportBadgeAchievements(badgeIds: string[]): Promise<void>
   }
 }
 
+/** Hard ceiling on the fame leaderboard. The summary score is documented as 0–1000;
+ *  anything above is either a balance regression or a tampered save. We clamp before
+ *  submitting to Game Center so the leaderboard stays meaningful. */
+const FAME_SCORE_MAX = 1000;
+
 /**
  * Report the player's fame score to the leaderboard at end of run.
+ * Clamped to the documented 0–1000 range to defeat tampered local saves.
  */
 export async function reportFameScore(score: number): Promise<void> {
-  if (!authenticated || score <= 0) return;
+  if (!authenticated) return;
+  if (!Number.isFinite(score) || score <= 0) return;
+
+  const clamped = Math.min(FAME_SCORE_MAX, Math.max(0, Math.floor(score)));
 
   try {
     const { LEADERBOARD_FAME_SCORE } = await import("./config");
-    await GameCenter.reportScore({ leaderboardId: LEADERBOARD_FAME_SCORE, score });
-    trackGameCenter("leaderboard", { score });
+    await GameCenter.reportScore({ leaderboardId: LEADERBOARD_FAME_SCORE, score: clamped });
+    trackGameCenter("leaderboard", { score: clamped, raw: score });
   } catch (err) {
-    trackGameCenter("error", { context: "reportScore", score, message: String(err) });
+    trackGameCenter("error", { context: "reportScore", score: clamped, message: String(err) });
   }
 }
 

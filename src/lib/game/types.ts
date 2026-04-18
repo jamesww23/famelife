@@ -1,5 +1,5 @@
 // ============================================================
-// Influencer Life Simulator – Core Type Definitions (v2 – Reigns-style)
+// Fame Life — Core Type Definitions (Reigns-style card game)
 // ============================================================
 
 // ---- Stats ----

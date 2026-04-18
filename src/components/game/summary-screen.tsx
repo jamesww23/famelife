@@ -4,8 +4,20 @@ import { useState, useEffect } from "react";
 import { useGame, generateSummary } from "@/state/game-context";
 import { formatFollowers, formatMoney } from "@/lib/game/progression";
 import { processRunEnd, getNextGoals, RunUnlocks } from "@/lib/game/legacy";
+import { milestones } from "@/data/milestones";
 import { UnlockSummary } from "./unlock-summary";
 import { playGameOver, playTap } from "@/lib/sounds";
+
+/** Convert a milestone id like "first_10k" to its display label. */
+function milestoneLabel(id: string): string {
+  const def = milestones.find((m) => m.id === id);
+  if (def) return `${def.emoji} ${def.title}`;
+  // Fallback: title-case the id segments
+  return id
+    .split("_")
+    .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
+    .join(" ");
+}
 
 /** Process run end once and cache the result across renders. */
 function useRunUnlocks(state: Parameters<typeof processRunEnd>[0]): RunUnlocks | null {
@@ -37,7 +49,12 @@ export function SummaryScreen() {
     playGameOver();
   }, []);
 
-  const shareText = `${state.character.avatar} ${state.character.name} — ${summary.earnedTitleEmoji} ${summary.earnedTitle}\n${summary.fameRankEmoji} ${summary.fameRank} | Fame Score: ${summary.fameScore}/1000\n\n"${summary.headline}"\n\n${summary.storyRecap}\n\n👥 ${formatFollowers(summary.followers)} followers\n💰 ${formatMoney(summary.money)}\n🏆 Top ${100 - summary.percentile}% of players\n🔥 ${summary.viralMoments} viral moments\n😱 ${summary.scandals} scandals\n\nPlay Fame Life: `;
+  // App Store URL is set after first submission. Until then we omit it from
+  // the share text so we never publish a broken trailing colon.
+  // TODO: paste the App Store link below and re-deploy when the app is live.
+  const APP_STORE_URL = ""; // e.g. "https://apps.apple.com/app/idXXXXXXXXXX"
+  const playLine = APP_STORE_URL ? `\n\nPlay Fame Life: ${APP_STORE_URL}` : "\n\n#FameLife";
+  const shareText = `${state.character.avatar} ${state.character.name} — ${summary.earnedTitleEmoji} ${summary.earnedTitle}\n${summary.fameRankEmoji} ${summary.fameRank} | Fame Score: ${summary.fameScore}/1000\n\n"${summary.headline}"\n\n${summary.storyRecap}\n\n👥 ${formatFollowers(summary.followers)} followers\n💰 ${formatMoney(summary.money)}\n🏆 Top ${100 - summary.percentile}% of players\n🔥 ${summary.viralMoments} viral moments\n😱 ${summary.scandals} scandals${playLine}`;
 
   const handleShare = async () => {
     if (navigator.share) {
@@ -170,7 +187,7 @@ export function SummaryScreen() {
             <div className="flex flex-wrap gap-2">
               {summary.milestones.map((id) => (
                 <span key={id} className="text-xs bg-purple-50 text-purple-600 font-bold px-2.5 py-1 rounded-full">
-                  {id.replace(/_/g, " ")}
+                  {milestoneLabel(id)}
                 </span>
               ))}
             </div>

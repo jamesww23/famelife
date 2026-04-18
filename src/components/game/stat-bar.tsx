@@ -5,7 +5,7 @@ import { useGame } from "@/state/game-context";
 import { STAT_EMOJI } from "@/lib/game/constants";
 import { formatFollowers, formatMoney, getTierName, getTierEmoji, getMaxTurns, formatQuarter } from "@/lib/game/progression";
 import { Stats, StatKey } from "@/lib/game/types";
-import { playMoney, playLevelUp } from "@/lib/sounds";
+import { playMoney, playLevelUp, isMuted, toggleMute, subscribeMute } from "@/lib/sounds";
 
 interface DeltaSnapshot {
   deltas: Partial<Record<StatKey, number>>;
@@ -67,19 +67,22 @@ export function StatBar() {
 
   return (
     <div className="stat-header w-full">
-      {/* Top row: character + quarter + tier */}
-      <div className="flex items-center justify-between mb-2">
-        <div className="flex items-center gap-1.5">
+      {/* Top row: character + quarter + tier + mute */}
+      <div className="flex items-center justify-between mb-2 gap-2">
+        <div className="flex items-center gap-1.5 min-w-0">
           <span className="text-sm">{state.character.avatar}</span>
-          <span className="text-white font-bold text-xs">{state.character.name}</span>
+          <span className="text-white font-bold text-xs truncate">{state.character.name}</span>
           <span className="text-white/30 text-xs">·</span>
-          <span className="text-white/70 text-xs font-semibold">
+          <span className="text-white/70 text-xs font-semibold whitespace-nowrap">
             {formatQuarter(week)}
           </span>
         </div>
-        <span className="text-white/90 text-xs font-bold">
-          {getTierEmoji(careerTier)} {getTierName(careerTier)}
-        </span>
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="text-white/90 text-xs font-bold whitespace-nowrap">
+            {getTierEmoji(careerTier)} {getTierName(careerTier)}
+          </span>
+          <MuteToggle />
+        </div>
       </div>
 
       {/* Quarter progress bar */}
@@ -105,6 +108,22 @@ export function StatBar() {
         />
       </div>
     </div>
+  );
+}
+
+function MuteToggle() {
+  const [m, setM] = useState(() => isMuted());
+  useEffect(() => subscribeMute(setM), []);
+  return (
+    <button
+      type="button"
+      onClick={() => toggleMute()}
+      aria-label={m ? "Unmute sound" : "Mute sound"}
+      aria-pressed={m}
+      className="flex items-center justify-center w-11 h-11 -my-1 -mr-1 rounded-lg text-white/80 hover:text-white hover:bg-white/10 active:scale-95 transition-all"
+    >
+      <span aria-hidden="true" className="text-base leading-none">{m ? "🔇" : "🔊"}</span>
+    </button>
   );
 }
 
@@ -156,7 +175,7 @@ function StatPill({
       role="status"
       aria-label={`${label}: ${value}${danger ? " — critically low!" : ""}${hasChanged && delta ? ` (${delta > 0 ? "+" : ""}${delta})` : ""}`}
     >
-      <div className="text-[9px] sm:text-[10px] font-semibold text-white/40 uppercase tracking-wider leading-none mb-0.5">{label}</div>
+      <div className="text-[10px] sm:text-[11px] font-semibold text-white/40 uppercase tracking-wider leading-none mb-0.5">{label}</div>
       <div className="flex items-center gap-1 w-full">
         <span className="text-xs">{emoji}</span>
         <span className={`text-xs font-bold ${danger ? "text-red-400" : "text-white/90"}`}>{value}</span>

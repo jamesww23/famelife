@@ -206,8 +206,11 @@ export function StartScreen() {
                 {avatarList.map((a) => (
                   <button
                     key={a}
+                    type="button"
                     onClick={() => setAvatar(a)}
-                    className={`text-2xl sm:text-3xl p-2 sm:p-3 rounded-xl transition-all ${
+                    aria-label={`Choose avatar ${a}`}
+                    aria-pressed={avatar === a}
+                    className={`text-2xl sm:text-3xl rounded-xl transition-all flex items-center justify-center min-h-[44px] min-w-[44px] aspect-square ${
                       avatar === a
                         ? "bg-white shadow-[0_0_0_3px_#e040fb] scale-110"
                         : "bg-white/20 active:scale-[0.95]"

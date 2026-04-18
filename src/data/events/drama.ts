@@ -544,16 +544,16 @@ export const dramaEvents: GameEvent[] = [
   {
     id: "drunk_livestream",
     type: "drama",
-    title: "That Livestream...",
-    emoji: "\uD83C\uDF7A",
-    text: "You went live at 2 AM after a party. You don't remember what you said. But 200K people do. Clips are EVERYWHERE.",
+    title: "That Late-Night Stream...",
+    emoji: "\uD83C\uDF99\uFE0F",
+    text: "You went live at 2 AM after a long day. You barely remember what you said. But 200K people do. Clips are EVERYWHERE.",
     weight: 8,
     choices: [
       {
         id: "own_drunk_stream",
-        text: "Post a hungover apology",
+        text: "Post a raw, honest apology",
         effects: { followers: 25000, fame: 8, reputation: -10, mentalHealth: -8 },
-        socialReaction: { type: "tweet", text: "the hungover apology video is sending me \uD83D\uDE02 at least they're honest", author: "@nightowl_clips" },
+        socialReaction: { type: "tweet", text: "the raw apology video is sending me \uD83D\uDE02 at least they're honest", author: "@nightowl_clips" },
       },
       {
         id: "delete_everything",
@@ -645,8 +645,8 @@ export const dramaEvents: GameEvent[] = [
   {
     id: "double_or_nothing",
     type: "drama",
-    title: "Double or Nothing",
-    emoji: "🎰",
+    title: "Triple the Bag",
+    emoji: "💼",
     text: "A brand offers to TRIPLE your fee — $75K instead of $25K — if you do something outrageous on camera. They want controversy. They want you to say something that'll trend for days. It'll be scripted but nobody will know that.",
     weight: 7,
     minTier: "rising_influencer",

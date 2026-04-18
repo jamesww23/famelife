@@ -10,7 +10,7 @@ export const rewardedBoosts: RewardedBoost[] = [
     triggerCondition: "post_content",
   },
   {
-    id: "pr_team",
+    id: "pr_crisis_team",
     name: "PR Crisis Team",
     emoji: "🛡️",
     description: "Hire a crisis team to save your reputation.",

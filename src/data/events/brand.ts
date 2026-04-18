@@ -112,7 +112,7 @@ export const brandEvents: GameEvent[] = [
         stakes: { upside: "$50K cash", downside: "Reputation destroyed, lose followers" },
         requiresConfirmation: true,
         scheduledEvent: { eventId: "brand_drops_you", delay: 2 },
-        socialReaction: { type: "tweet", text: "another influencer shilling a rugpull. shocker.", author: "@cryptoskeptic" },
+        socialReaction: { type: "tweet", text: "another creator shilling a scam coin. shocker.", author: "@cryptoskeptic" },
       },
       {
         id: "reject_scam",

@@ -21,7 +21,7 @@ import {
 } from "@/lib/game/engine";
 import { generateSummary } from "@/lib/game/summary";
 import { loadLegacyAsync } from "@/lib/game/legacy";
-import { STORAGE_KEY } from "@/lib/game/constants";
+import { STORAGE_KEY, SAVE_VERSION } from "@/lib/game/constants";
 import {
   getItem,
   setItem,
@@ -32,6 +32,57 @@ import {
   resetAdState,
   trackEvent,
 } from "@/lib/native";
+import { captureError } from "@/lib/native/analytics";
+
+// ── Save envelope ─────────────────────────────────────────
+// We wrap GameState in a small envelope so we can detect schema changes
+// at parse time and start fresh rather than corrupt the player's run.
+interface SaveEnvelope {
+  version: number;
+  state: GameState;
+}
+
+/** Loose runtime guard — checks the shape, not every field. */
+function isPlausibleGameState(value: unknown): value is GameState {
+  if (!value || typeof value !== "object") return false;
+  const v = value as Record<string, unknown>;
+  return (
+    typeof v.phase === "string" &&
+    typeof v.week === "number" &&
+    typeof v.archetype === "string" &&
+    typeof v.character === "object" && v.character !== null &&
+    typeof v.stats === "object" && v.stats !== null &&
+    Array.isArray(v.flags) &&
+    Array.isArray(v.milestones)
+  );
+}
+
+/** Decode a saved blob, returning null if it's stale, corrupt, or wrong version. */
+function decodeSave(raw: string): GameState | null {
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object") return null;
+
+    // Versioned envelope (v1+)
+    if ("version" in parsed && "state" in parsed) {
+      const env = parsed as SaveEnvelope;
+      if (env.version !== SAVE_VERSION) return null;
+      if (!isPlausibleGameState(env.state)) return null;
+      return env.state;
+    }
+
+    // No envelope — reject. (Old "influencer-life-save-v6" key has been retired,
+    // so any unwrapped blob here is from a pre-release dev session and should be discarded.)
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function encodeSave(state: GameState): string {
+  const envelope: SaveEnvelope = { version: SAVE_VERSION, state };
+  return JSON.stringify(envelope);
+}
 
 type GameContextValue = {
   state: GameState;
@@ -138,16 +189,22 @@ const INITIAL: GameState = {
 export function GameProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(reducer, INITIAL);
   const initialized = useRef(false);
+  // Suppress the persist effect until the load attempt has completed,
+  // otherwise the first render writes INITIAL on top of any saved game.
+  const hydrated = useRef(false);
   const prevMilestones = useRef<string[]>([]);
 
   // Initialize native services + warm legacy cache on mount
   useEffect(() => {
-    initNativeServices().catch(() => {
-      // Native services are optional — game works without them
+    initNativeServices().catch((e) => {
+      // Native services are optional — game works without them, but log so we know.
+      captureError(e, { context: "initNativeServices" });
     });
     // Eagerly load legacy from Preferences (UserDefaults) so that
     // synchronous `loadLegacy()` reads from a warm cache on native.
-    loadLegacyAsync().catch(() => {});
+    loadLegacyAsync().catch((e) => {
+      captureError(e, { context: "loadLegacyAsync" });
+    });
   }, []);
 
   // Load saved state on mount — async for native storage
@@ -159,28 +216,30 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
       try {
         const saved = await getItem(STORAGE_KEY);
         if (saved) {
-          const parsed = JSON.parse(saved) as GameState;
-          if (parsed.phase !== "start" && parsed.week > 0) {
-            // Migrate old saves missing new fields
-            if (!parsed.purchases) parsed.purchases = [];
-            if (!parsed.scheduledEvents) parsed.scheduledEvents = [];
-            if (parsed.riskLevel === undefined) parsed.riskLevel = 0;
-            dispatch({ type: "SET_STATE", state: parsed });
+          const decoded = decodeSave(saved);
+          if (decoded && decoded.phase !== "start" && decoded.week > 0) {
+            dispatch({ type: "SET_STATE", state: decoded });
+          } else if (saved && !decoded) {
+            // Stale / corrupt save — clear it so the next write is clean.
+            await removeItem(STORAGE_KEY).catch(() => {});
           }
         }
-      } catch {
-        // Ignore invalid saves
+      } catch (e) {
+        captureError(e, { context: "loadSave", key: STORAGE_KEY });
+      } finally {
+        // Allow persist effect to write only after we've finished trying to load.
+        hydrated.current = true;
       }
     })();
   }, []);
 
   // Persist state on change — async for native storage
   useEffect(() => {
-    if (state.phase !== "start" && state.week > 0) {
-      setItem(STORAGE_KEY, JSON.stringify(state)).catch(() => {
-        // Storage error — non-fatal
-      });
-    }
+    if (!hydrated.current) return;
+    if (state.phase === "start" || state.week === 0) return;
+    setItem(STORAGE_KEY, encodeSave(state)).catch((e) => {
+      captureError(e, { context: "persistSave", key: STORAGE_KEY });
+    });
   }, [state]);
 
   // Report new milestones to Game Center
@@ -190,7 +249,9 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
         (m) => !prevMilestones.current.includes(m)
       );
       for (const milestoneId of newMilestones) {
-        reportMilestoneAchievement(milestoneId).catch(() => {});
+        reportMilestoneAchievement(milestoneId).catch((e) => {
+          captureError(e, { context: "reportMilestoneAchievement", milestoneId });
+        });
       }
     }
     prevMilestones.current = state.milestones;
@@ -199,12 +260,16 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
   // Show interstitial ad between turns
   useEffect(() => {
     if (state.phase === "activity" && state.week > 1) {
-      maybeShowInterstitial().catch(() => {});
+      maybeShowInterstitial().catch((e) => {
+        captureError(e, { context: "maybeShowInterstitial" });
+      });
     }
   }, [state.phase, state.week]);
 
   const startGame = useCallback((archetype: ArchetypeId, character: CharacterBuild) => {
-    removeItem(STORAGE_KEY).catch(() => {});
+    removeItem(STORAGE_KEY).catch((e) => {
+      captureError(e, { context: "startGame:removeItem" });
+    });
     resetAdState();
     trackEvent("game_start", { archetype, character: character.name });
     dispatch({ type: "START_GAME", archetype, character });

@@ -40,8 +40,10 @@ export function ShopPanel({ onClose }: { onClose: () => void }) {
               </span>
             )}
             <button
+              type="button"
               onClick={() => { playTap(); onClose(); }}
-              className="text-xs font-semibold text-gray-400 hover:text-gray-600 transition-colors"
+              aria-label="Close shop"
+              className="text-xs font-semibold text-gray-500 hover:text-gray-700 transition-colors min-h-[44px] px-3 -mr-2 flex items-center"
             >
               ← Back
             </button>
@@ -59,8 +61,10 @@ export function ShopPanel({ onClose }: { onClose: () => void }) {
             return (
               <button
                 key={cat.id}
+                type="button"
                 onClick={() => { playTap(); setActiveCategory(cat.id as ShopCategory); }}
-                className={`shrink-0 px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all ${
+                aria-pressed={isActive}
+                className={`shrink-0 px-3 py-2 rounded-lg text-xs font-bold transition-all min-h-[44px] flex items-center ${
                   isActive
                     ? "bg-purple-500 text-white shadow-sm"
                     : "bg-gray-100 text-gray-500 hover:bg-gray-200"
@@ -171,8 +175,10 @@ export function ShopPanel({ onClose }: { onClose: () => void }) {
                       )}
                       {affordable && !locked && (
                         <button
+                          type="button"
                           onClick={() => handleBuy(item)}
-                          className="mt-1.5 px-3 py-1 bg-purple-500 text-white text-[10px] font-bold rounded-lg hover:bg-purple-600 active:scale-95 transition-all"
+                          aria-label={`Buy ${item.name} for ${formatMoney(item.cost)}`}
+                          className="mt-1.5 px-4 py-2 bg-purple-500 text-white text-xs font-bold rounded-lg hover:bg-purple-600 active:scale-95 transition-all min-h-[44px] min-w-[44px]"
                         >
                           Buy
                         </button>

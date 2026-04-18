@@ -46,7 +46,13 @@ export const STAT_EMOJI: Record<keyof Stats, string> = {
 };
 
 export const MAX_RECENT_EVENTS = 12;
-export const STORAGE_KEY = "influencer-life-save-v6";
+/**
+ * Save key for the active run. Bump the version suffix when the GameState
+ * shape changes incompatibly (the load path will reject mismatched versions
+ * and start a fresh run rather than corrupt the player's save).
+ */
+export const STORAGE_KEY = "fame-life-save-v1";
+export const SAVE_VERSION = 1;
 
 // Game length in quarters (each turn = 1 quarter = 3 months)
 export const GAME_TURNS = 40; // 10 years
