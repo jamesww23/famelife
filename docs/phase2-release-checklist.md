@@ -5,14 +5,16 @@
 Everything below marked with ✅ is **implemented in code** and committed.
 Items marked with 🔧 require **your manual action** (dashboard, credentials, or local install).
 
-> **💡 Automation**: Most steps below that say "App Store Connect → ..." can be
-> automated via [`asc-cli`](https://github.com/tddworks/asc-cli). See
-> [`asc-cli-workflow.md`](asc-cli-workflow.md) for setup + the full v1.0
-> script. Specifically: app creation, all 31 Game Center achievements, the
-> leaderboard, age rating, screenshots, description/keywords, build archive
-> upload, and review submission are all scriptable. Use the UI only for
-> one-time things asc-cli can't do (Apple Dev enrollment, bundle ID
-> registration, API key generation, Xcode signing team selection).
+> **📍 Live submission state**: Most of this checklist is already **done**.
+> See [`submission-state.md`](submission-state.md) for the current snapshot
+> (App IDs, what's configured, what's still blocking). Most App Store Connect
+> + Game Center work listed below is complete: all 31 achievements, the
+> leaderboard, metadata, screenshots, privacy URL, review contact are all set.
+
+> **💡 Automation**: Remaining App Store Connect steps can be scripted via
+> [`asc-cli`](https://github.com/tddworks/asc-cli) — see
+> [`asc-cli-workflow.md`](asc-cli-workflow.md). asc-cli is already installed
+> and authenticated at `~/.asc/credentials.json`.
 
 ---
 
