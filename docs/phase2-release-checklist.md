@@ -5,6 +5,15 @@
 Everything below marked with ✅ is **implemented in code** and committed.
 Items marked with 🔧 require **your manual action** (dashboard, credentials, or local install).
 
+> **💡 Automation**: Most steps below that say "App Store Connect → ..." can be
+> automated via [`asc-cli`](https://github.com/tddworks/asc-cli). See
+> [`asc-cli-workflow.md`](asc-cli-workflow.md) for setup + the full v1.0
+> script. Specifically: app creation, all 31 Game Center achievements, the
+> leaderboard, age rating, screenshots, description/keywords, build archive
+> upload, and review submission are all scriptable. Use the UI only for
+> one-time things asc-cli can't do (Apple Dev enrollment, bundle ID
+> registration, API key generation, Xcode signing team selection).
+
 ---
 
 ## What's Implemented in Code ✅
