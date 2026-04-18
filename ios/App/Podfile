@@ -1,0 +1,34 @@
+# Fame Life — CocoaPods configuration
+#
+# Capacitor uses Swift Package Manager (SPM) for its core and plugins.
+# CocoaPods is used ONLY for AppLovin MAX SDK (which doesn't distribute via SPM).
+#
+# After running `pod install`, always open App.xcworkspace (NOT .xcodeproj).
+
+platform :ios, '15.0'
+
+target 'App' do
+  use_frameworks!
+
+  # AppLovin MAX SDK for ad monetization
+  # Pinned to ~> 13.6 — current resolved version. Bump intentionally; major releases
+  # have historically required SKAdNetwork list updates and PrivacyInfo changes.
+  pod 'AppLovinSDK', '~> 13.6'
+
+  # Add mediation adapters as needed for higher fill rates / eCPM:
+  # pod 'AppLovinMediationGoogleAdapter'
+  # pod 'AppLovinMediationFacebookAdapter'
+  # pod 'AppLovinMediationUnityAdsAdapter'
+  # pod 'AppLovinMediationIronSourceAdapter'
+  # See: https://developers.applovin.com/en/ios/preparing-mediated-networks
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
+      # Suppress warnings from third-party pods
+      config.build_settings['GCC_WARN_INHIBIT_ALL_WARNINGS'] = 'YES'
+    end
+  end
+end

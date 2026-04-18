@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Privacy Manifest for Fame Life
+
+  Declares:
+  - Tracking via IDFA (ATT-gated) for ad personalization
+  - Device ID collection for third-party advertising (AppLovin MAX)
+  - UserDefaults access for game save persistence (Capacitor Preferences)
+
+  AppLovin MAX SDK (12.4.1+) ships its own PrivacyInfo.xcprivacy that covers
+  the SDK's internal API usage. This manifest covers the app's own declarations.
+
+  Reference: https://developer.apple.com/documentation/bundleresources/privacy-manifest-files
+-->
+<plist version="1.0">
+<dict>
+	<!-- App uses ATT to request IDFA for ad personalization -->
+	<key>NSPrivacyTracking</key>
+	<true/>
+	<key>NSPrivacyTrackingDomains</key>
+	<array>
+		<string>applovin.com</string>
+	</array>
+	<!-- Data collected: Device ID (IDFA) for third-party advertising -->
+	<key>NSPrivacyCollectedDataTypes</key>
+	<array>
+		<dict>
+			<key>NSPrivacyCollectedDataType</key>
+			<string>NSPrivacyCollectedDataTypeDeviceID</string>
+			<key>NSPrivacyCollectedDataTypeLinked</key>
+			<false/>
+			<key>NSPrivacyCollectedDataTypeTracking</key>
+			<true/>
+			<key>NSPrivacyCollectedDataTypePurposes</key>
+			<array>
+				<string>NSPrivacyCollectedDataTypePurposeThirdPartyAdvertising</string>
+			</array>
+		</dict>
+	</array>
+	<!-- Required Reason APIs used by the app -->
+	<key>NSPrivacyAccessedAPITypes</key>
+	<array>
+		<!-- UserDefaults: used by Capacitor Preferences for game save data -->
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<!-- CA92.1: Access UserDefaults to read/write data accessible only to the app itself -->
+				<string>CA92.1</string>
+			</array>
+		</dict>
+		<!-- File timestamp: WKWebView/Capacitor cache management; AppLovin 13.x telemetry -->
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryFileTimestamp</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<!-- C617.1: Inside app or group container — Capacitor cache, AppLovin asset cache -->
+				<string>C617.1</string>
+			</array>
+		</dict>
+		<!-- System boot time: required by AppLovin SDK for ad attribution -->
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategorySystemBootTime</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<!-- 35F9.1: Measure time between events to avoid duplicate event reporting -->
+				<string>35F9.1</string>
+			</array>
+		</dict>
+		<!-- Disk space: AppLovin SDK checks before downloading creatives -->
+		<dict>
+			<key>NSPrivacyAccessedAPIType</key>
+			<string>NSPrivacyAccessedAPICategoryDiskSpace</string>
+			<key>NSPrivacyAccessedAPITypeReasons</key>
+			<array>
+				<!-- E174.1: Display disk space info to the user, or write only when sufficient space -->
+				<string>E174.1</string>
+			</array>
+		</dict>
+	</array>
+</dict>
+</plist>
