@@ -226,3 +226,85 @@ export function playFailure() {
   playTone(185, 0.3, "sine", 0.08, 0.1);
   playTone(165, 0.35, "sine", 0.06, 0.25);
 }
+
+// ──────────────────────────────────────────────────────────
+// Background Music — procedural ambient loop
+// ──────────────────────────────────────────────────────────
+// A slow chillhop-style chord progression with gentle arpeggios.
+// 4 chords × 4 beats × ~0.7s/beat ≈ ~11 second loop.
+// Volume kept very low so it sits beneath SFX without competing.
+
+let bgmIntervalId: ReturnType<typeof setInterval> | null = null;
+let bgmStep = 0;
+
+// Cm9-style progression in a comfy lower register: i - VI - III - VII
+// (Cm - Ab - Eb - Bb) — minor melancholic but not dark.
+const BGM_CHORDS: ReadonlyArray<readonly number[]> = [
+  [261.63, 311.13, 392.00, 466.16], // Cm9: C-Eb-G-Bb
+  [207.65, 261.63, 311.13, 415.30], // Ab maj7: Ab-C-Eb-G
+  [155.56, 196.00, 233.08, 311.13], // Ebmaj7: Eb-G-Bb-D
+  [233.08, 293.66, 349.23, 466.16], // Bbm: Bb-D-F-Bb (passing)
+];
+
+const BEAT_MS = 700;
+
+/** Play one beat of the BGM (called by setInterval). */
+function bgmBeat() {
+  const c = getCtx();
+  if (!c) return;
+
+  const chord = BGM_CHORDS[Math.floor(bgmStep / 4) % BGM_CHORDS.length];
+  const beatInChord = bgmStep % 4;
+
+  if (beatInChord === 0) {
+    // Downbeat: play full chord as soft pad
+    chord.forEach((freq, i) => {
+      playTone(freq * 0.5, 2.4, "sine", 0.03, i * 0.02);
+    });
+  }
+  // Arpeggio: pluck one note from the chord on every beat
+  const note = chord[beatInChord % chord.length];
+  playTone(note, 0.45, "triangle", 0.025, 0);
+
+  bgmStep++;
+}
+
+/** Start the background music loop. Idempotent — safe to call multiple times. */
+export function startBGM() {
+  if (bgmIntervalId !== null) return;
+  if (typeof window === "undefined") return;
+  bgmStep = 0;
+  // Play first beat immediately, then every BEAT_MS thereafter.
+  bgmBeat();
+  bgmIntervalId = setInterval(bgmBeat, BEAT_MS);
+}
+
+/** Stop the background music loop. */
+export function stopBGM() {
+  if (bgmIntervalId !== null) {
+    clearInterval(bgmIntervalId);
+    bgmIntervalId = null;
+  }
+}
+
+/** Whether the BGM scheduler is currently running. */
+export function isBGMRunning(): boolean {
+  return bgmIntervalId !== null;
+}
+
+// Stop BGM when the user mutes; restart when they unmute (only if it was
+// running when they muted — tracked via a separate flag).
+let bgmShouldRunWhenUnmuted = false;
+subscribeMute((m) => {
+  if (m) {
+    if (bgmIntervalId !== null) {
+      bgmShouldRunWhenUnmuted = true;
+      stopBGM();
+    }
+  } else {
+    if (bgmShouldRunWhenUnmuted) {
+      bgmShouldRunWhenUnmuted = false;
+      startBGM();
+    }
+  }
+});

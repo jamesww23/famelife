@@ -4,12 +4,17 @@ import { useState, useEffect } from "react";
 import { useGame } from "@/state/game-context";
 import { playBoost, playTap } from "@/lib/sounds";
 import { useFocusTrap } from "@/lib/use-focus-trap";
+import { showRewardedAd } from "@/lib/native";
+import { addBreadcrumb, captureError } from "@/lib/native/analytics";
+
+const SHARE_URL = "https://famelife.vercel.app";
 
 export function BoostModal() {
   const { state, onAcceptBoost, onDeclineBoost } = useGame();
   const boost = state.pendingBoost;
   const [loading, setLoading] = useState(false);
   const [method, setMethod] = useState<"ad" | "share" | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const ref = useFocusTrap<HTMLDivElement>(!!boost && !loading);
 
   useEffect(() => {
@@ -18,14 +23,76 @@ export function BoostModal() {
 
   if (!boost) return null;
 
-  const handleAccept = (via: "ad" | "share") => {
-    setMethod(via);
+  // Watch Ad path: actually call the ad SDK. Only grants the boost on real
+  // reward callback. If the SDK has no fill, init failed, or the user closed
+  // the ad early, surface a short error and let them pick another option.
+  const handleWatchAd = async () => {
+    setMethod("ad");
     setLoading(true);
-    // Simulate loading
-    setTimeout(() => {
+    setErrorMsg(null);
+    try {
+      const rewarded = await showRewardedAd();
+      if (rewarded) {
+        addBreadcrumb("boost", "rewarded ad granted");
+        onAcceptBoost();
+      } else {
+        addBreadcrumb("boost", "rewarded ad not available or skipped");
+        setLoading(false);
+        setErrorMsg("Ad not available right now — try another option.");
+      }
+    } catch (err) {
+      captureError(err, { context: "boost-watch-ad" });
       setLoading(false);
-      onAcceptBoost();
-    }, via === "ad" ? 1500 : 800);
+      setErrorMsg("Ad failed to load — try another option.");
+    }
+  };
+
+  // Share path: trigger the OS share sheet. iOS WKWebView requires the
+  // navigator.share() call to happen synchronously inside the click handler
+  // to preserve the user-gesture context. Don't await any setState before it.
+  const handleShare = () => {
+    setMethod("share");
+    setErrorMsg(null);
+
+    if (typeof navigator !== "undefined" && typeof navigator.share === "function") {
+      const sharePromise = navigator.share({
+        title: "Fame Life",
+        text: `${boost.emoji} ${boost.name} — boost activated in Fame Life!`,
+        url: SHARE_URL,
+      });
+      setLoading(true);
+      sharePromise
+        .then(() => {
+          addBreadcrumb("boost", "share completed, granting boost");
+          onAcceptBoost();
+        })
+        .catch((err: unknown) => {
+          // AbortError is the expected "user cancelled the share sheet" path.
+          // Anything else is a real error worth logging.
+          const isAbort = err instanceof Error && err.name === "AbortError";
+          if (!isAbort) captureError(err, { context: "boost-share" });
+          setLoading(false);
+          setErrorMsg(isAbort ? null : "Share failed — try another option.");
+        });
+    } else {
+      // No native share API available (older browsers / weird WebView setups).
+      // Fall back to clipboard so the user still has SOMETHING for free.
+      const text = `${boost.emoji} ${boost.name} — playing Fame Life! ${SHARE_URL}`;
+      const writePromise = navigator.clipboard?.writeText
+        ? navigator.clipboard.writeText(text)
+        : Promise.reject(new Error("Clipboard API unavailable"));
+      setLoading(true);
+      writePromise
+        .then(() => {
+          addBreadcrumb("boost", "share fallback: copied to clipboard");
+          // Brief pause so the loading state is visible — feels intentional.
+          setTimeout(() => onAcceptBoost(), 600);
+        })
+        .catch(() => {
+          setLoading(false);
+          setErrorMsg("Sharing isn't available on this device.");
+        });
+    }
   };
 
   return (
@@ -44,17 +111,14 @@ export function BoostModal() {
           <div className="text-center py-8" aria-live="polite">
             <div className="text-4xl mb-3 animate-pulse">{boost.emoji}</div>
             <p className="text-gray-500 font-medium">
-              {method === "ad" ? "Loading reward..." : "Sharing..."}
+              {method === "ad" ? "Loading ad..." : "Sharing..."}
             </p>
             <div className="w-48 h-2 bg-gray-100 rounded-full mx-auto mt-4 overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-[#e040fb] to-[#ff6b9d] rounded-full"
-                style={{
-                  animation: `grow ${method === "ad" ? "1.5s" : "0.8s"} ease-out forwards`,
-                }}
+                className="h-full bg-gradient-to-r from-[#e040fb] to-[#ff6b9d] rounded-full animate-pulse"
+                style={{ width: "60%" }}
               />
             </div>
-            <style>{`@keyframes grow { from { width: 0; } to { width: 100%; } }`}</style>
           </div>
         ) : (
           <>
@@ -80,6 +144,16 @@ export function BoostModal() {
               })}
             </div>
 
+            {/* Optional, non-blocking error feedback (e.g. ad couldn't load). */}
+            {errorMsg && (
+              <p
+                role="status"
+                className="text-center text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-lg py-2 px-3 mb-3"
+              >
+                {errorMsg}
+              </p>
+            )}
+
             {/* Optionality note — required by Apple guideline 3.2.1: rewarded ads must be clearly optional */}
             <p className="text-center text-[11px] text-gray-400 mb-3">
               Optional bonus — pick any option below
@@ -89,7 +163,7 @@ export function BoostModal() {
             <div className="space-y-2.5">
               <button
                 type="button"
-                onClick={() => { playTap(); handleAccept("ad"); }}
+                onClick={() => { playTap(); handleWatchAd(); }}
                 aria-label="Watch a short ad to receive this bonus"
                 className="w-full py-3.5 bg-gradient-to-r from-[#e040fb] to-[#ff6b9d] text-white rounded-xl font-bold text-base hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg min-h-[48px]"
                 style={{ boxShadow: "0 4px 20px rgba(224, 64, 251, 0.3)" }}
@@ -98,7 +172,7 @@ export function BoostModal() {
               </button>
               <button
                 type="button"
-                onClick={() => { playTap(); handleAccept("share"); }}
+                onClick={() => { playTap(); handleShare(); }}
                 aria-label="Share with friends to receive this bonus"
                 className="w-full py-3.5 bg-[#00e5ff] text-gray-900 rounded-xl font-bold text-base hover:scale-[1.02] active:scale-[0.98] transition-all min-h-[48px]"
                 style={{ boxShadow: "0 4px 16px rgba(0, 229, 255, 0.25)" }}

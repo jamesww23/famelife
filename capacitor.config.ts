@@ -12,7 +12,11 @@ const config: CapacitorConfig = {
   ios: {
     contentInset: "always",
     allowsLinkPreview: false,
-    scrollEnabled: false,
+    // scrollEnabled MUST be true for content-driven layouts. Setting it false
+    // disables ALL WebView vertical scroll on iOS — including legitimate scroll
+    // when content overflows the viewport. The game screen, shop panel, and
+    // event card flows all rely on native scrolling.
+    scrollEnabled: true,
     backgroundColor: "#764ba2",
     preferredContentMode: "mobile",
   },

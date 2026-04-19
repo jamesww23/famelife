@@ -33,6 +33,7 @@ import {
   trackEvent,
 } from "@/lib/native";
 import { captureError } from "@/lib/native/analytics";
+import { startBGM, stopBGM } from "@/lib/sounds";
 
 // ── Save envelope ─────────────────────────────────────────
 // We wrap GameState in a small envelope so we can detect schema changes
@@ -272,6 +273,18 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
       });
     }
   }, [state.phase, state.week]);
+
+  // BGM lifecycle: start during gameplay, stop on start screen and game over.
+  // The mute toggle is handled inside sounds.ts itself (subscribeMute).
+  useEffect(() => {
+    const inGame = state.phase !== "start" && state.phase !== "game_over";
+    if (inGame) {
+      startBGM();
+    } else {
+      stopBGM();
+    }
+    return () => stopBGM();
+  }, [state.phase]);
 
   const startGame = useCallback((archetype: ArchetypeId, character: CharacterBuild) => {
     removeItem(STORAGE_KEY).catch((e) => {
