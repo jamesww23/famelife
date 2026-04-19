@@ -4,7 +4,12 @@
 + Game Center + local tooling. Any future Claude session reading this file
 should NOT ask the user to redo any item marked ✅.**
 
-Last verified: 2026-04-18 (via asc-cli queries).
+Last verified: 2026-04-19 (via asc-cli queries).
+
+**Current active build**: **build 3** (ID `7f7ec5e6-6125-4ece-ac79-7d10d4e2d91e`),
+processed VALID, in Internal TestFlight group. Builds 1 (rejected ITMS-90474)
+and 2 (superseded — stubbed Watch Ad/Share, no scroll, no BGM) are archived
+but should not be linked to the submission.
 
 ---
 
