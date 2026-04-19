@@ -25,7 +25,7 @@
 	<key>CFBundleShortVersionString</key>
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
-	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<string>2</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
@@ -36,6 +36,12 @@
 	<array>
 		<string>arm64</string>
 	</array>
+	<!-- Portrait-only game on both iPhone and iPad. UIRequiresFullScreen=true
+	     opts out of iPad multitasking (split view / slide over / picture-in-picture),
+	     which is required by Apple to allow a restricted orientation set on iPad.
+	     Without this, ITMS-90474 rejects the upload. -->
+	<key>UIRequiresFullScreen</key>
+	<true/>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
