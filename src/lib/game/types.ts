@@ -381,6 +381,8 @@ export interface CareerLegacy {
   unlockedBadges: string[]; // badge IDs
   unlockedTitles: string[]; // title IDs (from earned titles)
   runHistory: RunRecord[];  // last 20 runs
+  sharesCompleted: number;  // lifetime count of successful shares
+  pendingShareBonus: boolean; // true = next run starts with +$5K +10% fame
 }
 
 // ---- Summary ----

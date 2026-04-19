@@ -6,6 +6,10 @@ import { getItem, setItem, removeItem, reportBadgeAchievements, reportFameScore,
 const LEGACY_KEY = "fame-life-legacy-v1";
 const MAX_RUN_HISTORY = 20;
 
+// Per-run bonus granted after a successful share.
+export const SHARE_BONUS_MONEY = 5000;
+export const SHARE_BONUS_FAME_MULT = 1.10;
+
 // ---- Default Legacy ----
 
 function createDefaultLegacy(): CareerLegacy {
@@ -23,7 +27,16 @@ function createDefaultLegacy(): CareerLegacy {
     unlockedBadges: [],
     unlockedTitles: [],
     runHistory: [],
+    sharesCompleted: 0,
+    pendingShareBonus: false,
   };
+}
+
+// Hydrate a parsed payload into a full CareerLegacy, defaulting fields that
+// older saves may be missing. Cheaper than a full schema version bump and
+// safer — existing runs keep their stats/badges without needing migration.
+function hydrateLegacy(parsed: Partial<CareerLegacy>): CareerLegacy {
+  return { ...createDefaultLegacy(), ...parsed };
 }
 
 // ---- Persistence (async, native-backed) ----
@@ -41,10 +54,10 @@ export async function loadLegacyAsync(): Promise<CareerLegacy> {
   try {
     const saved = await getItem(LEGACY_KEY);
     if (saved) {
-      const parsed = JSON.parse(saved) as CareerLegacy;
+      const parsed = JSON.parse(saved) as Partial<CareerLegacy>;
       if (parsed.version === 1) {
-        cachedLegacy = parsed;
-        return parsed;
+        cachedLegacy = hydrateLegacy(parsed);
+        return cachedLegacy;
       }
     }
   } catch {
@@ -65,10 +78,10 @@ export function loadLegacy(): CareerLegacy {
   try {
     const saved = localStorage.getItem(LEGACY_KEY);
     if (saved) {
-      const parsed = JSON.parse(saved) as CareerLegacy;
+      const parsed = JSON.parse(saved) as Partial<CareerLegacy>;
       if (parsed.version === 1) {
-        cachedLegacy = parsed;
-        return parsed;
+        cachedLegacy = hydrateLegacy(parsed);
+        return cachedLegacy;
       }
     }
   } catch {
@@ -249,4 +262,66 @@ export function getNextGoals(legacy: CareerLegacy): NextGoal[] {
 /** Get a badge definition by ID */
 export function getBadgeById(id: string) {
   return badges.find(b => b.id === id) ?? null;
+}
+
+// ---- Share Reward ----
+
+export interface ShareRewardResult {
+  /** True if this share unlocked the Storyteller badge for the first time. */
+  newlyUnlockedStoryteller: boolean;
+  /** True if the pending-bonus flag was set (stacks only once until consumed). */
+  bonusArmed: boolean;
+}
+
+/**
+ * Called when the player successfully completes a share from the summary
+ * screen. Increments share count, arms the next-run bonus, and unlocks the
+ * Storyteller badge + Game Center achievement on first share.
+ */
+export async function claimShareReward(): Promise<ShareRewardResult> {
+  const legacy = await loadLegacyAsync();
+
+  const wasFirstShare = legacy.sharesCompleted === 0;
+  legacy.sharesCompleted += 1;
+
+  const bonusArmed = !legacy.pendingShareBonus; // treat repeated shares pre-consume as no-ops
+  legacy.pendingShareBonus = true;
+
+  let newlyUnlockedStoryteller = false;
+  if (wasFirstShare && !legacy.unlockedBadges.includes("storyteller")) {
+    legacy.unlockedBadges.push("storyteller");
+    newlyUnlockedStoryteller = true;
+  }
+
+  await saveLegacy(legacy);
+
+  if (newlyUnlockedStoryteller) {
+    reportBadgeAchievements(["storyteller"]).catch(() => {});
+  }
+
+  trackEvent("share_completed", {
+    totalShares: legacy.sharesCompleted,
+    firstShare: wasFirstShare,
+  });
+
+  return { newlyUnlockedStoryteller, bonusArmed };
+}
+
+/**
+ * Consume the pending share bonus (called at run start). Returns the bonus
+ * that should be applied, or null if there's nothing to grant. Clears the
+ * flag and persists so the bonus can't double-dip.
+ */
+export function consumePendingShareBonus():
+  | { money: number; fameMultiplier: number }
+  | null {
+  const legacy = loadLegacy();
+  if (!legacy.pendingShareBonus) return null;
+
+  legacy.pendingShareBonus = false;
+  saveLegacy(legacy).catch(() => {
+    // Storage error — bonus is still consumed in memory, next run won't repeat.
+  });
+
+  return { money: SHARE_BONUS_MONEY, fameMultiplier: SHARE_BONUS_FAME_MULT };
 }

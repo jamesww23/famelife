@@ -6,9 +6,9 @@ should NOT ask the user to redo any item marked ✅.**
 
 Last verified: 2026-04-19 (via asc-cli queries).
 
-**Current active build**: **build 6** (ID `812e767d-7b93-4321-92d2-54a193b8b278`),
-processed VALID, in Internal TestFlight group. When submitting v1.0, link
-this build via `asc versions set-build`.
+**Current active build**: **build 7** (ID `b0a6d238-4cee-42cb-a967-5ddfa527f3e8`),
+processed VALID, attached to Internal TestFlight group with "What's New" notes.
+When submitting v1.0, link this build via `asc versions set-build`.
 
 ### Build history
 
@@ -19,7 +19,8 @@ this build via `asc versions set-build`.
 | 3 | `7f7ec5e6...` | VALID (superseded) | Added scroll fix, real ad wiring, share sheet, BGM. Tested on device — boost modal only fired once/run due to triggerCondition filter bug |
 | 4 | — | Upload rejected | Stale `ios/.build` cache with CFBundleVersion=2 baked into IPA (ITMS-90189) |
 | 5 | — | Upload rejected | Same cache bug as 4 |
-| 6 | `812e767d...` | **VALID (ACTIVE)** | Clean archive after moving `.build` aside. Boost filter fallback to any-pool + BOOST_CHANCE bumped 0.22→0.40 + interstitial attempt every turn |
+| 6 | `812e767d...` | VALID (superseded) | Clean archive after moving `.build` aside. Boost filter fallback to any-pool + BOOST_CHANCE bumped 0.22→0.40 + interstitial attempt every turn |
+| 7 | `b0a6d238...` | **VALID (ACTIVE)** | New Nano Banana app icon (neon purple + crown + 1M badge + FAME wordmark). Uploaded but not distributed — `add-beta-group` and `update-beta-notes` were missed post-archive; reattached on 2026-04-19 |
 
 ### Stale-cache lesson
 
@@ -92,10 +93,14 @@ All declaration categories currently set to `NONE`, which yields a **4+** rating
 - **Leaderboard ID**: `19089ae3-62b2-49be-9e12-601ebc2c0da3`
 - **Integration code**: `src/lib/native/achievements.ts` → `LEADERBOARD_FAME_SCORE` (in `config.ts`) references this vendor ID ✅
 
-### Achievements (all 31 created ✅)
+### Achievements (all 32 created ✅)
 
 All vendor IDs below match the code mappings in `src/lib/native/achievements.ts`
 (`MILESTONE_TO_ACHIEVEMENT` + `BADGE_TO_ACHIEVEMENT`). No ID mismatches detected.
+
+**Total achievement points = 1000 (the Apple-enforced cap).** Any new achievement
+must be 0 points, or another achievement's points must be reduced to make room.
+Storyteller is 0 points (social/fun, not a skill milestone).
 
 | Vendor ID | Title | Points |
 |---|---|---|
@@ -130,6 +135,7 @@ All vendor IDs below match the code mappings in `src/lib/native/achievements.ts`
 | `com.uptap.famelife.achievement.fame_life` | Fame Life | 1 |
 | `com.uptap.famelife.achievement.speed_runner` | Speed Runner | 1 |
 | `com.uptap.famelife.achievement.hall_of_fame` | Hall of Fame | 0 |
+| `com.uptap.famelife.achievement.storyteller` | Storyteller | 0 |
 
 **Do not recreate.** If you need to modify (e.g., change points), use
 `asc game-center achievements update` rather than delete + create.

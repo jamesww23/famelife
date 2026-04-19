@@ -27,7 +27,16 @@ import { traits } from "@/data/traits";
 
 // ---- Initial State ----
 
-export function createInitialState(archetypeId: ArchetypeId, character: CharacterBuild): GameState {
+export interface StartBonus {
+  money?: number;
+  fameMultiplier?: number;
+}
+
+export function createInitialState(
+  archetypeId: ArchetypeId,
+  character: CharacterBuild,
+  startBonus?: StartBonus,
+): GameState {
   // Fall back to the first archetype if a corrupted save references one we no longer ship.
   // This keeps the game playable rather than crashing on a stale id.
   const arch = archetypes.find((a) => a.id === archetypeId) ?? archetypes[0];
@@ -35,6 +44,14 @@ export function createInitialState(archetypeId: ArchetypeId, character: Characte
   let stats = applyEffectsSimple({ ...DEFAULT_STATS }, arch.startingModifiers);
   if (trait) {
     stats = applyEffectsSimple(stats, trait.modifiers);
+  }
+  // Share-reward bonus: applied after archetype/trait so it layers on the
+  // player's actual starting baseline and doesn't get overwritten.
+  if (startBonus?.money) {
+    stats = { ...stats, money: stats.money + startBonus.money };
+  }
+  if (startBonus?.fameMultiplier && startBonus.fameMultiplier !== 1) {
+    stats = { ...stats, fame: Math.round(stats.fame * startBonus.fameMultiplier) };
   }
 
   return {

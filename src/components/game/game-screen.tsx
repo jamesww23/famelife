@@ -16,23 +16,26 @@ export function GameScreen() {
   const [confirmingQuit, setConfirmingQuit] = useState(false);
 
   return (
-    <div className="min-h-screen min-h-[100dvh] flex flex-col items-center p-3 sm:p-4 pb-6 sm:pb-8">
+    <div
+      className="min-h-screen min-h-[100dvh] flex flex-col items-center p-3 sm:p-4"
+      style={{ paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))" }}
+    >
       {/* Top stat bar */}
       <div className="w-full max-w-lg mb-4 animate-slide-down">
         <StatBar />
       </div>
 
-      {/* Center content area */}
-      <div className="w-full max-w-lg flex-1 flex flex-col justify-center">
+      {/* Content area — anchored under the stat bar, not vertically centered */}
+      <div className="w-full max-w-lg flex flex-col">
         {state.phase === "activity" && <ActivityPhase />}
         {state.phase === "event" && state.currentEvent && <EventCard />}
         {state.phase === "outcome" && <EventOutcome />}
       </div>
 
-      {/* Quit button — small and unobtrusive but readable */}
+      {/* Quit button — pushed to bottom, clears home indicator via safe-area pb above */}
       <button
         onClick={() => { playTap(); setConfirmingQuit(true); }}
-        className="mt-4 text-white/50 text-sm font-medium hover:text-white/80 transition-colors py-2 px-4 min-h-[44px]"
+        className="mt-auto pt-6 text-white/50 text-sm font-medium hover:text-white/80 transition-colors py-2 px-4 min-h-[44px]"
       >
         Quit Run
       </button>

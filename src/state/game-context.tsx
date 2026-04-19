@@ -18,9 +18,10 @@ import {
   declineBoost,
   endTurn,
   purchaseItem,
+  type StartBonus,
 } from "@/lib/game/engine";
 import { generateSummary } from "@/lib/game/summary";
-import { loadLegacyAsync } from "@/lib/game/legacy";
+import { loadLegacyAsync, consumePendingShareBonus } from "@/lib/game/legacy";
 import { STORAGE_KEY, SAVE_VERSION } from "@/lib/game/constants";
 import {
   getItem,
@@ -103,7 +104,7 @@ const GameContext = createContext<GameContextValue | null>(null);
 
 type Action =
   | { type: "SET_STATE"; state: GameState }
-  | { type: "START_GAME"; archetype: ArchetypeId; character: CharacterBuild }
+  | { type: "START_GAME"; archetype: ArchetypeId; character: CharacterBuild; startBonus?: StartBonus }
   | { type: "SELECT_ACTIVITY"; activity: QuarterlyActivity }
   | { type: "CHOOSE_EVENT"; choice: EventChoice }
   | { type: "BUY_ITEM"; item: ShopItem }
@@ -120,7 +121,7 @@ function reducer(state: GameState, action: Action): GameState {
       return action.state;
     case "START_GAME": {
       // Start in activity phase — player picks their first action
-      return createInitialState(action.archetype, action.character);
+      return createInitialState(action.archetype, action.character, action.startBonus);
     }
     case "SELECT_ACTIVITY": {
       // Apply activity effects, then serve the quarter's random event
@@ -291,8 +292,15 @@ export function GameProvider({ children }: { children: React.ReactNode }) {
       captureError(e, { context: "startGame:removeItem" });
     });
     resetAdState();
-    trackEvent("game_start", { archetype, character: character.name });
-    dispatch({ type: "START_GAME", archetype, character });
+    // Consume any pending share bonus — fire-and-forget persist; if it fails
+    // the bonus is still applied to this run (bonus is already in memory).
+    const startBonus = consumePendingShareBonus() ?? undefined;
+    trackEvent("game_start", {
+      archetype,
+      character: character.name,
+      shareBonus: startBonus ? 1 : 0,
+    });
+    dispatch({ type: "START_GAME", archetype, character, startBonus });
   }, []);
 
   const selectActivity = useCallback((activity: QuarterlyActivity) => {

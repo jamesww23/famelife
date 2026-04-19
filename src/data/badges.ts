@@ -266,6 +266,15 @@ export const badges: BadgeDef[] = [
     category: "social",
     check: (run) => run.flags.includes("charityPersona"),
   },
+  {
+    id: "storyteller",
+    name: "Storyteller",
+    emoji: "📣",
+    description: "Share your fame story with the world",
+    rarity: "common",
+    category: "social",
+    check: (_run, legacy) => legacy.sharesCompleted >= 1,
+  },
 
   // ---- ECONOMY & LUXURY ----
   {

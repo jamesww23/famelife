@@ -99,14 +99,20 @@ export function StartScreen() {
         {/* Progress dots — hidden on intro */}
         {step !== "intro" && (
           <div className="flex justify-center gap-2 mb-5">
-            {STEPS.slice(1).map((_, i) => (
-              <div
-                key={i}
-                className={`h-1.5 rounded-full transition-all ${
-                  i < stepIndex ? "bg-white w-8" : "bg-white/30 w-4"
-                }`}
-              />
-            ))}
+            {STEPS.slice(1).map((_, i) => {
+              // STEPS index 0 is "intro"; onboarding dot i corresponds to step (i+1).
+              const dotStep = i + 1;
+              const cls =
+                dotStep < stepIndex ? "bg-white w-8"
+                : dotStep === stepIndex ? "bg-white w-4"
+                : "bg-white/30 w-4";
+              return (
+                <div
+                  key={i}
+                  className={`h-1.5 rounded-full transition-all ${cls}`}
+                />
+              );
+            })}
           </div>
         )}
 

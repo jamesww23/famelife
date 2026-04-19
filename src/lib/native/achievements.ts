@@ -89,6 +89,7 @@ const BADGE_TO_ACHIEVEMENT: Record<string, string> = {
   speed_runner:       "com.uptap.famelife.achievement.speed_runner",
   hall_of_fame:       "com.uptap.famelife.achievement.hall_of_fame",
   veteran:            "com.uptap.famelife.achievement.veteran",
+  storyteller:        "com.uptap.famelife.achievement.storyteller",
 };
 
 // ── Public API ───────────────────────────────────────────

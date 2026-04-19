@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { useGame, generateSummary } from "@/state/game-context";
 import { formatFollowers, formatMoney } from "@/lib/game/progression";
-import { processRunEnd, getNextGoals, RunUnlocks } from "@/lib/game/legacy";
+import { processRunEnd, getNextGoals, claimShareReward, RunUnlocks } from "@/lib/game/legacy";
+import { SHARE_BONUS_MONEY, SHARE_BONUS_FAME_MULT } from "@/lib/game/legacy";
 import { milestones } from "@/data/milestones";
 import { UnlockSummary } from "./unlock-summary";
 import { playGameOver, playTap } from "@/lib/sounds";
@@ -28,7 +29,7 @@ function useRunUnlocks(state: Parameters<typeof processRunEnd>[0]): RunUnlocks |
     processed[1](true);
     processRunEnd(state).then(setUnlocks).catch(() => {
       // Fallback with empty unlocks if native storage fails
-      setUnlocks({ newBadges: [], newTitles: [], updatedLegacy: { version: 1, totalRuns: 0, lifetimeEarnings: 0, bestFollowers: 0, bestFame: 0, bestFameScore: 0, bestMoney: 0, longestRun: 0, mostScandals: 0, fastestTo1M: null, unlockedBadges: [], unlockedTitles: [], runHistory: [] } });
+      setUnlocks({ newBadges: [], newTitles: [], updatedLegacy: { version: 1, totalRuns: 0, lifetimeEarnings: 0, bestFollowers: 0, bestFame: 0, bestFameScore: 0, bestMoney: 0, longestRun: 0, mostScandals: 0, fastestTo1M: null, unlockedBadges: [], unlockedTitles: [], runHistory: [], sharesCompleted: 0, pendingShareBonus: false } });
     });
   }, [state, processed]);
   return unlocks;
@@ -41,6 +42,7 @@ export function SummaryScreen() {
   const summary = generateSummary(state);
   const [shared, setShared] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [storytellerUnlocked, setStorytellerUnlocked] = useState(false);
   const [view, setView] = useState<View>("summary");
 
   const unlocks = useRunUnlocks(state);
@@ -49,12 +51,29 @@ export function SummaryScreen() {
     playGameOver();
   }, []);
 
-  // App Store URL is set after first submission. Until then we omit it from
-  // the share text so we never publish a broken trailing colon.
+  // Prefer the App Store link once live; fall back to the web build so the
+  // shared message always has a clickable landing page with OG preview.
   // TODO: paste the App Store link below and re-deploy when the app is live.
   const APP_STORE_URL = ""; // e.g. "https://apps.apple.com/app/idXXXXXXXXXX"
-  const playLine = APP_STORE_URL ? `\n\nPlay Fame Life: ${APP_STORE_URL}` : "\n\n#FameLife";
+  const WEB_URL = "https://famelife.vercel.app";
+  const shareUrl = APP_STORE_URL || WEB_URL;
+  const playLine = APP_STORE_URL
+    ? `\n\nPlay Fame Life: ${APP_STORE_URL}`
+    : `\n\nPlay at ${WEB_URL} #FameLife`;
   const shareText = `${state.character.avatar} ${state.character.name} — ${summary.earnedTitleEmoji} ${summary.earnedTitle}\n${summary.fameRankEmoji} ${summary.fameRank} | Fame Score: ${summary.fameScore}/1000\n\n"${summary.headline}"\n\n${summary.storyRecap}\n\n👥 ${formatFollowers(summary.followers)} followers\n💰 ${formatMoney(summary.money)}\n🏆 Top ${100 - summary.percentile}% of players\n🔥 ${summary.viralMoments} viral moments\n😱 ${summary.scandals} scandals${playLine}`;
+
+  const grantShareReward = async () => {
+    try {
+      const result = await claimShareReward();
+      setShared(true);
+      if (result.newlyUnlockedStoryteller) {
+        setStorytellerUnlocked(true);
+      }
+    } catch {
+      // Reward persistence failed — still mark shared so UI reflects the action.
+      setShared(true);
+    }
+  };
 
   const handleShare = async () => {
     if (navigator.share) {
@@ -62,13 +81,16 @@ export function SummaryScreen() {
         await navigator.share({
           title: `Fame Life — ${summary.fameRank}`,
           text: shareText,
+          url: shareUrl,
         });
-        setShared(true);
+        await grantShareReward();
       } catch {
-        // User cancelled
+        // User cancelled — no reward granted.
       }
     } else {
+      // No native share — copy falls back to reward as the action completed.
       await handleCopy();
+      await grantShareReward();
     }
   };
 
@@ -209,8 +231,25 @@ export function SummaryScreen() {
             onClick={() => { playTap(); handleShare(); }}
             className="w-full py-3.5 bg-white text-[#e040fb] rounded-2xl font-bold text-base active:scale-[0.98] transition-all btn-glow flex items-center justify-center gap-2"
           >
-            {shared ? "Shared!" : "📤 Share Your Fame Story"}
+            {shared ? "🎁 Shared — bonus banked!" : "📤 Share Your Fame Story"}
           </button>
+          {shared && (
+            <div
+              className="w-full rounded-2xl bg-white/15 border border-white/25 px-4 py-3 text-center animate-scale-in"
+              role="status"
+              aria-live="polite"
+            >
+              {storytellerUnlocked && (
+                <p className="text-sm font-bold text-white mb-1">
+                  📣 Storyteller badge unlocked!
+                </p>
+              )}
+              <p className="text-white/90 text-sm font-semibold">
+                Next run starts with <span className="text-yellow-300">+${SHARE_BONUS_MONEY / 1000}K</span> &amp;{" "}
+                <span className="text-pink-200">+{Math.round((SHARE_BONUS_FAME_MULT - 1) * 100)}% Fame</span>
+              </p>
+            </div>
+          )}
           <button
             onClick={() => { playTap(); handleCopy(); }}
             className="w-full py-3 bg-white/20 text-white rounded-2xl font-semibold text-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2"
