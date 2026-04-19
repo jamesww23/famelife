@@ -46,17 +46,20 @@ public class AdsPlugin: CAPPlugin, CAPBridgedPlugin {
             return
         }
 
-        let settings = ALSdkSettings()
         let hasConsent = call.getBool("hasConsent") ?? false
-        settings.isExcessiveAdMonitoringEnabled = false
 
-        let sdk = ALSdk.shared(withKey: sdkKey, settings: settings)
-        sdk.mediationProvider = "max"
+        // AppLovin MAX SDK 13.x: configuration goes through ALSdkInitializationConfiguration,
+        // and ALSdk.shared() takes no arguments. The legacy `ALSdk.shared(withKey:)` and
+        // `ALSdk.shared(withKey:settings:)` were removed.
+        // Reference: https://developers.applovin.com/en/ios/overview/integration#initialize-the-sdk
+        let initConfig = ALSdkInitializationConfiguration(sdkKey: sdkKey) { builder in
+            builder.mediationProvider = ALMediationProviderMAX
+        }
 
-        // Set consent flag
+        // Set consent flag (GDPR / regional privacy) before init.
         ALPrivacySettings.setHasUserConsent(hasConsent)
 
-        sdk.initializeSdk { _ in
+        ALSdk.shared().initialize(with: initConfig) { _ in
             call.resolve()
         }
         #else
