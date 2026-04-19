@@ -21,7 +21,9 @@ Last verified: 2026-04-18 (via asc-cli queries).
 | **Fame Score Leaderboard ID** | `19089ae3-62b2-49be-9e12-601ebc2c0da3` |
 | **Review Detail ID** | `a0d4e23b-0f2c-410f-9f09-3efbfdf05d76` |
 | Bundle ID | `com.uptap.famelife` |
-| Team | Uptap / James Wu (`j@uptap.com`) |
+| Apple Developer team account | `ac2ji8@gmail.com` (do NOT confuse with the review contact below) |
+| App Review contact email | `j@uptap.com` (James Wu, +86 15711172951) |
+| TestFlight Internal Group ID | `211f19db-b4ec-4d87-8763-31e295dd3945` (auto-includes all team members; do not try to add `j@uptap.com` as a tester — it's not a team member) |
 
 ## Infrastructure state
 
