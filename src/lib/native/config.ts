@@ -32,9 +32,12 @@ export const HAS_AD_CREDENTIALS =
 
 /**
  * Minimum turns between interstitial ads.
- * Keeps monetization sustainable without ruining pacing.
+ * 1 = attempt to show an ad every turn. AppLovin no-ops silently when it
+ * has no fill, so this is safe — the user only sees an ad when AppLovin
+ * actually has one. This maximizes fill opportunities, which is important
+ * for new apps where AppLovin's fill rate is still ramping up.
  */
-export const INTERSTITIAL_FREQUENCY = 3;
+export const INTERSTITIAL_FREQUENCY = 1;
 
 // ── Game Center ──────────────────────────────────────────
 /**

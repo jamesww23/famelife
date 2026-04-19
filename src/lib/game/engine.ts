@@ -170,7 +170,11 @@ function findEligibleBoost(state: GameState): RewardedBoost | null {
   const riskBonus = lastChoice?.riskTag ? 0.15 : 0;
   if (Math.random() > BOOST_CHANCE + riskBonus) return null;
 
-  const candidates = rewardedBoosts.filter((boost) => {
+  // Prefer boosts that thematically match the event. Fall back to ANY boost
+  // so the offer still appears on events without a specific match (lifestyle,
+  // platform, recovery, empire) — otherwise players playing those event-heavy
+  // runs may see zero boost offers for an entire game.
+  const themed = rewardedBoosts.filter((boost) => {
     switch (boost.triggerCondition) {
       case "post_content":
         return lastEvent.type === "viral";
@@ -189,6 +193,7 @@ function findEligibleBoost(state: GameState): RewardedBoost | null {
     }
   });
 
-  if (candidates.length === 0) return null;
-  return candidates[Math.floor(Math.random() * candidates.length)];
+  // Themed pool when available, otherwise pull from the full set.
+  const pool = themed.length > 0 ? themed : rewardedBoosts;
+  return pool[Math.floor(Math.random() * pool.length)];
 }

@@ -57,8 +57,14 @@ export const SAVE_VERSION = 1;
 // Game length in quarters (each turn = 1 quarter = 3 months)
 export const GAME_TURNS = 40; // 10 years
 
-// Boost chance per turn (was 0.35 — reduced to prevent free stat inflation every 3 turns)
-export const BOOST_CHANCE = 0.22;
+// Boost chance per turn. Was 0.22 but combined with the triggerCondition
+// filter bug (boost.triggerCondition rarely matched event.type), this
+// effectively produced ~1 boost offer in 40 turns for real playtests.
+// Filter bug is now fixed (engine.ts falls back to any boost) so the
+// effective rate is roughly this number per turn. Pick a rate that pairs
+// well with Apple's 3.2.1 guidance that rewarded ads must be clearly
+// optional — ~1 offer every 2-3 turns feels engaging without being pushy.
+export const BOOST_CHANCE = 0.4;
 
 // Recovery per quarter (tuned down so burnout/fatigue arcs have real teeth)
 export const ENERGY_RECOVERY = 14;
