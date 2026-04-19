@@ -6,10 +6,27 @@ should NOT ask the user to redo any item marked ✅.**
 
 Last verified: 2026-04-19 (via asc-cli queries).
 
-**Current active build**: **build 3** (ID `7f7ec5e6-6125-4ece-ac79-7d10d4e2d91e`),
-processed VALID, in Internal TestFlight group. Builds 1 (rejected ITMS-90474)
-and 2 (superseded — stubbed Watch Ad/Share, no scroll, no BGM) are archived
-but should not be linked to the submission.
+**Current active build**: **build 6** (ID `812e767d-7b93-4321-92d2-54a193b8b278`),
+processed VALID, in Internal TestFlight group. When submitting v1.0, link
+this build via `asc versions set-build`.
+
+### Build history
+
+| # | ID | State | Notes |
+|---|---|---|---|
+| 1 | — | Rejected | ITMS-90474 (iPad orientations) → fixed with `UIRequiresFullScreen=true` in commit 9f41412 |
+| 2 | `a4c45cc3...` | VALID (superseded) | First valid upload, but Watch Ad/Share were stubbed, no scroll, no BGM |
+| 3 | `7f7ec5e6...` | VALID (superseded) | Added scroll fix, real ad wiring, share sheet, BGM. Tested on device — boost modal only fired once/run due to triggerCondition filter bug |
+| 4 | — | Upload rejected | Stale `ios/.build` cache with CFBundleVersion=2 baked into IPA (ITMS-90189) |
+| 5 | — | Upload rejected | Same cache bug as 4 |
+| 6 | `812e767d...` | **VALID (ACTIVE)** | Clean archive after moving `.build` aside. Boost filter fallback to any-pool + BOOST_CHANCE bumped 0.22→0.40 + interstitial attempt every turn |
+
+### Stale-cache lesson
+
+`asc builds archive --output-dir ios/.build` reuses archive content across
+invocations. If Info.plist version changes between archives, the rebuild may
+fail to pick up the new version. Always move `ios/.build` aside (or use a
+per-build output-dir) when bumping CFBundleVersion.
 
 ---
 
