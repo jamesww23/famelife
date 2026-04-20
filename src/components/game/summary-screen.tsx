@@ -75,32 +75,48 @@ export function SummaryScreen() {
     }
   };
 
-  const handleShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: `Fame Life — ${summary.fameRank}`,
-          text: shareText,
-          url: shareUrl,
-        });
-        await grantShareReward();
-      } catch {
-        // User cancelled — no reward granted.
-      }
-    } else {
-      // No native share — copy falls back to reward as the action completed.
-      await handleCopy();
-      await grantShareReward();
-    }
-  };
-
-  const handleCopy = async () => {
+  // Returns true iff clipboard write succeeded — caller uses this to decide
+  // whether to grant the share reward in the no-native-share fallback path.
+  const handleCopy = async (): Promise<boolean> => {
     try {
       await navigator.clipboard.writeText(shareText);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+      return true;
     } catch {
-      // Clipboard not available
+      return false;
+    }
+  };
+
+  const handleShare = async () => {
+    // Guard: don't let the share reward race processRunEnd's legacy save.
+    // Both are full-object writes to the same key; whichever finishes last
+    // would stomp the other's increment. Gating here is simpler than
+    // serializing writes.
+    if (!unlocks) return;
+
+    if (!navigator.share) {
+      // No Web Share API — fall back to clipboard copy; only reward on success.
+      const ok = await handleCopy();
+      if (ok) await grantShareReward();
+      return;
+    }
+
+    try {
+      await navigator.share({
+        title: `Fame Life — ${summary.fameRank}`,
+        text: shareText,
+        url: shareUrl,
+      });
+      await grantShareReward();
+    } catch (err) {
+      // Dismissing the share sheet raises AbortError — that's the only
+      // non-error case. Anything else is a real failure (missing payload,
+      // unsupported in a WKWebView context, etc.) — fall back to copy so
+      // the player can still broadcast their run.
+      if (err instanceof DOMException && err.name === "AbortError") return;
+      const ok = await handleCopy();
+      if (ok) await grantShareReward();
     }
   };
 
@@ -229,9 +245,14 @@ export function SummaryScreen() {
           )}
           <button
             onClick={() => { playTap(); handleShare(); }}
-            className="w-full py-3.5 bg-white text-[#e040fb] rounded-2xl font-bold text-base active:scale-[0.98] transition-all btn-glow flex items-center justify-center gap-2"
+            disabled={!unlocks}
+            className={`w-full py-3.5 rounded-2xl font-bold text-base transition-all flex items-center justify-center gap-2 ${
+              unlocks
+                ? "bg-white text-[#e040fb] active:scale-[0.98] btn-glow"
+                : "bg-white/60 text-[#e040fb]/60 cursor-not-allowed"
+            }`}
           >
-            {shared ? "🎁 Shared — bonus banked!" : "📤 Share Your Fame Story"}
+            {!unlocks ? "Finalizing run…" : shared ? "🎁 Shared — bonus banked!" : "📤 Share Your Fame Story"}
           </button>
           {shared && (
             <div

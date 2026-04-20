@@ -32,11 +32,47 @@ function createDefaultLegacy(): CareerLegacy {
   };
 }
 
-// Hydrate a parsed payload into a full CareerLegacy, defaulting fields that
-// older saves may be missing. Cheaper than a full schema version bump and
-// safer — existing runs keep their stats/badges without needing migration.
-function hydrateLegacy(parsed: Partial<CareerLegacy>): CareerLegacy {
-  return { ...createDefaultLegacy(), ...parsed };
+// Hydrate a parsed payload into a full CareerLegacy. Handles both the case
+// where older saves are missing newer fields AND the case where a persisted
+// field is the wrong shape (e.g. `unlockedBadges: null` from a partial write).
+// Every field is defensively coerced; on any type mismatch we fall back to
+// the default. This prevents `.includes()` / `.filter()` crashes deep in
+// badge/title processing when storage has been corrupted.
+function hydrateLegacy(parsed: unknown): CareerLegacy {
+  const defaults = createDefaultLegacy();
+  if (!parsed || typeof parsed !== "object") return defaults;
+  const p = parsed as Record<string, unknown>;
+
+  const asNum = (v: unknown, d: number): number =>
+    typeof v === "number" && Number.isFinite(v) ? v : d;
+  const asNumOrNull = (v: unknown): number | null =>
+    v === null ? null : typeof v === "number" && Number.isFinite(v) ? v : null;
+  const asBool = (v: unknown, d: boolean): boolean =>
+    typeof v === "boolean" ? v : d;
+  const asStringArray = (v: unknown): string[] =>
+    Array.isArray(v) ? v.filter((s): s is string => typeof s === "string") : [];
+  const asRunHistory = (v: unknown): RunRecord[] =>
+    Array.isArray(v)
+      ? (v.filter((r) => r && typeof r === "object") as RunRecord[])
+      : [];
+
+  return {
+    version: 1,
+    totalRuns: asNum(p.totalRuns, defaults.totalRuns),
+    lifetimeEarnings: asNum(p.lifetimeEarnings, defaults.lifetimeEarnings),
+    bestFollowers: asNum(p.bestFollowers, defaults.bestFollowers),
+    bestFame: asNum(p.bestFame, defaults.bestFame),
+    bestFameScore: asNum(p.bestFameScore, defaults.bestFameScore),
+    bestMoney: asNum(p.bestMoney, defaults.bestMoney),
+    longestRun: asNum(p.longestRun, defaults.longestRun),
+    mostScandals: asNum(p.mostScandals, defaults.mostScandals),
+    fastestTo1M: asNumOrNull(p.fastestTo1M),
+    unlockedBadges: asStringArray(p.unlockedBadges),
+    unlockedTitles: asStringArray(p.unlockedTitles),
+    runHistory: asRunHistory(p.runHistory),
+    sharesCompleted: asNum(p.sharesCompleted, defaults.sharesCompleted),
+    pendingShareBonus: asBool(p.pendingShareBonus, defaults.pendingShareBonus),
+  };
 }
 
 // ---- Persistence (async, native-backed) ----
@@ -54,8 +90,8 @@ export async function loadLegacyAsync(): Promise<CareerLegacy> {
   try {
     const saved = await getItem(LEGACY_KEY);
     if (saved) {
-      const parsed = JSON.parse(saved) as Partial<CareerLegacy>;
-      if (parsed.version === 1) {
+      const parsed: unknown = JSON.parse(saved);
+      if (parsed && typeof parsed === "object" && (parsed as { version?: unknown }).version === 1) {
         cachedLegacy = hydrateLegacy(parsed);
         return cachedLegacy;
       }
@@ -78,8 +114,8 @@ export function loadLegacy(): CareerLegacy {
   try {
     const saved = localStorage.getItem(LEGACY_KEY);
     if (saved) {
-      const parsed = JSON.parse(saved) as Partial<CareerLegacy>;
-      if (parsed.version === 1) {
+      const parsed: unknown = JSON.parse(saved);
+      if (parsed && typeof parsed === "object" && (parsed as { version?: unknown }).version === 1) {
         cachedLegacy = hydrateLegacy(parsed);
         return cachedLegacy;
       }
