@@ -5,10 +5,17 @@
  * 1. Platform detection (sync, immediate)
  * 2. Lifecycle listeners (sync)
  * 3. Game Center authentication (async, non-blocking)
- * 4. ATT prompt (async, must complete before ads)
- * 5. Ad SDK initialization (async, after ATT)
+ *
+ * ATT + ad SDK init are deliberately NOT in initNativeServices — they are
+ * triggered by the first user interaction on the start screen (the "Start
+ * Your Fame Story" button). Calling ATTrackingManager too early during app
+ * launch (while the scene isn't yet UIScene.ActivationState.foregroundActive)
+ * silently resolves without showing the prompt. On iPadOS 26+ this is strict
+ * enough that Apple's review team will reject the submission with
+ * Guideline 2.1 — exactly what happened to Fame Life v1.0 build 9.
  *
  * Call `initNativeServices()` once from the app root.
+ * Call `requestTrackingAndInitAds()` from the first user gesture.
  */
 
 export { isNative, isIOS, isWeb } from "./platform";
@@ -29,7 +36,7 @@ export {
   showLeaderboardsUI,
   isGameCenterAuthenticated,
 } from "./achievements";
-export { requestTrackingPermission, hasTrackingConsent } from "./privacy";
+export { requestTrackingPermission, hasTrackingConsent, getTrackingStatus } from "./privacy";
 export { initLifecycle, onPause, onResume } from "./lifecycle";
 export {
   trackEvent,
@@ -73,14 +80,26 @@ export async function initNativeServices(): Promise<void> {
   // 3. Game Center (non-blocking)
   authenticateGameCenter().catch(() => {});
 
-  // 4. ATT prompt → Ad init (sequential, but non-blocking to game)
+  // NOTE: ATT prompt + ad init deliberately NOT here. See header comment.
+  // Call requestTrackingAndInitAds() from the start screen button tap.
+  addBreadcrumb("init", "Native services initialized (ATT deferred to user gesture)");
+}
+
+/**
+ * Trigger the App Tracking Transparency prompt and initialize the ad SDK.
+ *
+ * MUST be called from a user interaction handler (e.g. button onClick) to
+ * guarantee the app is in foreground-active state. iOS silently suppresses
+ * the ATT prompt if requested during app launch. Safe to call multiple
+ * times — iOS only shows the prompt once per install, subsequent calls
+ * resolve immediately with the cached decision.
+ */
+export async function requestTrackingAndInitAds(): Promise<void> {
+  if (!isNative()) return;
   try {
     await requestTrackingPermission();
     await initializeAds();
   } catch {
-    // Ads are optional — game works without them
     addBreadcrumb("init", "Ad initialization failed — continuing without ads");
   }
-
-  addBreadcrumb("init", "Native services initialized");
 }

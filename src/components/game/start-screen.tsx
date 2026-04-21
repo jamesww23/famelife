@@ -10,6 +10,7 @@ import { STAT_EMOJI } from "@/lib/game/constants";
 import { Logo } from "./logo";
 import { ProfileScreen } from "./profile-screen";
 import { playTap, playGameStart, playSwoosh } from "@/lib/sounds";
+import { requestTrackingAndInitAds } from "@/lib/native";
 
 type Step = "intro" | "gender" | "avatar" | "trait" | "archetype" | "goal" | "profile";
 type Gender = "male" | "female" | "random";
@@ -148,7 +149,16 @@ export function StartScreen() {
               </div>
 
               <button
-                onClick={() => { playTap(); setStep("gender"); }}
+                onClick={async () => {
+                  playTap();
+                  // Triggers the App Tracking Transparency prompt on iOS from
+                  // a guaranteed-active user gesture (see src/lib/native/index.ts
+                  // comment). Awaits the user's decision, then chains ad SDK
+                  // init. Safe no-op on web and on subsequent launches (iOS
+                  // caches the ATT decision after first response).
+                  await requestTrackingAndInitAds();
+                  setStep("gender");
+                }}
                 className="w-full py-3.5 sm:py-4 rounded-2xl text-base sm:text-lg btn-primary-gradient active:scale-[0.98] transition-all"
               >
                 Start Your Fame Story
