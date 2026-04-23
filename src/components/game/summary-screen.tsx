@@ -148,18 +148,38 @@ export function SummaryScreen() {
   return (
     <div className="min-h-screen min-h-[100dvh] flex items-center justify-center p-3 sm:p-4">
       <div className="w-full max-w-lg animate-slide-up">
-        {/* Header */}
+        {/* Header — halo-framed avatar matching prompt D */}
         <div className="text-center mb-4 sm:mb-6">
-          <div className="text-4xl sm:text-5xl mb-2">{state.character.avatar}</div>
+          <div
+            className="inline-flex items-center justify-center w-24 h-24 sm:w-28 sm:h-28 rounded-full mb-3 relative"
+            style={{
+              background: "radial-gradient(circle, rgba(255,180,0,0.3) 0%, rgba(224,64,251,0.15) 50%, transparent 70%)",
+              boxShadow: "0 0 0 3px rgba(255,215,0,0.7), 0 0 30px rgba(255,180,0,0.5), inset 0 0 20px rgba(255,255,255,0.1)",
+            }}
+          >
+            <span className="text-5xl sm:text-6xl drop-shadow-lg" aria-hidden="true">{state.character.avatar}</span>
+          </div>
           <h1 className="text-2xl sm:text-3xl font-black text-white mb-1">{state.character.name}&apos;s Story</h1>
           <p className="text-white/70 text-sm">{summary.endingReason}</p>
         </div>
 
-        {/* Earned Title */}
-        <div className="game-card p-3 sm:p-4 mb-3 sm:mb-4 text-center">
-          <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">You Earned</div>
-          <div className="text-xl sm:text-2xl font-black text-gray-900">
-            {summary.earnedTitleEmoji} {summary.earnedTitle}
+        {/* Earned Title — emphasized with gradient background and emoji halo */}
+        <div className="game-card p-4 sm:p-5 mb-3 sm:mb-4 flex items-center gap-3">
+          <div
+            className="shrink-0 w-14 h-14 rounded-full flex items-center justify-center text-3xl"
+            style={{
+              background: "radial-gradient(circle, rgba(255,215,0,0.4), rgba(255,107,157,0.2))",
+              boxShadow: "0 0 0 2px rgba(255,215,0,0.5), 0 0 16px rgba(255,180,0,0.4)",
+            }}
+            aria-hidden="true"
+          >
+            {summary.earnedTitleEmoji}
+          </div>
+          <div>
+            <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">You Earned</div>
+            <div className="text-xl sm:text-2xl font-black text-gray-900 leading-tight">
+              {summary.earnedTitle}
+            </div>
           </div>
         </div>
 
