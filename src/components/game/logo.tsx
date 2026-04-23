@@ -67,13 +67,13 @@ export function Logo() {
         📱
       </div>
 
-      {/* Main title */}
-      <h1 className="logo-text text-5xl sm:text-6xl font-black tracking-tight mb-1" style={{ lineHeight: 1.1 }}>
+      {/* Main title — chunky 3D treatment defined in globals.css .logo-text */}
+      <h1 className="logo-text text-6xl sm:text-7xl font-black tracking-tight mb-3 pt-1 pb-2" style={{ lineHeight: 1 }}>
         FAME LIFE
       </h1>
 
       {/* Subtitle */}
-      <p className="logo-subtitle text-sm sm:text-base font-bold tracking-widest uppercase">
+      <p className="logo-subtitle text-[11px] sm:text-sm font-bold tracking-widest uppercase px-2">
         Go Viral. Get Rich. Become an Internet Legend.
       </p>
 
