@@ -45,6 +45,21 @@ export const STAT_EMOJI: Record<keyof Stats, string> = {
   mentalHealth: "🧠",
 };
 
+/**
+ * 3D-rendered stat icon PNGs (extracted from the art direction reference set).
+ * Used in prominent displays (stat header, event outcomes). Inline uses keep
+ * STAT_EMOJI as the fallback — system emoji read better at small sizes.
+ * Paths are relative to `public/` so Next.js serves them directly.
+ */
+export const STAT_ICON_URL: Record<keyof Stats, string> = {
+  followers: "/ui/stat-icons/followers.png",
+  fame: "/ui/stat-icons/fame.png",
+  reputation: "/ui/stat-icons/reputation.png",
+  money: "/ui/stat-icons/money.png",
+  energy: "/ui/stat-icons/energy.png",
+  mentalHealth: "/ui/stat-icons/mental.png",
+};
+
 export const MAX_RECENT_EVENTS = 12;
 /**
  * Save key for the active run. Bump the version suffix when the GameState

@@ -317,13 +317,28 @@ export function StartScreen() {
                   <button
                     key={arch.id}
                     onClick={() => setSelectedArchetype(arch.id)}
-                    className={`game-card p-3 sm:p-4 text-left transition-all ${
+                    className={`game-card p-3 sm:p-4 text-left transition-all relative overflow-hidden ${
                       selectedArchetype === arch.id
                         ? "border-3 border-[#e040fb] scale-[1.02] shadow-[0_0_0_3px_#e040fb]"
                         : "border-3 border-transparent active:scale-[0.97]"
                     }`}
                   >
-                    <div className="text-2xl sm:text-3xl mb-1.5 sm:mb-2">{arch.emoji}</div>
+                    {arch.portraitUrl ? (
+                      <div className="mb-2 -mx-3 -mt-3 sm:-mx-4 sm:-mt-4 h-28 sm:h-32 overflow-hidden relative">
+                        <img
+                          src={arch.portraitUrl}
+                          alt=""
+                          aria-hidden="true"
+                          // Portraits are 512×970 tall with the face in the upper-middle.
+                          // Adjust objectPosition Y to frame the face cleanly in the square card.
+                          className="w-full h-full object-cover"
+                          style={{ objectPosition: "50% 30%" }}
+                        />
+                        <span className="absolute top-1 left-1 text-lg drop-shadow-md" aria-hidden="true">{arch.emoji}</span>
+                      </div>
+                    ) : (
+                      <div className="text-2xl sm:text-3xl mb-1.5 sm:mb-2">{arch.emoji}</div>
+                    )}
                     <div className="font-bold text-xs sm:text-sm text-gray-900">{arch.name}</div>
                     <div className="text-[11px] sm:text-xs text-gray-500 mt-0.5 sm:mt-1 leading-snug">{arch.description}</div>
                     <ArchetypeStartingStats arch={arch} />

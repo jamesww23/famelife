@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useGame } from "@/state/game-context";
-import { STAT_EMOJI } from "@/lib/game/constants";
+import { STAT_EMOJI, STAT_ICON_URL } from "@/lib/game/constants";
 import { formatFollowers, formatMoney, getTierName, getTierEmoji, getMaxTurns, formatQuarter } from "@/lib/game/progression";
 import { Stats, StatKey } from "@/lib/game/types";
 import { playMoney, playLevelUp, isMuted, toggleMute, subscribeMute } from "@/lib/sounds";
@@ -98,12 +98,12 @@ export function StatBar() {
 
       {/* Stats grid */}
       <div className="grid grid-cols-3 gap-1.5">
-        <StatPill label="Followers" emoji={STAT_EMOJI.followers} value={formatFollowers(stats.followers)} delta={snap.deltas.followers} deltaKey={snap.deltaKey} deltaFormat="followers" />
-        <StatPill label="Money" emoji={STAT_EMOJI.money} value={formatMoney(stats.money)} delta={snap.deltas.money} deltaKey={snap.deltaKey} deltaFormat="money" />
-        <StatPill label="Fame" emoji={STAT_EMOJI.fame} value={`${stats.fame}`} bar barValue={stats.fame} barColor="#a855f7" delta={snap.deltas.fame} deltaKey={snap.deltaKey} />
-        <StatPill label="Rep" emoji={STAT_EMOJI.reputation} value={`${stats.reputation}`} bar barValue={stats.reputation} barColor="#10b981" delta={snap.deltas.reputation} deltaKey={snap.deltaKey} />
-        <StatPill label="Energy" emoji={STAT_EMOJI.energy} value={`${stats.energy}`} bar barValue={stats.energy} barColor="#f59e0b" delta={snap.deltas.energy} deltaKey={snap.deltaKey} />
-        <StatPill label="Mental" emoji={STAT_EMOJI.mentalHealth} value={`${stats.mentalHealth}`} bar barValue={stats.mentalHealth} barColor="#3b82f6"
+        <StatPill label="Followers" iconUrl={STAT_ICON_URL.followers} emoji={STAT_EMOJI.followers} value={formatFollowers(stats.followers)} delta={snap.deltas.followers} deltaKey={snap.deltaKey} deltaFormat="followers" />
+        <StatPill label="Money" iconUrl={STAT_ICON_URL.money} emoji={STAT_EMOJI.money} value={formatMoney(stats.money)} delta={snap.deltas.money} deltaKey={snap.deltaKey} deltaFormat="money" />
+        <StatPill label="Fame" iconUrl={STAT_ICON_URL.fame} emoji={STAT_EMOJI.fame} value={`${stats.fame}`} bar barValue={stats.fame} barColor="#a855f7" delta={snap.deltas.fame} deltaKey={snap.deltaKey} />
+        <StatPill label="Rep" iconUrl={STAT_ICON_URL.reputation} emoji={STAT_EMOJI.reputation} value={`${stats.reputation}`} bar barValue={stats.reputation} barColor="#10b981" delta={snap.deltas.reputation} deltaKey={snap.deltaKey} />
+        <StatPill label="Energy" iconUrl={STAT_ICON_URL.energy} emoji={STAT_EMOJI.energy} value={`${stats.energy}`} bar barValue={stats.energy} barColor="#f59e0b" delta={snap.deltas.energy} deltaKey={snap.deltaKey} />
+        <StatPill label="Mental" iconUrl={STAT_ICON_URL.mentalHealth} emoji={STAT_EMOJI.mentalHealth} value={`${stats.mentalHealth}`} bar barValue={stats.mentalHealth} barColor="#3b82f6"
           danger={stats.mentalHealth < 25} delta={snap.deltas.mentalHealth} deltaKey={snap.deltaKey}
         />
       </div>
@@ -130,6 +130,7 @@ function MuteToggle() {
 function StatPill({
   label,
   emoji,
+  iconUrl,
   value,
   bar,
   barValue,
@@ -141,6 +142,7 @@ function StatPill({
 }: {
   label: string;
   emoji: string;
+  iconUrl?: string;
   value: string;
   bar?: boolean;
   barValue?: number;
@@ -176,8 +178,19 @@ function StatPill({
       aria-label={`${label}: ${value}${danger ? " — critically low!" : ""}${hasChanged && delta ? ` (${delta > 0 ? "+" : ""}${delta})` : ""}`}
     >
       <div className="text-[10px] sm:text-[11px] font-semibold text-white/40 uppercase tracking-wider leading-none mb-0.5">{label}</div>
-      <div className="flex items-center gap-1 w-full">
-        <span className="text-xs">{emoji}</span>
+      <div className="flex items-center gap-1.5 w-full">
+        {iconUrl ? (
+          <img
+            src={iconUrl}
+            alt=""
+            aria-hidden="true"
+            width={22}
+            height={22}
+            className="w-[22px] h-[22px] object-contain shrink-0 drop-shadow-[0_0_6px_rgba(255,255,255,0.15)]"
+          />
+        ) : (
+          <span className="text-xs">{emoji}</span>
+        )}
         <span className={`text-xs font-bold ${danger ? "text-red-400" : "text-white/90"}`}>{value}</span>
       </div>
       {bar && (
