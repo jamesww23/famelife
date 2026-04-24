@@ -324,15 +324,15 @@ export function StartScreen() {
                     }`}
                   >
                     {arch.portraitUrl ? (
-                      <div className="mb-2 -mx-3 -mt-3 sm:-mx-4 sm:-mt-4 aspect-square overflow-hidden relative">
-                        {/* Portraits are 512×512 face-centered squares — no
-                            objectPosition tuning needed, object-cover keeps
-                            the face framed consistently across archetypes. */}
+                      <div className="mb-2 -mx-3 -mt-3 sm:-mx-4 sm:-mt-4 h-28 sm:h-32 overflow-hidden relative">
                         <img
                           src={arch.portraitUrl}
                           alt=""
                           aria-hidden="true"
+                          // Portraits are 512×970 tall with the face in the upper-middle.
+                          // Adjust objectPosition Y to frame the face cleanly in the square card.
                           className="w-full h-full object-cover"
+                          style={{ objectPosition: "50% 30%" }}
                         />
                         <span className="absolute top-1 left-1 text-lg drop-shadow-md" aria-hidden="true">{arch.emoji}</span>
                       </div>
