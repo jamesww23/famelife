@@ -55,9 +55,6 @@ export interface Archetype {
   id: ArchetypeId;
   name: string;
   emoji: string;
-  /** Optional 3D portrait (512×970 PNG) shown in the archetype selector and
-   *  stat header. Falls back to `emoji` when absent. Served from /public/ui/archetypes/. */
-  portraitUrl?: string;
   description: string;
   startingModifiers: StatEffects;
   eventWeightModifiers: Partial<Record<EventCategory, number>>;
