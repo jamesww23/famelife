@@ -413,18 +413,9 @@ export function StartScreen() {
 
 function StoryStep({ emoji, text }: { emoji: string; text: string }) {
   return (
-    <div className="flex items-center gap-2.5 py-1">
-      <span
-        className="shrink-0 w-9 h-9 rounded-lg flex items-center justify-center text-lg"
-        style={{
-          background: "linear-gradient(135deg, #6b21a8, #8b5cf6)",
-          boxShadow: "0 2px 6px rgba(107, 33, 168, 0.3), inset 0 1px 0 rgba(255,255,255,0.12)",
-        }}
-        aria-hidden="true"
-      >
-        {emoji}
-      </span>
-      <span className="text-sm font-semibold text-gray-800">{text}</span>
+    <div className="flex items-center gap-2.5 py-0.5">
+      <span className="text-lg shrink-0">{emoji}</span>
+      <span className="text-sm font-semibold text-gray-700">{text}</span>
     </div>
   );
 }
