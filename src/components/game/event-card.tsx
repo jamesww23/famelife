@@ -93,21 +93,20 @@ function EventCardInner() {
 
           {/* Emoji + Title */}
           <div className="flex items-start gap-2 mb-2">
-            {event.emoji && <span className="text-3xl sm:text-4xl shrink-0">{event.emoji}</span>}
-            <h2 className="text-xl sm:text-2xl font-black text-gray-900 leading-tight">{event.title}</h2>
+            {event.emoji && <span className="text-2xl sm:text-3xl shrink-0">{event.emoji}</span>}
+            <h2 className="text-lg sm:text-xl font-black text-gray-900 leading-tight">{event.title}</h2>
           </div>
 
           {/* Description */}
           <p className="text-gray-600 text-sm leading-relaxed mb-1">{event.text}</p>
         </div>
 
-        {/* Choice buttons — letter-badge style matching prompt B */}
+        {/* Choice buttons */}
         <div className="space-y-2 sm:space-y-2.5">
-          {event.choices.map((choice, i) => (
+          {event.choices.map((choice) => (
             <ChoiceButton
               key={choice.id}
               choice={choice}
-              letter={String.fromCharCode(65 + i)}
               onClick={() => handleChoiceClick(choice)}
             />
           ))}
@@ -128,69 +127,52 @@ function EventCardInner() {
 
 function ChoiceButton({
   choice,
-  letter,
   onClick,
 }: {
   choice: EventChoice;
-  letter: string;
   onClick: () => void;
 }) {
   const tag = choice.riskTag;
   const isRisky = tag === "high_risk" || tag === "reputation_risk";
-  const isOpportunity = tag === "big_opportunity";
-
-  // Letter badge color reflects the choice's risk category
-  let badgeColor = "text-gray-400 bg-gray-100";
-  if (isOpportunity) badgeColor = "text-emerald-600 bg-emerald-50 border-l-4 border-emerald-500";
-  else if (isRisky) badgeColor = "text-red-500 bg-red-50 border-l-4 border-red-400";
 
   return (
     <button
       onClick={onClick}
-      aria-label={`Choose ${letter}: ${choice.text}${tag ? `. ${RISK_TAG_LABELS[tag]}` : ""}`}
-      className={`choice-btn text-left flex items-stretch gap-3 !p-0 overflow-hidden ${
-        isRisky ? "choice-btn-risky" : ""
-      } ${isOpportunity ? "choice-btn-opportunity" : ""}`}
+      aria-label={`Choose: ${choice.text}${tag ? `. ${RISK_TAG_LABELS[tag]}` : ""}`}
+      className={`choice-btn ${isRisky ? "choice-btn-risky" : ""} ${tag === "big_opportunity" ? "choice-btn-opportunity" : ""}`}
     >
-      {/* Letter badge on the left */}
-      <span
-        className={`shrink-0 w-12 flex items-center justify-center text-2xl font-black ${badgeColor}`}
-        aria-hidden="true"
-      >
-        {letter}
-      </span>
+      {/* Risk tag */}
+      {tag && (
+        <div className="flex items-center justify-center gap-1 mb-1.5">
+          <span
+            className="risk-tag text-[10px] sm:text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
+            style={{
+              color: RISK_TAG_COLORS[tag],
+              backgroundColor: RISK_TAG_COLORS[tag] + "15",
+              border: `1px solid ${RISK_TAG_COLORS[tag]}30`,
+            }}
+          >
+            {RISK_TAG_EMOJI[tag]} {RISK_TAG_LABELS[tag]}
+          </span>
+        </div>
+      )}
 
-      {/* Choice content */}
-      <div className="flex-1 py-3 pr-4 min-w-0 text-left">
-        <div className="font-bold text-gray-900 text-sm sm:text-base leading-snug text-left">{choice.text}</div>
+      {/* Choice text */}
+      <span className={tag ? "font-bold" : ""}>{choice.text}</span>
 
-        {tag && (
-          <div className="mt-1 inline-flex">
-            <span
-              className="risk-tag text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full"
-              style={{
-                color: RISK_TAG_COLORS[tag],
-                backgroundColor: RISK_TAG_COLORS[tag] + "15",
-                border: `1px solid ${RISK_TAG_COLORS[tag]}30`,
-              }}
-            >
-              {RISK_TAG_EMOJI[tag]} {RISK_TAG_LABELS[tag]}
-            </span>
-          </div>
-        )}
+      {/* Stakes preview */}
+      {choice.stakes && (
+        <div className="flex items-center justify-center gap-3 mt-1.5 text-[11px]">
+          <span className="text-emerald-500 font-semibold">↑ {choice.stakes.upside}</span>
+          <span className="text-gray-300">|</span>
+          <span className="text-red-400 font-semibold">↓ {choice.stakes.downside}</span>
+        </div>
+      )}
 
-        {choice.stakes && (
-          <div className="flex items-center gap-3 mt-1.5 text-[11px]">
-            <span className="text-emerald-500 font-semibold">↑ {choice.stakes.upside}</span>
-            <span className="text-gray-300">|</span>
-            <span className="text-red-400 font-semibold">↓ {choice.stakes.downside}</span>
-          </div>
-        )}
-
-        {choice.requiresConfirmation && (
-          <div className="text-[10px] text-gray-400 mt-1">⚠️ Requires confirmation</div>
-        )}
-      </div>
+      {/* Confirmation indicator */}
+      {choice.requiresConfirmation && (
+        <div className="text-[10px] text-gray-400 mt-1">⚠️ Requires confirmation</div>
+      )}
     </button>
   );
 }
